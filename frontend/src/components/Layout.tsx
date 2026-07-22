@@ -92,16 +92,17 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* 桌面端侧边栏 */}
-      <aside className="hidden md:flex h-screen w-sidebar flex-col overflow-y-auto border-r bg-card px-4 py-6">
+      <aside className="hidden h-screen w-sidebar flex-col overflow-y-auto border-r bg-card px-4 py-6 md:flex">
         <h1 className="mb-8 px-3 text-lg font-bold tracking-tight text-foreground">
           TalentMatch
         </h1>
         {navContent}
       </aside>
 
-      {/* 移动端顶部栏 */}
-      <div className="flex flex-1 flex-col md:hidden">
-        <header className="flex items-center justify-between border-b bg-card px-4 py-3">
+      {/* 右侧区域：移动端纵向、桌面端横向共用同一份主内容 */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* 移动端顶部栏 */}
+        <header className="flex items-center justify-between border-b bg-card px-4 py-3 md:hidden">
           <h1 className="text-base font-bold text-foreground">TalentMatch</h1>
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
@@ -117,10 +118,10 @@ export default function Layout({ children }: LayoutProps) {
             </SheetContent>
           </Sheet>
         </header>
-      </div>
 
-      {/* 主内容区：移动端与桌面端共享同一份渲染，避免重复挂载 */}
-      <main className="flex-1 overflow-auto p-4 md:block md:p-6">{children}</main>
+        {/* 主内容区 */}
+        <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
+      </div>
 
       {/* 全局通知容器 */}
       <Toaster />

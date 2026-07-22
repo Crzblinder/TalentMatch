@@ -50,6 +50,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Keep frontend source utils (shadcn/ui convention)
+!frontend/src/lib/
+
 # Database / Vector stores
 *.db
 *.sqlite
