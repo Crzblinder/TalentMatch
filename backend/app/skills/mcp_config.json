@@ -1,0 +1,68 @@
+{
+  "name": "talentmatch-job-search-assistant",
+  "version": "1.0.0",
+  "description": "TalentMatch 应届毕业生求职助手 MCP 配置",
+  "tools": [
+    {
+      "name": "search_jobs",
+      "description": "联网搜索求职相关信息，如公司评价、面经、薪资、校招动态、技能趋势等",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "搜索关键词" },
+          "intent": {
+            "type": "string",
+            "enum": ["general", "salary", "interview", "company", "fresh_graduate", "skill_trend"],
+            "description": "搜索意图"
+          },
+          "location": { "type": "string", "description": "地域限定" },
+          "top_n": { "type": "integer", "description": "返回结果数量" }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "fuzzy_parse_resume",
+      "description": "对简历进行模糊识别解析，识别边界不清的经历、零经验场景、求职困境等",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "resume_text": { "type": "string", "description": "原始简历文本" },
+          "focus": {
+            "type": "string",
+            "enum": ["auto", "experience", "skills", "obstacles"],
+            "description": "解析重点"
+          }
+        },
+        "required": ["resume_text"]
+      }
+    },
+    {
+      "name": "fuzzy_parse_jd",
+      "description": "对岗位描述进行模糊识别解析，识别应届生友好度、隐性门槛、技能别名等",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "jd_text": { "type": "string", "description": "原始岗位描述文本" },
+          "focus": {
+            "type": "string",
+            "enum": ["auto", "requirements", "barriers", "fresh_graduate_friendly"],
+            "description": "解析重点"
+          }
+        },
+        "required": ["jd_text"]
+      }
+    },
+    {
+      "name": "detect_job_search_obstacles",
+      "description": "识别应届毕业生的求职困境与障碍",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "resume_data": { "type": "object", "description": "已解析的简历结构化数据" },
+          "jd_data": { "type": "object", "description": "已解析的岗位结构化数据" }
+        }
+      }
+    }
+  ]
+}

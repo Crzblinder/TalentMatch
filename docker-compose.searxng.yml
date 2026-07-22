@@ -1,0 +1,25 @@
+# SearXNG 本地搜索服务叠加文件
+# 启动命令：docker compose -f docker-compose.searxng.yml up -d
+# 启动后可通过 http://localhost:8080 访问，JSON API 示例：
+#   curl "http://localhost:8080/search?q=Python&format=json"
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: talentmatch-searxng
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+      - SEARXNG_SECRET_KEY=${SEARXNG_SECRET_KEY:-change-me-in-production}
+      # 启用 JSON 输出格式
+      - SEARXNG_FORMATS=json
+      # 默认禁用用户界面中的第三方追踪，保持最小化
+      - SEARXNG_DEBUG=false
+    restart: unless-stopped
+    # 如需固定容器内 DNS，可取消下面注释
+    # dns:
+    #   - 223.5.5.5
+    #   - 119.29.29.29

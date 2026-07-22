@@ -1,0 +1,64 @@
+{
+  "version": "1.0.0",
+  "description": "TalentMatch 应届毕业生求职助手技能集合",
+  "skills": [
+    {
+      "name": "fuzzy_parse_resume",
+      "display_name": "简历模糊识别解析",
+      "description": "对边界不清、零经验、经历杂乱的简历进行 LLM 模糊识别，自动归类项目/实习经历并识别技能别名",
+      "entrypoint": "app.agents.tools:fuzzy_parse_resume",
+      "input_schema": {
+        "resume_text": "string",
+        "focus": "auto | experience | skills | obstacles"
+      },
+      "triggers": ["简历上传后", "用户手动点击深度解析", "经历边界模糊时"]
+    },
+    {
+      "name": "fuzzy_parse_jd",
+      "display_name": "JD 模糊识别解析",
+      "description": "识别岗位描述中的应届生友好度、隐性门槛、技能别名与软性要求",
+      "entrypoint": "app.agents.tools:fuzzy_parse_jd",
+      "input_schema": {
+        "jd_text": "string",
+        "focus": "auto | requirements | barriers | fresh_graduate_friendly"
+      },
+      "triggers": ["JD 上传后", "用户手动点击深度解析", "岗位门槛不明时"]
+    },
+    {
+      "name": "search_jobs",
+      "display_name": "联网求职情报搜索",
+      "description": "基于 DuckDuckGo/Tavily 搜索公司评价、面经、薪资、校招动态、技能趋势",
+      "entrypoint": "app.agents.tools:search_jobs",
+      "input_schema": {
+        "query": "string",
+        "intent": "general | salary | interview | company | fresh_graduate | skill_trend",
+        "location": "string?",
+        "top_n": "integer"
+      },
+      "triggers": ["用户主动搜索", "工作流 enable_search=true", "公司/岗位信息不对称时"]
+    },
+    {
+      "name": "detect_job_search_obstacles",
+      "display_name": "求职困境识别",
+      "description": "结合简历与 JD 识别应届毕业生的经验、技能、学历、院校、专业等困境，并给出应对建议",
+      "entrypoint": "app.agents.tools:detect_job_search_obstacles",
+      "input_schema": {
+        "resume_data": "object?",
+        "jd_data": "object?"
+      },
+      "triggers": ["匹配完成后", "简历/JD 解析后", "用户请求诊断"]
+    },
+    {
+      "name": "optimize_resume",
+      "display_name": "简历优化",
+      "description": "根据目标岗位 JD 动态优化项目经历、实习经历、个人优势，并可调整字段排序",
+      "entrypoint": "app.agents.resume_optimizer:ResumeOptimizer.optimize_resume",
+      "input_schema": {
+        "resume_data": "object",
+        "jd_text": "string",
+        "field_order": "string[]"
+      },
+      "triggers": ["用户上传 JD 后", "简历编辑器中点击 AI 优化"]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+- [x] 旧舆情/企业相关模型、Agent、服务已移除，无残留引用
+- [x] 新模型（Job/Skill/SkillRelation/Company/UserSkillProfile/MatchResult）已创建并在数据库初始化时生效
+- [x] 新 5-Agent 工作流（JDParser/TalentMatcher/TrendPredictor/LearningPlanner/SkillAdvisor）可正常编译并流式输出
+- [x] RAG 检索目标已切换为 JD 与技能知识，混合检索功能正常
+- [x] API 路由已迁移为 `/api/v1/jobs/*`，所有端点可访问且返回正确结构
+- [x] 前端 5 个页面已按新主题重命名、重构，路由与菜单同步更新
+- [x] 前端可视化组件（技能雷达图、知识图谱、匹配结果、趋势图）可正常渲染
+- [x] 后端单元测试与 E2E 测试通过
+- [x] README 已完成主题替换与运行说明更新
+- [x] Docker Compose 与 CI 配置未因主题变更出现破坏性错误
+- [x] `backend/app/crawler/scraper.py` 已重写为真实 JD 爬虫，可跑通并采集公开 RSS 源
+- [x] `backend/data/seed_jobs.json` 包含 80 条人工整理的行业典型岗位种子数据
+- [x] `fetch_real_jobs` 合并 seed + RSS 数据，默认启动可加载 90 条真实 JD
+- [x] `README.md` 已诚实说明数据来源：seed（人工整理）+ RSS（实时采集）+ fallback（生成补充）
+- [x] 旧新闻爬虫残留已清理，`backend/app/crawler/` 只与岗位采集相关

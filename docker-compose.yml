@@ -1,0 +1,72 @@
+# TalentMatch 主编排：MySQL + Backend + Frontend
+# 如需叠加本地 SearXNG 搜索服务，请使用：
+#   docker compose -f docker-compose.yml -f docker-compose.searxng.yml up -d
+# SearXNG 默认访问地址：http://localhost:8080
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: talentmatch_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: talentmatch
+      MYSQL_USER: talentmatch
+      MYSQL_PASSWORD: talentmatch
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: talentmatch_backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=mysql+pymysql://talentmatch:talentmatch@mysql:3306/talentmatch?charset=utf8mb4
+      - VECTOR_DB_PATH=/app/chroma_data
+    volumes:
+      - chroma_data:/app/chroma_data
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: >
+      sh -c "python scripts/init_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: talentmatch_frontend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Use the backend service name so the Vite dev-server proxy can reach it
+      # from inside the frontend container. The browser still accesses the UI at
+      # http://localhost:5173 and /api requests are proxied server-side.
+      - VITE_API_BASE_URL=http://backend:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  mysql_data:
+  chroma_data:

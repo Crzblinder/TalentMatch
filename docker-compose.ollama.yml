@@ -1,0 +1,36 @@
+# docker-compose.ollama.yml — 本地 Ollama 叠加编排文件
+# 使用方法（与基础 docker-compose.yml 配合）：
+#   docker compose -f docker-compose.yml -f docker-compose.ollama.yml up --build -d
+# 或：
+#   make docker-up-ollama
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: talentmatch_ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # 启动后自动拉取指定中文模型（qwen2.5:7b 中文能力强，适合消费级 GPU）
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        /bin/ollama serve &
+        sleep 5
+        echo "Pulling model $${OLLAMA_MODEL:-qwen2.5:7b} ..."
+        ollama pull $${OLLAMA_MODEL:-qwen2.5:7b}
+        echo "Model ready."
+        wait
+
+  backend:
+    environment:
+      - USE_LOCAL_LLM=true
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=qwen2.5:7b
+    depends_on:
+      - ollama
+
+volumes:
+  ollama_data:

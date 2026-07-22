@@ -1,0 +1,3049 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+    <script type="module">import { injectIntoGlobalHook } from "/@react-refresh";
+injectIntoGlobalHook(window);
+window.$RefreshReg$ = () => {};
+window.$RefreshSig$ = () => (type) => type;</script>
+
+    <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentMatch Engine - 岗位技能图谱与人才匹配</title>
+  <style type="text/css">[data-sonner-toaster][dir=ltr],html[dir=ltr]{--toast-icon-margin-start:-3px;--toast-icon-margin-end:4px;--toast-svg-margin-start:-1px;--toast-svg-margin-end:0px;--toast-button-margin-start:auto;--toast-button-margin-end:0;--toast-close-button-start:0;--toast-close-button-end:unset;--toast-close-button-transform:translate(-35%, -35%)}[data-sonner-toaster][dir=rtl],html[dir=rtl]{--toast-icon-margin-start:4px;--toast-icon-margin-end:-3px;--toast-svg-margin-start:0px;--toast-svg-margin-end:-1px;--toast-button-margin-start:0;--toast-button-margin-end:auto;--toast-close-button-start:unset;--toast-close-button-end:0;--toast-close-button-transform:translate(35%, -35%)}[data-sonner-toaster]{position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1:hsl(0, 0%, 99%);--gray2:hsl(0, 0%, 97.3%);--gray3:hsl(0, 0%, 95.1%);--gray4:hsl(0, 0%, 93%);--gray5:hsl(0, 0%, 90.9%);--gray6:hsl(0, 0%, 88.7%);--gray7:hsl(0, 0%, 85.8%);--gray8:hsl(0, 0%, 78%);--gray9:hsl(0, 0%, 56.1%);--gray10:hsl(0, 0%, 52.3%);--gray11:hsl(0, 0%, 43.5%);--gray12:hsl(0, 0%, 9%);--border-radius:8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:0;z-index:999999999;transition:transform .4s ease}@media (hover:none) and (pointer:coarse){[data-sonner-toaster][data-lifted=true]{transform:none}}[data-sonner-toaster][data-x-position=right]{right:var(--offset-right)}[data-sonner-toaster][data-x-position=left]{left:var(--offset-left)}[data-sonner-toaster][data-x-position=center]{left:50%;transform:translateX(-50%)}[data-sonner-toaster][data-y-position=top]{top:var(--offset-top)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--offset-bottom)}[data-sonner-toast]{--y:translateY(100%);--lift-amount:calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:0;overflow-wrap:anywhere}[data-sonner-toast][data-styled=true]{padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px rgba(0,0,0,.1);width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}[data-sonner-toast]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-y-position=top]{top:0;--y:translateY(-100%);--lift:1;--lift-amount:calc(1 * var(--gap))}[data-sonner-toast][data-y-position=bottom]{bottom:0;--y:translateY(100%);--lift:-1;--lift-amount:calc(var(--lift) * var(--gap))}[data-sonner-toast][data-styled=true] [data-description]{font-weight:400;line-height:1.4;color:#3f3f3f}[data-rich-colors=true][data-sonner-toast][data-styled=true] [data-description]{color:inherit}[data-sonner-toaster][data-sonner-theme=dark] [data-description]{color:#e8e8e8}[data-sonner-toast][data-styled=true] [data-title]{font-weight:500;line-height:1.5;color:inherit}[data-sonner-toast][data-styled=true] [data-icon]{display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}[data-sonner-toast][data-promise=true] [data-icon]>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}[data-sonner-toast][data-styled=true] [data-icon]>*{flex-shrink:0}[data-sonner-toast][data-styled=true] [data-icon] svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}[data-sonner-toast][data-styled=true] [data-content]{display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;font-weight:500;cursor:pointer;outline:0;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}[data-sonner-toast][data-styled=true] [data-button]:focus-visible{box-shadow:0 0 0 2px rgba(0,0,0,.4)}[data-sonner-toast][data-styled=true] [data-button]:first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}[data-sonner-toast][data-styled=true] [data-cancel]{color:var(--normal-text);background:rgba(0,0,0,.08)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]{background:rgba(255,255,255,.3)}[data-sonner-toast][data-styled=true] [data-close-button]{position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;color:var(--gray12);background:var(--normal-bg);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}[data-sonner-toast][data-styled=true] [data-close-button]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-styled=true] [data-disabled=true]{cursor:not-allowed}[data-sonner-toast][data-styled=true]:hover [data-close-button]:hover{background:var(--gray2);border-color:var(--gray5)}[data-sonner-toast][data-swiping=true]::before{content:'';position:absolute;left:-100%;right:-100%;height:100%;z-index:-1}[data-sonner-toast][data-y-position=top][data-swiping=true]::before{bottom:50%;transform:scaleY(3) translateY(50%)}[data-sonner-toast][data-y-position=bottom][data-swiping=true]::before{top:50%;transform:scaleY(3) translateY(-50%)}[data-sonner-toast][data-swiping=false][data-removed=true]::before{content:'';position:absolute;inset:0;transform:scaleY(2)}[data-sonner-toast][data-expanded=true]::after{content:'';position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}[data-sonner-toast][data-mounted=true]{--y:translateY(0);opacity:1}[data-sonner-toast][data-expanded=false][data-front=false]{--scale:var(--toasts-before) * 0.05 + 1;--y:translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}[data-sonner-toast]>*{transition:opacity .4s}[data-sonner-toast][data-x-position=right]{right:0}[data-sonner-toast][data-x-position=left]{left:0}[data-sonner-toast][data-expanded=false][data-front=false][data-styled=true]>*{opacity:0}[data-sonner-toast][data-visible=false]{opacity:0;pointer-events:none}[data-sonner-toast][data-mounted=true][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}[data-sonner-toast][data-removed=true][data-front=true][data-swipe-out=false]{--y:translateY(calc(var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=false]{--y:translateY(40%);opacity:0;transition:transform .5s,opacity .2s}[data-sonner-toast][data-removed=true][data-front=false]::before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount-y,0)) translateX(var(--swipe-amount-x,0));transition:none}[data-sonner-toast][data-swiped=true]{user-select:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation-duration:.2s;animation-timing-function:ease-out;animation-fill-mode:forwards}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=left]{animation-name:swipe-out-left}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=right]{animation-name:swipe-out-right}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=up]{animation-name:swipe-out-up}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=down]{animation-name:swipe-out-down}@keyframes swipe-out-left{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) - 100%));opacity:0}}@keyframes swipe-out-right{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) + 100%));opacity:0}}@keyframes swipe-out-up{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) - 100%));opacity:0}}@keyframes swipe-out-down{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) + 100%));opacity:0}}@media (max-width:600px){[data-sonner-toaster]{position:fixed;right:var(--mobile-offset-right);left:var(--mobile-offset-left);width:100%}[data-sonner-toaster][dir=rtl]{left:calc(var(--mobile-offset-left) * -1)}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset-left) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset-left)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--mobile-offset-bottom)}[data-sonner-toaster][data-y-position=top]{top:var(--mobile-offset-top)}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset-left);right:var(--mobile-offset-right);transform:none}}[data-sonner-toaster][data-sonner-theme=light]{--normal-bg:#fff;--normal-border:var(--gray4);--normal-text:var(--gray12);--success-bg:hsl(143, 85%, 96%);--success-border:hsl(145, 92%, 87%);--success-text:hsl(140, 100%, 27%);--info-bg:hsl(208, 100%, 97%);--info-border:hsl(221, 91%, 93%);--info-text:hsl(210, 92%, 45%);--warning-bg:hsl(49, 100%, 97%);--warning-border:hsl(49, 91%, 84%);--warning-text:hsl(31, 92%, 45%);--error-bg:hsl(359, 100%, 97%);--error-border:hsl(359, 100%, 94%);--error-text:hsl(360, 100%, 45%)}[data-sonner-toaster][data-sonner-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg:#000;--normal-border:hsl(0, 0%, 20%);--normal-text:var(--gray1)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg:#fff;--normal-border:var(--gray3);--normal-text:var(--gray12)}[data-sonner-toaster][data-sonner-theme=dark]{--normal-bg:#000;--normal-bg-hover:hsl(0, 0%, 12%);--normal-border:hsl(0, 0%, 20%);--normal-border-hover:hsl(0, 0%, 25%);--normal-text:var(--gray1);--success-bg:hsl(150, 100%, 6%);--success-border:hsl(147, 100%, 12%);--success-text:hsl(150, 86%, 65%);--info-bg:hsl(215, 100%, 6%);--info-border:hsl(223, 43%, 17%);--info-text:hsl(216, 87%, 65%);--warning-bg:hsl(64, 100%, 6%);--warning-border:hsl(60, 100%, 9%);--warning-text:hsl(46, 87%, 65%);--error-bg:hsl(358, 76%, 10%);--error-border:hsl(357, 89%, 16%);--error-text:hsl(358, 100%, 81%)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]{background:var(--normal-bg);border-color:var(--normal-border);color:var(--normal-text)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]:hover{background:var(--normal-bg-hover);border-color:var(--normal-border-hover)}[data-rich-colors=true][data-sonner-toast][data-type=success]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size:16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:first-child{animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}100%{opacity:.15}}@media (prefers-reduced-motion){.sonner-loading-bar,[data-sonner-toast],[data-sonner-toast]>*{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}</style><style type="text/css" data-vite-dev-id="D:/TalentMatch/frontend/src/index.css">/* ---- Tailwind CSS 核心指令 ---- */
+*, ::before, ::after {
+  --tw-border-spacing-x: 0;
+  --tw-border-spacing-y: 0;
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-pan-x:  ;
+  --tw-pan-y:  ;
+  --tw-pinch-zoom:  ;
+  --tw-scroll-snap-strictness: proximity;
+  --tw-gradient-from-position:  ;
+  --tw-gradient-via-position:  ;
+  --tw-gradient-to-position:  ;
+  --tw-ordinal:  ;
+  --tw-slashed-zero:  ;
+  --tw-numeric-figure:  ;
+  --tw-numeric-spacing:  ;
+  --tw-numeric-fraction:  ;
+  --tw-ring-inset:  ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  --tw-blur:  ;
+  --tw-brightness:  ;
+  --tw-contrast:  ;
+  --tw-grayscale:  ;
+  --tw-hue-rotate:  ;
+  --tw-invert:  ;
+  --tw-saturate:  ;
+  --tw-sepia:  ;
+  --tw-drop-shadow:  ;
+  --tw-backdrop-blur:  ;
+  --tw-backdrop-brightness:  ;
+  --tw-backdrop-contrast:  ;
+  --tw-backdrop-grayscale:  ;
+  --tw-backdrop-hue-rotate:  ;
+  --tw-backdrop-invert:  ;
+  --tw-backdrop-opacity:  ;
+  --tw-backdrop-saturate:  ;
+  --tw-backdrop-sepia:  ;
+  --tw-contain-size:  ;
+  --tw-contain-layout:  ;
+  --tw-contain-paint:  ;
+  --tw-contain-style:  ;
+}
+::backdrop {
+  --tw-border-spacing-x: 0;
+  --tw-border-spacing-y: 0;
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-pan-x:  ;
+  --tw-pan-y:  ;
+  --tw-pinch-zoom:  ;
+  --tw-scroll-snap-strictness: proximity;
+  --tw-gradient-from-position:  ;
+  --tw-gradient-via-position:  ;
+  --tw-gradient-to-position:  ;
+  --tw-ordinal:  ;
+  --tw-slashed-zero:  ;
+  --tw-numeric-figure:  ;
+  --tw-numeric-spacing:  ;
+  --tw-numeric-fraction:  ;
+  --tw-ring-inset:  ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  --tw-blur:  ;
+  --tw-brightness:  ;
+  --tw-contrast:  ;
+  --tw-grayscale:  ;
+  --tw-hue-rotate:  ;
+  --tw-invert:  ;
+  --tw-saturate:  ;
+  --tw-sepia:  ;
+  --tw-drop-shadow:  ;
+  --tw-backdrop-blur:  ;
+  --tw-backdrop-brightness:  ;
+  --tw-backdrop-contrast:  ;
+  --tw-backdrop-grayscale:  ;
+  --tw-backdrop-hue-rotate:  ;
+  --tw-backdrop-invert:  ;
+  --tw-backdrop-opacity:  ;
+  --tw-backdrop-saturate:  ;
+  --tw-backdrop-sepia:  ;
+  --tw-contain-size:  ;
+  --tw-contain-layout:  ;
+  --tw-contain-paint:  ;
+  --tw-contain-style:  ;
+}
+/* ! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com *//*
+1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
+2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
+*/
+
+*,
+::before,
+::after {
+  box-sizing: border-box; /* 1 */
+  border-width: 0; /* 2 */
+  border-style: solid; /* 2 */
+  border-color: #e5e7eb; /* 2 */
+}
+
+::before,
+::after {
+  --tw-content: '';
+}
+
+/*
+1. Use a consistent sensible line-height in all browsers.
+2. Prevent adjustments of font size after orientation changes in iOS.
+3. Use a more readable tab size.
+4. Use the user's configured `sans` font-family by default.
+5. Use the user's configured `sans` font-feature-settings by default.
+6. Use the user's configured `sans` font-variation-settings by default.
+7. Disable tap highlights on iOS
+*/
+
+html,
+:host {
+  line-height: 1.5; /* 1 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+  -moz-tab-size: 4; /* 3 */
+  -o-tab-size: 4;
+     tab-size: 4; /* 3 */
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* 4 */
+  font-feature-settings: normal; /* 5 */
+  font-variation-settings: normal; /* 6 */
+  -webkit-tap-highlight-color: transparent; /* 7 */
+}
+
+/*
+1. Remove the margin in all browsers.
+2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
+*/
+
+body {
+  margin: 0; /* 1 */
+  line-height: inherit; /* 2 */
+}
+
+/*
+1. Add the correct height in Firefox.
+2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
+3. Ensure horizontal rules are visible by default.
+*/
+
+hr {
+  height: 0; /* 1 */
+  color: inherit; /* 2 */
+  border-top-width: 1px; /* 3 */
+}
+
+/*
+Add the correct text decoration in Chrome, Edge, and Safari.
+*/
+
+abbr:where([title]) {
+  -webkit-text-decoration: underline dotted;
+          text-decoration: underline dotted;
+}
+
+/*
+Remove the default font size and weight for headings.
+*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/*
+Reset links to optimize for opt-in styling instead of opt-out.
+*/
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+/*
+Add the correct font weight in Edge and Safari.
+*/
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+/*
+1. Use the user's configured `mono` font-family by default.
+2. Use the user's configured `mono` font-feature-settings by default.
+3. Use the user's configured `mono` font-variation-settings by default.
+4. Correct the odd `em` font sizing in all browsers.
+*/
+
+code,
+kbd,
+samp,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; /* 1 */
+  font-feature-settings: normal; /* 2 */
+  font-variation-settings: normal; /* 3 */
+  font-size: 1em; /* 4 */
+}
+
+/*
+Add the correct font size in all browsers.
+*/
+
+small {
+  font-size: 80%;
+}
+
+/*
+Prevent `sub` and `sup` elements from affecting the line height in all browsers.
+*/
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/*
+1. Remove text indentation from table contents in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=999088, https://bugs.webkit.org/show_bug.cgi?id=201297)
+2. Correct table border color inheritance in all Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=935729, https://bugs.webkit.org/show_bug.cgi?id=195016)
+3. Remove gaps between table borders by default.
+*/
+
+table {
+  text-indent: 0; /* 1 */
+  border-color: inherit; /* 2 */
+  border-collapse: collapse; /* 3 */
+}
+
+/*
+1. Change the font styles in all browsers.
+2. Remove the margin in Firefox and Safari.
+3. Remove default padding in all browsers.
+*/
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit; /* 1 */
+  font-feature-settings: inherit; /* 1 */
+  font-variation-settings: inherit; /* 1 */
+  font-size: 100%; /* 1 */
+  font-weight: inherit; /* 1 */
+  line-height: inherit; /* 1 */
+  letter-spacing: inherit; /* 1 */
+  color: inherit; /* 1 */
+  margin: 0; /* 2 */
+  padding: 0; /* 3 */
+}
+
+/*
+Remove the inheritance of text transform in Edge and Firefox.
+*/
+
+button,
+select {
+  text-transform: none;
+}
+
+/*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Remove default button styles.
+*/
+
+button,
+input:where([type='button']),
+input:where([type='reset']),
+input:where([type='submit']) {
+  -webkit-appearance: button; /* 1 */
+  background-color: transparent; /* 2 */
+  background-image: none; /* 2 */
+}
+
+/*
+Use the modern Firefox focus style for all focusable elements.
+*/
+
+:-moz-focusring {
+  outline: auto;
+}
+
+/*
+Remove the additional `:invalid` styles in Firefox. (https://github.com/mozilla/gecko-dev/blob/2f9eacd9d3d995c937b4251a5557d95d494c9be1/layout/style/res/forms.css#L728-L737)
+*/
+
+:-moz-ui-invalid {
+  box-shadow: none;
+}
+
+/*
+Add the correct vertical alignment in Chrome and Firefox.
+*/
+
+progress {
+  vertical-align: baseline;
+}
+
+/*
+Correct the cursor style of increment and decrement buttons in Safari.
+*/
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/*
+1. Correct the odd appearance in Chrome and Safari.
+2. Correct the outline style in Safari.
+*/
+
+[type='search'] {
+  -webkit-appearance: textfield; /* 1 */
+  outline-offset: -2px; /* 2 */
+}
+
+/*
+Remove the inner padding in Chrome and Safari on macOS.
+*/
+
+::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Change font properties to `inherit` in Safari.
+*/
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button; /* 1 */
+  font: inherit; /* 2 */
+}
+
+/*
+Add the correct display in Chrome and Safari.
+*/
+
+summary {
+  display: list-item;
+}
+
+/*
+Removes the default spacing and border for appropriate elements.
+*/
+
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
+  margin: 0;
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+ol,
+ul,
+menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+Reset default styling for dialogs.
+*/
+dialog {
+  padding: 0;
+}
+
+/*
+Prevent resizing textareas horizontally by default.
+*/
+
+textarea {
+  resize: vertical;
+}
+
+/*
+1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
+2. Set the default placeholder color to the user's configured gray 400 color.
+*/
+
+input::-moz-placeholder, textarea::-moz-placeholder {
+  opacity: 1; /* 1 */
+  color: #9ca3af; /* 2 */
+}
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 1; /* 1 */
+  color: #9ca3af; /* 2 */
+}
+
+/*
+Set the default cursor for buttons.
+*/
+
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+/*
+Make sure disabled buttons don't get the pointer cursor.
+*/
+:disabled {
+  cursor: default;
+}
+
+/*
+1. Make replaced elements `display: block` by default. (https://github.com/mozdevs/cssremedy/issues/14)
+2. Add `vertical-align: middle` to align replaced elements more sensibly by default. (https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210)
+   This can trigger a poorly considered lint error in some tools but is included by design.
+*/
+
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: block; /* 1 */
+  vertical-align: middle; /* 2 */
+}
+
+/*
+Constrain images and videos to the parent width and preserve their intrinsic aspect ratio. (https://github.com/mozdevs/cssremedy/issues/14)
+*/
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Make elements with the HTML hidden attribute stay hidden by default */
+[hidden]:where(:not([hidden="until-found"])) {
+  display: none;
+}
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 47.4% 11.2%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --danger: 0 84.2% 60.2%;
+    --danger-foreground: 210 40% 98%;
+
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 210 40% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217.2 91.2% 59.8%;
+
+    --radius: 0.5rem;
+
+    /* 旧布局变量兼容：pages 组件原样保留 */
+    --bg: #f8fafc;
+    --primary-light: #eff6ff;
+    --text: #334155;
+    --sidebar-bg: #ffffff;
+    --sidebar-text: #475569;
+    --sidebar-width: 230px;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  }
+  * {
+    box-sizing: border-box;
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+.container {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1400px;
+  }
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+.pointer-events-none {
+  pointer-events: none;
+}
+.fixed {
+  position: fixed;
+}
+.absolute {
+  position: absolute;
+}
+.relative {
+  position: relative;
+}
+.sticky {
+  position: sticky;
+}
+.inset-0 {
+  inset: 0px;
+}
+.inset-x-0 {
+  left: 0px;
+  right: 0px;
+}
+.inset-y-0 {
+  top: 0px;
+  bottom: 0px;
+}
+.bottom-0 {
+  bottom: 0px;
+}
+.left-0 {
+  left: 0px;
+}
+.left-2 {
+  left: 0.5rem;
+}
+.left-\[50\%\] {
+  left: 50%;
+}
+.right-0 {
+  right: 0px;
+}
+.right-4 {
+  right: 1rem;
+}
+.top-0 {
+  top: 0px;
+}
+.top-4 {
+  top: 1rem;
+}
+.top-\[50\%\] {
+  top: 50%;
+}
+.z-10 {
+  z-index: 10;
+}
+.z-50 {
+  z-index: 50;
+}
+.m-0 {
+  margin: 0px;
+}
+.-mx-1 {
+  margin-left: -0.25rem;
+  margin-right: -0.25rem;
+}
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+.my-1 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+.mb-4 {
+  margin-bottom: 1rem;
+}
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+.ml-1 {
+  margin-left: 0.25rem;
+}
+.ml-2 {
+  margin-left: 0.5rem;
+}
+.ml-auto {
+  margin-left: auto;
+}
+.mr-1 {
+  margin-right: 0.25rem;
+}
+.mr-2 {
+  margin-right: 0.5rem;
+}
+.mt-1 {
+  margin-top: 0.25rem;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+.mt-3 {
+  margin-top: 0.75rem;
+}
+.mt-4 {
+  margin-top: 1rem;
+}
+.mt-6 {
+  margin-top: 1.5rem;
+}
+.block {
+  display: block;
+}
+.inline-block {
+  display: inline-block;
+}
+.flex {
+  display: flex;
+}
+.inline-flex {
+  display: inline-flex;
+}
+.table {
+  display: table;
+}
+.grid {
+  display: grid;
+}
+.hidden {
+  display: none;
+}
+.h-0\.5 {
+  height: 0.125rem;
+}
+.h-10 {
+  height: 2.5rem;
+}
+.h-12 {
+  height: 3rem;
+}
+.h-2 {
+  height: 0.5rem;
+}
+.h-2\.5 {
+  height: 0.625rem;
+}
+.h-20 {
+  height: 5rem;
+}
+.h-24 {
+  height: 6rem;
+}
+.h-28 {
+  height: 7rem;
+}
+.h-3 {
+  height: 0.75rem;
+}
+.h-3\.5 {
+  height: 0.875rem;
+}
+.h-32 {
+  height: 8rem;
+}
+.h-4 {
+  height: 1rem;
+}
+.h-5 {
+  height: 1.25rem;
+}
+.h-6 {
+  height: 1.5rem;
+}
+.h-64 {
+  height: 16rem;
+}
+.h-8 {
+  height: 2rem;
+}
+.h-9 {
+  height: 2.25rem;
+}
+.h-\[1px\] {
+  height: 1px;
+}
+.h-\[320px\] {
+  height: 320px;
+}
+.h-\[360px\] {
+  height: 360px;
+}
+.h-\[calc\(100vh-120px\)\] {
+  height: calc(100vh - 120px);
+}
+.h-\[var\(--radix-select-trigger-height\)\] {
+  height: var(--radix-select-trigger-height);
+}
+.h-full {
+  height: 100%;
+}
+.h-px {
+  height: 1px;
+}
+.max-h-96 {
+  max-height: 24rem;
+}
+.max-h-\[420px\] {
+  max-height: 420px;
+}
+.min-h-\[80px\] {
+  min-height: 80px;
+}
+.min-h-screen {
+  min-height: 100vh;
+}
+.w-1\/2 {
+  width: 50%;
+}
+.w-10 {
+  width: 2.5rem;
+}
+.w-12 {
+  width: 3rem;
+}
+.w-16 {
+  width: 4rem;
+}
+.w-2 {
+  width: 0.5rem;
+}
+.w-2\.5 {
+  width: 0.625rem;
+}
+.w-20 {
+  width: 5rem;
+}
+.w-24 {
+  width: 6rem;
+}
+.w-28 {
+  width: 7rem;
+}
+.w-3 {
+  width: 0.75rem;
+}
+.w-3\.5 {
+  width: 0.875rem;
+}
+.w-3\/4 {
+  width: 75%;
+}
+.w-32 {
+  width: 8rem;
+}
+.w-4 {
+  width: 1rem;
+}
+.w-5 {
+  width: 1.25rem;
+}
+.w-6 {
+  width: 1.5rem;
+}
+.w-8 {
+  width: 2rem;
+}
+.w-9 {
+  width: 2.25rem;
+}
+.w-\[140px\] {
+  width: 140px;
+}
+.w-\[1px\] {
+  width: 1px;
+}
+.w-\[95\%\] {
+  width: 95%;
+}
+.w-full {
+  width: 100%;
+}
+.w-sidebar {
+  width: var(--sidebar-width);
+}
+.min-w-\[200px\] {
+  min-width: 200px;
+}
+.min-w-\[40px\] {
+  min-width: 40px;
+}
+.min-w-\[600px\] {
+  min-width: 600px;
+}
+.min-w-\[8rem\] {
+  min-width: 8rem;
+}
+.min-w-\[var\(--radix-select-trigger-width\)\] {
+  min-width: var(--radix-select-trigger-width);
+}
+.max-w-2xl {
+  max-width: 42rem;
+}
+.max-w-6xl {
+  max-width: 72rem;
+}
+.max-w-\[280px\] {
+  max-width: 280px;
+}
+.max-w-lg {
+  max-width: 32rem;
+}
+.max-w-sm {
+  max-width: 24rem;
+}
+.flex-1 {
+  flex: 1 1 0%;
+}
+.shrink-0 {
+  flex-shrink: 0;
+}
+.caption-bottom {
+  caption-side: bottom;
+}
+.translate-x-\[-50\%\] {
+  --tw-translate-x: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.translate-y-\[-50\%\] {
+  --tw-translate-y: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.transform {
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+@keyframes pulse {
+  50% {
+    opacity: .5;
+  }
+}
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+.cursor-default {
+  cursor: default;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.touch-none {
+  touch-action: none;
+}
+.select-none {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.resize {
+  resize: both;
+}
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.flex-row {
+  flex-direction: row;
+}
+.flex-col {
+  flex-direction: column;
+}
+.flex-col-reverse {
+  flex-direction: column-reverse;
+}
+.flex-wrap {
+  flex-wrap: wrap;
+}
+.items-start {
+  align-items: flex-start;
+}
+.items-center {
+  align-items: center;
+}
+.justify-end {
+  justify-content: flex-end;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.gap-1 {
+  gap: 0.25rem;
+}
+.gap-1\.5 {
+  gap: 0.375rem;
+}
+.gap-2 {
+  gap: 0.5rem;
+}
+.gap-3 {
+  gap: 0.75rem;
+}
+.gap-4 {
+  gap: 1rem;
+}
+.gap-6 {
+  gap: 1.5rem;
+}
+.gap-x-4 {
+  -moz-column-gap: 1rem;
+       column-gap: 1rem;
+}
+.gap-y-2 {
+  row-gap: 0.5rem;
+}
+.space-y-1 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.25rem * var(--tw-space-y-reverse));
+}
+.space-y-1\.5 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.375rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.375rem * var(--tw-space-y-reverse));
+}
+.space-y-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+}
+.space-y-3 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+}
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+.space-y-6 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
+}
+.overflow-auto {
+  overflow: auto;
+}
+.overflow-hidden {
+  overflow: hidden;
+}
+.overflow-x-auto {
+  overflow-x: auto;
+}
+.overflow-y-auto {
+  overflow-y: auto;
+}
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+.whitespace-pre-line {
+  white-space: pre-line;
+}
+.rounded-\[inherit\] {
+  border-radius: inherit;
+}
+.rounded-full {
+  border-radius: 9999px;
+}
+.rounded-lg {
+  border-radius: var(--radius);
+}
+.rounded-md {
+  border-radius: calc(var(--radius) - 2px);
+}
+.rounded-sm {
+  border-radius: calc(var(--radius) - 4px);
+}
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+.border {
+  border-width: 1px;
+}
+.border-2 {
+  border-width: 2px;
+}
+.border-b {
+  border-bottom-width: 1px;
+}
+.border-l {
+  border-left-width: 1px;
+}
+.border-l-4 {
+  border-left-width: 4px;
+}
+.border-r {
+  border-right-width: 1px;
+}
+.border-t {
+  border-top-width: 1px;
+}
+.border-dashed {
+  border-style: dashed;
+}
+.border-destructive\/50 {
+  border-color: hsl(var(--destructive) / 0.5);
+}
+.border-gray-200 {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity, 1));
+}
+.border-input {
+  border-color: hsl(var(--input));
+}
+.border-muted-foreground\/30 {
+  border-color: hsl(var(--muted-foreground) / 0.3);
+}
+.border-primary {
+  border-color: hsl(var(--primary));
+}
+.border-primary\/20 {
+  border-color: hsl(var(--primary) / 0.2);
+}
+.border-transparent {
+  border-color: transparent;
+}
+.border-l-primary {
+  border-left-color: hsl(var(--primary));
+}
+.border-l-transparent {
+  border-left-color: transparent;
+}
+.border-t-transparent {
+  border-top-color: transparent;
+}
+.bg-\[var\(--sidebar-bg\)\] {
+  background-color: var(--sidebar-bg);
+}
+.bg-amber-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 243 199 / var(--tw-bg-opacity, 1));
+}
+.bg-amber-50\/80 {
+  background-color: rgb(255 251 235 / 0.8);
+}
+.bg-background {
+  background-color: hsl(var(--background));
+}
+.bg-black\/80 {
+  background-color: rgb(0 0 0 / 0.8);
+}
+.bg-blue-50\/80 {
+  background-color: rgb(239 246 255 / 0.8);
+}
+.bg-border {
+  background-color: hsl(var(--border));
+}
+.bg-card {
+  background-color: hsl(var(--card));
+}
+.bg-destructive {
+  background-color: hsl(var(--destructive));
+}
+.bg-destructive\/10 {
+  background-color: hsl(var(--destructive) / 0.1);
+}
+.bg-gray-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
+}
+.bg-green-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 252 231 / var(--tw-bg-opacity, 1));
+}
+.bg-green-50\/80 {
+  background-color: rgb(240 253 244 / 0.8);
+}
+.bg-muted {
+  background-color: hsl(var(--muted));
+}
+.bg-muted\/30 {
+  background-color: hsl(var(--muted) / 0.3);
+}
+.bg-muted\/50 {
+  background-color: hsl(var(--muted) / 0.5);
+}
+.bg-popover {
+  background-color: hsl(var(--popover));
+}
+.bg-primary {
+  background-color: hsl(var(--primary));
+}
+.bg-primary\/10 {
+  background-color: hsl(var(--primary) / 0.1);
+}
+.bg-primary\/5 {
+  background-color: hsl(var(--primary) / 0.05);
+}
+.bg-red-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1));
+}
+.bg-rose-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 228 230 / var(--tw-bg-opacity, 1));
+}
+.bg-secondary {
+  background-color: hsl(var(--secondary));
+}
+.bg-transparent {
+  background-color: transparent;
+}
+.bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+}
+.fill-current {
+  fill: currentColor;
+}
+.fill-red-500 {
+  fill: #ef4444;
+}
+.p-0 {
+  padding: 0px;
+}
+.p-1 {
+  padding: 0.25rem;
+}
+.p-2 {
+  padding: 0.5rem;
+}
+.p-3 {
+  padding: 0.75rem;
+}
+.p-4 {
+  padding: 1rem;
+}
+.p-5 {
+  padding: 1.25rem;
+}
+.p-6 {
+  padding: 1.5rem;
+}
+.p-8 {
+  padding: 2rem;
+}
+.p-\[1px\] {
+  padding: 1px;
+}
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+.px-2\.5 {
+  padding-left: 0.625rem;
+  padding-right: 0.625rem;
+}
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+.px-8 {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+.py-0\.5 {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+}
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+.py-1\.5 {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+.py-12 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+.py-6 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+.pb-2 {
+  padding-bottom: 0.5rem;
+}
+.pb-3 {
+  padding-bottom: 0.75rem;
+}
+.pb-4 {
+  padding-bottom: 1rem;
+}
+.pb-6 {
+  padding-bottom: 1.5rem;
+}
+.pl-8 {
+  padding-left: 2rem;
+}
+.pr-2 {
+  padding-right: 0.5rem;
+}
+.pr-3 {
+  padding-right: 0.75rem;
+}
+.pt-0 {
+  padding-top: 0px;
+}
+.pt-1 {
+  padding-top: 0.25rem;
+}
+.pt-2 {
+  padding-top: 0.5rem;
+}
+.pt-4 {
+  padding-top: 1rem;
+}
+.pt-6 {
+  padding-top: 1.5rem;
+}
+.text-left {
+  text-align: left;
+}
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+.align-top {
+  vertical-align: top;
+}
+.align-middle {
+  vertical-align: middle;
+}
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+.text-6xl {
+  font-size: 3.75rem;
+  line-height: 1;
+}
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+.font-bold {
+  font-weight: 700;
+}
+.font-medium {
+  font-weight: 500;
+}
+.font-semibold {
+  font-weight: 600;
+}
+.leading-none {
+  line-height: 1;
+}
+.leading-relaxed {
+  line-height: 1.625;
+}
+.tracking-tight {
+  letter-spacing: -0.025em;
+}
+.tracking-widest {
+  letter-spacing: 0.1em;
+}
+.text-amber-800 {
+  --tw-text-opacity: 1;
+  color: rgb(146 64 14 / var(--tw-text-opacity, 1));
+}
+.text-card-foreground {
+  color: hsl(var(--card-foreground));
+}
+.text-current {
+  color: currentColor;
+}
+.text-destructive {
+  color: hsl(var(--destructive));
+}
+.text-destructive-foreground {
+  color: hsl(var(--destructive-foreground));
+}
+.text-foreground {
+  color: hsl(var(--foreground));
+}
+.text-gray-400 {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity, 1));
+}
+.text-gray-500 {
+  --tw-text-opacity: 1;
+  color: rgb(107 114 128 / var(--tw-text-opacity, 1));
+}
+.text-gray-700 {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity, 1));
+}
+.text-gray-800 {
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity, 1));
+}
+.text-gray-900 {
+  --tw-text-opacity: 1;
+  color: rgb(17 24 39 / var(--tw-text-opacity, 1));
+}
+.text-green-800 {
+  --tw-text-opacity: 1;
+  color: rgb(22 101 52 / var(--tw-text-opacity, 1));
+}
+.text-muted-foreground {
+  color: hsl(var(--muted-foreground));
+}
+.text-popover-foreground {
+  color: hsl(var(--popover-foreground));
+}
+.text-primary {
+  color: hsl(var(--primary));
+}
+.text-primary-foreground {
+  color: hsl(var(--primary-foreground));
+}
+.text-red-500 {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity, 1));
+}
+.text-red-800 {
+  --tw-text-opacity: 1;
+  color: rgb(153 27 27 / var(--tw-text-opacity, 1));
+}
+.text-rose-600 {
+  --tw-text-opacity: 1;
+  color: rgb(225 29 72 / var(--tw-text-opacity, 1));
+}
+.text-secondary-foreground {
+  color: hsl(var(--secondary-foreground));
+}
+.underline-offset-4 {
+  text-underline-offset: 4px;
+}
+.accent-primary {
+  accent-color: hsl(var(--primary));
+}
+.opacity-0 {
+  opacity: 0;
+}
+.opacity-50 {
+  opacity: 0.5;
+}
+.opacity-60 {
+  opacity: 0.6;
+}
+.opacity-70 {
+  opacity: 0.7;
+}
+.shadow {
+  --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-lg {
+  --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-md {
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-sm {
+  --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.outline-none {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.outline {
+  outline-style: solid;
+}
+.ring-offset-background {
+  --tw-ring-offset-color: hsl(var(--background));
+}
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+.duration-200 {
+  transition-duration: 200ms;
+}
+.ease-in-out {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0) scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1)) rotate(var(--tw-enter-rotate, 0));
+  }
+}
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0));
+  }
+}
+.animate-in {
+  animation-name: enter;
+  animation-duration: 150ms;
+  --tw-enter-opacity: initial;
+  --tw-enter-scale: initial;
+  --tw-enter-rotate: initial;
+  --tw-enter-translate-x: initial;
+  --tw-enter-translate-y: initial;
+}
+.fade-in-0 {
+  --tw-enter-opacity: 0;
+}
+.zoom-in-95 {
+  --tw-enter-scale: .95;
+}
+.duration-200 {
+  animation-duration: 200ms;
+}
+.ease-in-out {
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- 设计令牌（Design Tokens）---- */
+
+/* ---- 自定义滚动条 ---- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ---- 通用工具类（保持与旧 pages 组件兼容）---- */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.page-header h2 {
+  margin: 0;
+}
+
+.card {
+  background: hsl(var(--card));
+  border-radius: 12px;
+  border: 1px solid hsl(var(--border));
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+
+.card h3 {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.error-banner {
+  background: #fef2f2;
+  color: hsl(var(--destructive));
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  border: 1px solid #fecaca;
+}
+
+.info-banner {
+  background: #f0f9ff;
+  color: #0c4a6e;
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  border: 1px solid #bae6fd;
+  line-height: 1.6;
+}
+
+.info-banner strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #0369a1;
+}
+
+.info-banner p {
+  margin: 0;
+}
+
+.info-success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #14532d;
+}
+
+.info-success strong {
+  display: inline;
+  color: #15803d;
+}
+
+.muted-text {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ---- 指标卡片 ---- */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: hsl(var(--card));
+  border-radius: 12px;
+  border: 1px solid hsl(var(--border));
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.15s, transform 0.1s;
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.stat-label {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: hsl(var(--primary));
+}
+
+.metric {
+  font-size: 32px;
+  font-weight: 700;
+  color: hsl(var(--primary));
+  margin: 8px 0;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---- 按钮 ---- */
+
+.btn {
+  background: hsl(var(--primary));
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+  opacity: 0.92;
+  box-shadow: var(--shadow);
+}
+
+.btn:disabled {
+  background: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.btn-outline {
+  background: transparent;
+  color: hsl(var(--primary));
+  border: 1px solid hsl(var(--primary));
+  box-shadow: none;
+}
+
+.btn-outline:hover {
+  background: var(--primary-light);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- 表单 ---- */
+
+textarea,
+input,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.15s;
+}
+
+textarea:focus,
+input:focus {
+  outline: none;
+  border-color: hsl(var(--primary));
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-with-suggestions {
+  position: relative;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 180px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.suggestion-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.suggestion-item:hover {
+  background: var(--primary-light);
+  color: hsl(var(--primary));
+}
+
+.filter-select {
+  padding: 9px 12px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  font-size: 14px;
+  background: hsl(var(--card));
+  color: var(--text);
+  min-width: 110px;
+}
+
+.filter-summary {
+  font-size: 13px;
+  color: var(--muted);
+  margin: -10px 0 14px;
+}
+
+.input-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.example-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.example-btns button {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.char-count {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.char-count-warn {
+  color: hsl(var(--destructive));
+}
+
+.event-id-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  font-size: 14px;
+}
+
+.event-id {
+  font-weight: 700;
+  color: hsl(var(--primary));
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ---- 评估页 ---- */
+.eval-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 14px;
+}
+
+.eval-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eval-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.eval-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.eval-options .btn-sm {
+  padding: 5px 12px;
+  font-size: 13px;
+}
+
+.eval-dataset-preview {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.suggestion-card {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+}
+
+.suggestion-card h3 {
+  color: #0369a1;
+}
+
+.suggestion-list {
+  margin: 0;
+  padding-left: 20px;
+  color: #0c4a6e;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.suggestion-list li {
+  margin-bottom: 4px;
+}
+
+/* ---- 表格 ---- */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.table th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.table tbody tr:hover {
+  background: hsl(var(--background));
+}
+
+.summary-cell {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.expand-icon {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.expanded-row td {
+  background: hsl(var(--background));
+  padding: 0;
+}
+
+/* ---- 徽章 ---- */
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.low {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.badge.medium {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badge.high {
+  background: #fee2e2;
+  color: hsl(var(--destructive));
+}
+
+.badge.critical {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+/* ---- 图表 ---- */
+
+.chart-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 0;
+}
+
+.chart-card {
+  min-height: 320px;
+}
+
+.chart-card h3 {
+  margin-bottom: 10px;
+}
+
+.chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---- 排行榜 ---- */
+
+.rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.rank-item:hover {
+  background: hsl(var(--background));
+}
+
+.rank-num {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #f3f4f6;
+  color: var(--muted);
+}
+
+.rank-num.rank-top {
+  background: #fee2e2;
+  color: hsl(var(--destructive));
+}
+
+.rank-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.rank-industry {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.rank-score {
+  font-weight: 700;
+  color: hsl(var(--destructive));
+  min-width: 40px;
+  text-align: right;
+}
+
+.rank-count {
+  color: var(--muted);
+  font-size: 12px;
+  min-width: 50px;
+  text-align: right;
+}
+
+/* ---- 分析步骤卡片 ---- */
+
+.step-card {
+  background: hsl(var(--card));
+  border-radius: 12px;
+  border: 1px solid hsl(var(--border));
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid hsl(var(--border));
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.step-body {
+  padding: 18px;
+  font-size: 14px;
+}
+
+.step-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: hsl(var(--primary));
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.step-label {
+  display: inline-block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-right: 8px;
+  min-width: 64px;
+}
+
+.step-val {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.prediction-main {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.match-score-big {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.prediction-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 24px;
+}
+
+/* ---- 分页 ---- */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+.pagination span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---- 抽屉 ---- */
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 50;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer-panel {
+  width: 460px;
+  max-width: 90%;
+  height: 100%;
+  background: hsl(var(--card));
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  animation: drawer-slide-in 0.25s ease-out;
+}
+
+@keyframes drawer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.drawer-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.detail-section {
+  margin-bottom: 20px;
+}
+
+.detail-section h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 16px;
+  font-size: 13px;
+}
+
+.detail-grid div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ---- 加载动画 ---- */
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid hsl(var(--border));
+  border-top-color: hsl(var(--primary));
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- 流式进度 ---- */
+
+.stream-progress-card {
+  background: hsl(var(--card));
+}
+
+.stream-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stream-step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+}
+
+.stream-step-done {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.stream-step-active {
+  background: #eff6ff;
+  color: hsl(var(--primary));
+}
+
+.stream-step-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stream-step-spinner {
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ---- 技能差距网格 ---- */
+
+.skill-gap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.gov-section {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.gov-section h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.gov-immediate {
+  color: #15803d;
+}
+
+.gov-short {
+  color: #991b1b;
+}
+
+.gov-long {
+  color: #b45309;
+}
+
+/* ---- 标签列表 ---- */
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ---- 响应式 ---- */
+
+@media (max-width: 768px) {
+  .chart-row {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  }
+
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .prediction-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .prediction-details {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skill-gap-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.file\:border-0::file-selector-button {
+  border-width: 0px;
+}
+
+.file\:bg-transparent::file-selector-button {
+  background-color: transparent;
+}
+
+.file\:text-sm::file-selector-button {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.file\:font-medium::file-selector-button {
+  font-weight: 500;
+}
+
+.placeholder\:text-muted-foreground::-moz-placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+.placeholder\:text-muted-foreground::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+.hover\:bg-accent:hover {
+  background-color: hsl(var(--accent));
+}
+
+.hover\:bg-amber-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 243 199 / var(--tw-bg-opacity, 1));
+}
+
+.hover\:bg-destructive\/80:hover {
+  background-color: hsl(var(--destructive) / 0.8);
+}
+
+.hover\:bg-destructive\/90:hover {
+  background-color: hsl(var(--destructive) / 0.9);
+}
+
+.hover\:bg-green-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 252 231 / var(--tw-bg-opacity, 1));
+}
+
+.hover\:bg-muted:hover {
+  background-color: hsl(var(--muted));
+}
+
+.hover\:bg-muted\/50:hover {
+  background-color: hsl(var(--muted) / 0.5);
+}
+
+.hover\:bg-primary\/80:hover {
+  background-color: hsl(var(--primary) / 0.8);
+}
+
+.hover\:bg-primary\/90:hover {
+  background-color: hsl(var(--primary) / 0.9);
+}
+
+.hover\:bg-red-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1));
+}
+
+.hover\:bg-rose-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 228 230 / var(--tw-bg-opacity, 1));
+}
+
+.hover\:bg-secondary\/80:hover {
+  background-color: hsl(var(--secondary) / 0.8);
+}
+
+.hover\:text-accent-foreground:hover {
+  color: hsl(var(--accent-foreground));
+}
+
+.hover\:text-muted-foreground:hover {
+  color: hsl(var(--muted-foreground));
+}
+
+.hover\:underline:hover {
+  text-decoration-line: underline;
+}
+
+.hover\:opacity-100:hover {
+  opacity: 1;
+}
+
+.focus\:bg-accent:focus {
+  background-color: hsl(var(--accent));
+}
+
+.focus\:text-accent-foreground:focus {
+  color: hsl(var(--accent-foreground));
+}
+
+.focus\:outline-none:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus\:ring-1:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.focus\:ring-2:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.focus\:ring-ring:focus {
+  --tw-ring-color: hsl(var(--ring));
+}
+
+.focus\:ring-offset-2:focus {
+  --tw-ring-offset-width: 2px;
+}
+
+.focus-visible\:outline-none:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus-visible\:ring-1:focus-visible {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.focus-visible\:ring-2:focus-visible {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.focus-visible\:ring-ring:focus-visible {
+  --tw-ring-color: hsl(var(--ring));
+}
+
+.focus-visible\:ring-offset-2:focus-visible {
+  --tw-ring-offset-width: 2px;
+}
+
+.disabled\:pointer-events-none:disabled {
+  pointer-events: none;
+}
+
+.disabled\:cursor-not-allowed:disabled {
+  cursor: not-allowed;
+}
+
+.disabled\:opacity-50:disabled {
+  opacity: 0.5;
+}
+
+.group.toaster .group-\[\.toaster\]\:border-border {
+  border-color: hsl(var(--border));
+}
+
+.group.toast .group-\[\.toast\]\:bg-muted {
+  background-color: hsl(var(--muted));
+}
+
+.group.toast .group-\[\.toast\]\:bg-primary {
+  background-color: hsl(var(--primary));
+}
+
+.group.toaster .group-\[\.toaster\]\:bg-background {
+  background-color: hsl(var(--background));
+}
+
+.group.toast .group-\[\.toast\]\:text-muted-foreground {
+  color: hsl(var(--muted-foreground));
+}
+
+.group.toast .group-\[\.toast\]\:text-primary-foreground {
+  color: hsl(var(--primary-foreground));
+}
+
+.group.toaster .group-\[\.toaster\]\:text-foreground {
+  color: hsl(var(--foreground));
+}
+
+.group.toaster .group-\[\.toaster\]\:shadow-lg {
+  --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.data-\[disabled\]\:pointer-events-none[data-disabled] {
+  pointer-events: none;
+}
+
+.data-\[side\=bottom\]\:translate-y-1[data-side="bottom"] {
+  --tw-translate-y: 0.25rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.data-\[side\=left\]\:-translate-x-1[data-side="left"] {
+  --tw-translate-x: -0.25rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.data-\[side\=right\]\:translate-x-1[data-side="right"] {
+  --tw-translate-x: 0.25rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.data-\[side\=top\]\:-translate-y-1[data-side="top"] {
+  --tw-translate-y: -0.25rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.data-\[state\=active\]\:bg-background[data-state="active"] {
+  background-color: hsl(var(--background));
+}
+
+.data-\[state\=checked\]\:bg-primary[data-state="checked"] {
+  background-color: hsl(var(--primary));
+}
+
+.data-\[state\=on\]\:bg-accent[data-state="on"] {
+  background-color: hsl(var(--accent));
+}
+
+.data-\[state\=open\]\:bg-accent[data-state="open"] {
+  background-color: hsl(var(--accent));
+}
+
+.data-\[state\=open\]\:bg-secondary[data-state="open"] {
+  background-color: hsl(var(--secondary));
+}
+
+.data-\[state\=selected\]\:bg-muted[data-state="selected"] {
+  background-color: hsl(var(--muted));
+}
+
+.data-\[state\=active\]\:text-foreground[data-state="active"] {
+  color: hsl(var(--foreground));
+}
+
+.data-\[state\=checked\]\:text-primary-foreground[data-state="checked"] {
+  color: hsl(var(--primary-foreground));
+}
+
+.data-\[state\=on\]\:text-accent-foreground[data-state="on"] {
+  color: hsl(var(--accent-foreground));
+}
+
+.data-\[state\=open\]\:text-muted-foreground[data-state="open"] {
+  color: hsl(var(--muted-foreground));
+}
+
+.data-\[disabled\]\:opacity-50[data-disabled] {
+  opacity: 0.5;
+}
+
+.data-\[state\=active\]\:shadow-sm[data-state="active"] {
+  --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.data-\[state\=closed\]\:duration-300[data-state="closed"] {
+  transition-duration: 300ms;
+}
+
+.data-\[state\=open\]\:duration-500[data-state="open"] {
+  transition-duration: 500ms;
+}
+
+.data-\[state\=open\]\:animate-in[data-state="open"] {
+  animation-name: enter;
+  animation-duration: 150ms;
+  --tw-enter-opacity: initial;
+  --tw-enter-scale: initial;
+  --tw-enter-rotate: initial;
+  --tw-enter-translate-x: initial;
+  --tw-enter-translate-y: initial;
+}
+
+.data-\[state\=closed\]\:animate-out[data-state="closed"] {
+  animation-name: exit;
+  animation-duration: 150ms;
+  --tw-exit-opacity: initial;
+  --tw-exit-scale: initial;
+  --tw-exit-rotate: initial;
+  --tw-exit-translate-x: initial;
+  --tw-exit-translate-y: initial;
+}
+
+.data-\[state\=closed\]\:fade-out-0[data-state="closed"] {
+  --tw-exit-opacity: 0;
+}
+
+.data-\[state\=open\]\:fade-in-0[data-state="open"] {
+  --tw-enter-opacity: 0;
+}
+
+.data-\[state\=closed\]\:zoom-out-95[data-state="closed"] {
+  --tw-exit-scale: .95;
+}
+
+.data-\[state\=open\]\:zoom-in-95[data-state="open"] {
+  --tw-enter-scale: .95;
+}
+
+.data-\[side\=bottom\]\:slide-in-from-top-2[data-side="bottom"] {
+  --tw-enter-translate-y: -0.5rem;
+}
+
+.data-\[side\=left\]\:slide-in-from-right-2[data-side="left"] {
+  --tw-enter-translate-x: 0.5rem;
+}
+
+.data-\[side\=right\]\:slide-in-from-left-2[data-side="right"] {
+  --tw-enter-translate-x: -0.5rem;
+}
+
+.data-\[side\=top\]\:slide-in-from-bottom-2[data-side="top"] {
+  --tw-enter-translate-y: 0.5rem;
+}
+
+.data-\[state\=closed\]\:slide-out-to-bottom[data-state="closed"] {
+  --tw-exit-translate-y: 100%;
+}
+
+.data-\[state\=closed\]\:slide-out-to-left[data-state="closed"] {
+  --tw-exit-translate-x: -100%;
+}
+
+.data-\[state\=closed\]\:slide-out-to-left-1\/2[data-state="closed"] {
+  --tw-exit-translate-x: -50%;
+}
+
+.data-\[state\=closed\]\:slide-out-to-right[data-state="closed"] {
+  --tw-exit-translate-x: 100%;
+}
+
+.data-\[state\=closed\]\:slide-out-to-top[data-state="closed"] {
+  --tw-exit-translate-y: -100%;
+}
+
+.data-\[state\=closed\]\:slide-out-to-top-\[48\%\][data-state="closed"] {
+  --tw-exit-translate-y: -48%;
+}
+
+.data-\[state\=open\]\:slide-in-from-bottom[data-state="open"] {
+  --tw-enter-translate-y: 100%;
+}
+
+.data-\[state\=open\]\:slide-in-from-left[data-state="open"] {
+  --tw-enter-translate-x: -100%;
+}
+
+.data-\[state\=open\]\:slide-in-from-left-1\/2[data-state="open"] {
+  --tw-enter-translate-x: -50%;
+}
+
+.data-\[state\=open\]\:slide-in-from-right[data-state="open"] {
+  --tw-enter-translate-x: 100%;
+}
+
+.data-\[state\=open\]\:slide-in-from-top[data-state="open"] {
+  --tw-enter-translate-y: -100%;
+}
+
+.data-\[state\=open\]\:slide-in-from-top-\[48\%\][data-state="open"] {
+  --tw-enter-translate-y: -48%;
+}
+
+.data-\[state\=closed\]\:duration-300[data-state="closed"] {
+  animation-duration: 300ms;
+}
+
+.data-\[state\=open\]\:duration-500[data-state="open"] {
+  animation-duration: 500ms;
+}
+
+.dark\:bg-amber-950\/30:is(.dark *) {
+  background-color: rgb(69 26 3 / 0.3);
+}
+
+.dark\:bg-blue-950\/30:is(.dark *) {
+  background-color: rgb(23 37 84 / 0.3);
+}
+
+.dark\:bg-green-950\/30:is(.dark *) {
+  background-color: rgb(5 46 22 / 0.3);
+}
+
+@media (min-width: 640px) {
+  .sm\:w-32 {
+    width: 8rem;
+  }
+  .sm\:w-36 {
+    width: 9rem;
+  }
+  .sm\:w-40 {
+    width: 10rem;
+  }
+  .sm\:w-64 {
+    width: 16rem;
+  }
+  .sm\:w-auto {
+    width: auto;
+  }
+  .sm\:max-w-5xl {
+    max-width: 64rem;
+  }
+  .sm\:max-w-md {
+    max-width: 28rem;
+  }
+  .sm\:max-w-sm {
+    max-width: 24rem;
+  }
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sm\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .sm\:flex-row {
+    flex-direction: row;
+  }
+  .sm\:items-center {
+    align-items: center;
+  }
+  .sm\:justify-end {
+    justify-content: flex-end;
+  }
+  .sm\:justify-between {
+    justify-content: space-between;
+  }
+  .sm\:space-x-2 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+  .sm\:rounded-lg {
+    border-radius: var(--radius);
+  }
+  .sm\:text-left {
+    text-align: left;
+  }
+}
+
+@media (min-width: 768px) {
+  .md\:block {
+    display: block;
+  }
+  .md\:flex {
+    display: flex;
+  }
+  .md\:hidden {
+    display: none;
+  }
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .md\:p-6 {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .lg\:grid-cols-\[1fr_360px\] {
+    grid-template-columns: 1fr 360px;
+  }
+}
+
+.\[\&\:has\(\[role\=checkbox\]\)\]\:pr-0:has([role=checkbox]) {
+  padding-right: 0px;
+}
+
+.\[\&\>span\]\:line-clamp-1>span {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.\[\&\>tr\]\:last\:border-b-0:last-child>tr {
+  border-bottom-width: 0px;
+}
+
+.\[\&_svg\]\:pointer-events-none svg {
+  pointer-events: none;
+}
+
+.\[\&_svg\]\:size-4 svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.\[\&_svg\]\:shrink-0 svg {
+  flex-shrink: 0;
+}
+
+.\[\&_tr\:last-child\]\:border-0 tr:last-child {
+  border-width: 0px;
+}
+
+.\[\&_tr\]\:border-b tr {
+  border-bottom-width: 1px;
+}
+</style><style type="text/css">
+  .with-scroll-bars-hidden {
+   overflow: hidden !important;
+   padding-right: 0px !important;
+  }
+  body[data-scroll-locked] {
+    overflow: hidden !important;
+    overscroll-behavior: contain;
+    position: relative !important;
+    padding-left: 0px;
+    padding-top: 0px;
+    padding-right: 0px;
+    margin-left:0;
+    margin-top:0;
+    margin-right: 0px !important;
+    
+  }
+  
+  .right-scroll-bar-position {
+    right: 0px !important;
+  }
+  
+  .width-before-scroll-bar {
+    margin-right: 0px !important;
+  }
+  
+  .right-scroll-bar-position .right-scroll-bar-position {
+    right: 0 !important;
+  }
+  
+  .width-before-scroll-bar .width-before-scroll-bar {
+    margin-right: 0 !important;
+  }
+  
+  body[data-scroll-locked] {
+    --removed-body-scroll-bar-size: 0px;
+  }
+</style></head>
+  <body data-scroll-locked="2" style="pointer-events: none;"><span data-radix-focus-guard="" tabindex="0" data-aria-hidden="true" aria-hidden="true" style="outline: none; opacity: 0; position: fixed; pointer-events: none;"></span>
+    <div id="root"><div class="flex min-h-screen bg-background"><aside class="hidden md:flex w-sidebar flex-col border-r bg-[var(--sidebar-bg)] px-4 py-6" data-aria-hidden="true" aria-hidden="true"><h1 class="mb-6 px-3 text-lg font-bold tracking-tight text-foreground">TalentMatch Engine</h1><nav class="flex flex-col gap-1"><a aria-current="page" class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors bg-primary text-primary-foreground" href="/"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard h-4 w-4"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span>仪表盘</span></a><a class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground" href="/match"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-target h-4 w-4"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg><span>岗位匹配</span></a><a class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground" href="/jobs"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-briefcase h-4 w-4"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg><span>岗位库</span></a><a class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground" href="/jobs?favorites=1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart h-4 w-4"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg><span>我的收藏</span></a><a class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground" href="/skills"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain h-4 w-4"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"></path><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"></path><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path><path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path><path d="M19.938 10.5a4 4 0 0 1 .585.396"></path><path d="M6 18a4 4 0 0 1-1.967-.516"></path><path d="M19.967 17.484A4 4 0 0 1 18 18"></path></svg><span>技能图谱</span></a><a class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground" href="/trends"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up h-4 w-4"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg><span>趋势分析</span></a></nav></aside><div class="flex flex-1 flex-col md:hidden" data-aria-hidden="true" aria-hidden="true"><header class="flex items-center justify-between border-b bg-[var(--sidebar-bg)] px-4 py-3"><h1 class="text-base font-bold text-foreground">TalentMatch Engine</h1><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 w-9" aria-label="打开菜单" type="button" aria-haspopup="dialog" aria-expanded="false" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu h-5 w-5"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button></header><main class="flex-1 overflow-auto p-4 md:p-6"><div class="space-y-6"><div class="flex items-center justify-between"><h2 class="text-2xl font-bold tracking-tight">技能图谱仪表盘</h2><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw mr-2 h-4 w-4"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>刷新</button></div><p class="text-xs text-muted-foreground">更新时间：2026/7/20 18:02:14</p><div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-briefcase h-4 w-4"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg>岗位总数</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">1</div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-banknote h-4 w-4"><rect width="20" height="12" x="2" y="6" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>平均薪资</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">¥27,500</div><p class="mt-1 text-xs text-muted-foreground">区间 ¥20,000-35,000</p></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain h-4 w-4"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"></path><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"></path><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path><path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path><path d="M19.938 10.5a4 4 0 0 1 .585.396"></path><path d="M6 18a4 4 0 0 1-1.967-.516"></path><path d="M19.967 17.484A4 4 0 0 1 18 18"></path></svg>技能总数</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">0</div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building2 lucide-building-2 h-4 w-4"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>企业总数</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">1</div></div></div></div><div class="grid grid-cols-1 gap-4 md:grid-cols-3"><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2 lucide-link-2 h-4 w-4"><path d="M9 17H7A5 5 0 0 1 7 7h2"></path><path d="M15 7h2a5 5 0 1 1 0 10h-2"></path><line x1="8" x2="16" y1="12" y2="12"></line></svg>技能关系数</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">0</div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flame h-4 w-4"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>热门岗位</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">1</div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles h-4 w-4"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path><path d="M4 17v2"></path><path d="M5 18H3"></path></svg>热门技能</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">4</div></div></div></div><div class="chart-row"><div class="rounded-lg border bg-card text-card-foreground shadow-sm chart-card"><div class="flex flex-col space-y-1.5 p-6 pb-3"><div class="font-semibold tracking-tight text-base">城市需求分布 TOP10</div></div><div class="p-6 pt-0"><div class="recharts-responsive-container" style="width: 100%; height: 300px; min-width: 0px;"><div style="width: 0px; overflow-x: visible;"></div></div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm chart-card"><div class="flex flex-col space-y-1.5 p-6 pb-3"><div class="font-semibold tracking-tight text-base">经验要求分布</div></div><div class="p-6 pt-0"><div class="recharts-responsive-container" style="width: 100%; height: 300px; min-width: 0px;"><div style="width: 0px; overflow-x: visible;"></div></div></div></div></div><div class="grid grid-cols-1 gap-4 lg:grid-cols-2"><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6"><div class="text-2xl font-semibold leading-none tracking-tight">热门技能分布</div></div><div class="p-6 pt-0"><div class="recharts-responsive-container" style="width: 100%; height: 260px; min-width: 0px;"><div style="width: 0px; overflow-x: visible;"></div></div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6"><div class="text-2xl font-semibold leading-none tracking-tight">行业需求分布</div></div><div class="p-6 pt-0"><div class="recharts-responsive-container" style="width: 100%; height: 260px; min-width: 0px;"><div style="width: 0px; overflow-x: visible;"></div></div></div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6"><div class="text-2xl font-semibold leading-none tracking-tight">市场趋势洞察</div></div><div class="p-6 pt-0 space-y-3"><p class="leading-relaxed text-muted-foreground">共分析 1 条岗位数据。平均薪资 20000-35000 元/月，热门技能包括 Python, FastAPI, PostgreSQL, 沟通能力。</p><div class="flex items-center gap-2"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">主流薪资范围</div><span class="font-medium">20k-35k</span></div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6"><div class="text-2xl font-semibold leading-none tracking-tight">热门岗位 TOP10</div></div><div class="p-6 pt-0"><ol class="space-y-3"><li class="flex items-center gap-3"><div class="inline-flex items-center border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80 h-6 w-6 justify-center rounded-full p-0">1</div><span class="text-sm font-medium">Python 后端工程师</span></li></ol></div></div></div></main></div><main class="hidden flex-1 overflow-auto p-6 md:block" data-aria-hidden="true" aria-hidden="true"><div class="space-y-6"><div class="flex items-center justify-between"><h2 class="text-2xl font-bold tracking-tight">技能图谱仪表盘</h2><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw mr-2 h-4 w-4"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>刷新</button></div><p class="text-xs text-muted-foreground">更新时间：2026/7/20 18:02:14</p><div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-briefcase h-4 w-4"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg>岗位总数</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">1</div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-banknote h-4 w-4"><rect width="20" height="12" x="2" y="6" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>平均薪资</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">¥27,500</div><p class="mt-1 text-xs text-muted-foreground">区间 ¥20,000-35,000</p></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain h-4 w-4"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"></path><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"></path><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path><path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path><path d="M19.938 10.5a4 4 0 0 1 .585.396"></path><path d="M6 18a4 4 0 0 1-1.967-.516"></path><path d="M19.967 17.484A4 4 0 0 1 18 18"></path></svg>技能总数</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">0</div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building2 lucide-building-2 h-4 w-4"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>企业总数</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">1</div></div></div></div><div class="grid grid-cols-1 gap-4 md:grid-cols-3"><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2 lucide-link-2 h-4 w-4"><path d="M9 17H7A5 5 0 0 1 7 7h2"></path><path d="M15 7h2a5 5 0 1 1 0 10h-2"></path><line x1="8" x2="16" y1="12" y2="12"></line></svg>技能关系数</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">0</div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flame h-4 w-4"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>热门岗位</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">1</div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6 pb-2"><div class="text-sm text-muted-foreground flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles h-4 w-4"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path><path d="M4 17v2"></path><path d="M5 18H3"></path></svg>热门技能</div></div><div class="p-6 pt-0"><div class="text-3xl font-bold">4</div></div></div></div><div class="chart-row"><div class="rounded-lg border bg-card text-card-foreground shadow-sm chart-card"><div class="flex flex-col space-y-1.5 p-6 pb-3"><div class="font-semibold tracking-tight text-base">城市需求分布 TOP10</div></div><div class="p-6 pt-0"><div class="recharts-responsive-container" style="width: 100%; height: 300px; min-width: 0px;"><div style="width: 0px; overflow-x: visible;"><div width="441" height="300" class="recharts-wrapper" style="position: relative; cursor: default; width: 441px; height: 300px;"><div xmlns="http://www.w3.org/1999/xhtml" tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"><div class="recharts-default-tooltip" role="status" aria-live="assertive" style="margin: 0px; padding: 10px; background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); white-space: nowrap;"><p class="recharts-tooltip-label" style="margin: 0px;"></p></div></div><svg role="application" tabindex="0" class="recharts-surface" width="441" height="300" viewBox="0 0 441 300" style="width: 100%; height: 100%; display: block;"><title></title><desc></desc><g tabindex="-1" class="recharts-zIndex-layer_-100"><g class="recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal"><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="65" y="5" width="371" height="260" x1="65" y1="265" x2="436" y2="265"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="65" y="5" width="371" height="260" x1="65" y1="200" x2="436" y2="200"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="65" y="5" width="371" height="260" x1="65" y1="135" x2="436" y2="135"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="65" y="5" width="371" height="260" x1="65" y1="70" x2="436" y2="70"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="65" y="5" width="371" height="260" x1="65" y1="5" x2="436" y2="5"></line></g><g class="recharts-cartesian-grid-vertical"><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="65" y="5" width="371" height="260" x1="250.5" y1="5" x2="250.5" y2="265"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="65" y="5" width="371" height="260" x1="65" y1="5" x2="65" y2="265"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="65" y="5" width="371" height="260" x1="436" y1="5" x2="436" y2="265"></line></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_-50"></g><defs><clipPath id="recharts2-clip"><rect x="65" y="5" height="260" width="371"></rect></clipPath></defs><g tabindex="-1" class="recharts-zIndex-layer_100"></g><g tabindex="-1" class="recharts-zIndex-layer_200"></g><g tabindex="-1" class="recharts-zIndex-layer_300"><g class="recharts-layer recharts-bar" id="recharts-bar-:r27:"><g class="recharts-layer recharts-bar-rectangles"><g class="recharts-layer"><g class="recharts-layer recharts-bar-rectangle"><g class="recharts-layer recharts-inactive-bar"><path fill="#3b82f6" name="岗位数" x="102.1" y="11.9307" width="297" height="253.0693" class="recharts-rectangle" d="M102.1,15.9307A 4,4,0,0,1,106.1,11.9307L 395.1,11.9307A 4,4,0,0,1,
+        399.1,15.9307L 399.1,265L 102.1,265Z"></path></g></g></g></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_400"></g><g tabindex="-1" class="recharts-zIndex-layer_500"><g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"><line angle="0" height="30" orientation="bottom" x="65" y="265" width="371" class="recharts-cartesian-axis-line" stroke="#666" fill="none" x1="65" y1="265" x2="436" y2="265"></line><g class="recharts-cartesian-axis-ticks recharts-xAxis-ticks"><g class="recharts-cartesian-axis-tick-lines recharts-xAxis-tick-lines"><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" height="30" orientation="bottom" x="65" y="265" width="371" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="250.5" y1="271" x2="250.5" y2="265"></line></g></g></g></g><g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis"><line angle="0" orientation="left" width="60" x="5" y="5" height="260" class="recharts-cartesian-axis-line" stroke="#666" fill="none" x1="65" y1="5" x2="65" y2="265"></line><g class="recharts-cartesian-axis-ticks recharts-yAxis-ticks"><g class="recharts-cartesian-axis-tick-lines recharts-yAxis-tick-lines"><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" orientation="left" width="60" x="5" y="5" height="260" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="59" y1="265" x2="65" y2="265"></line></g><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" orientation="left" width="60" x="5" y="5" height="260" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="59" y1="200" x2="65" y2="200"></line></g><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" orientation="left" width="60" x="5" y="5" height="260" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="59" y1="135" x2="65" y2="135"></line></g><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" orientation="left" width="60" x="5" y="5" height="260" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="59" y1="70" x2="65" y2="70"></line></g><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" orientation="left" width="60" x="5" y="5" height="260" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="59" y1="5" x2="65" y2="5"></line></g></g></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_600"></g><g tabindex="-1" class="recharts-zIndex-layer_1000"></g><g tabindex="-1" class="recharts-zIndex-layer_1100"></g><g tabindex="-1" class="recharts-zIndex-layer_1200"></g><g tabindex="-1" class="recharts-zIndex-layer_2000"><g class="recharts-cartesian-axis-tick-labels recharts-xAxis-tick-labels"><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="371" stroke="none" font-size="12" x="250.5" y="273" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#666"><tspan x="250.5" dy="0.71em">北京</tspan></text></g></g><g class="recharts-cartesian-axis-tick-labels recharts-yAxis-tick-labels"><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="left" width="60" height="260" stroke="none" x="57" y="265" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#666"><tspan x="57" dy="0.355em">0</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="left" width="60" height="260" stroke="none" x="57" y="200" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#666"><tspan x="57" dy="0.355em">0.25</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="left" width="60" height="260" stroke="none" x="57" y="135" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#666"><tspan x="57" dy="0.355em">0.5</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="left" width="60" height="260" stroke="none" x="57" y="70" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#666"><tspan x="57" dy="0.355em">0.75</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="left" width="60" height="260" stroke="none" x="57" y="12" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#666"><tspan x="57" dy="0.355em">1</tspan></text></g></g></g></svg></div></div></div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm chart-card"><div class="flex flex-col space-y-1.5 p-6 pb-3"><div class="font-semibold tracking-tight text-base">经验要求分布</div></div><div class="p-6 pt-0"><div class="recharts-responsive-container" style="width: 100%; height: 300px; min-width: 0px;"><div style="width: 0px; overflow-x: visible;"><div width="441" height="300" class="recharts-wrapper" style="position: relative; cursor: default; width: 441px; height: 300px;"><div xmlns="http://www.w3.org/1999/xhtml" tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"><div class="recharts-default-tooltip" role="status" aria-live="assertive" style="margin: 0px; padding: 10px; background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); white-space: nowrap;"><p class="recharts-tooltip-label" style="margin: 0px;"></p></div></div><div class="recharts-legend-wrapper" style="position: absolute; width: 431px; height: auto; left: 5px; bottom: 5px;"><ul class="recharts-default-legend" style="padding: 0px; margin: 0px; text-align: center;"><li class="recharts-legend-item legend-item-0" style="display: inline-block; margin-right: 10px;"><svg aria-label="3-5年 legend icon" class="recharts-surface" width="14" height="14" viewBox="0 0 32 32" style="display: inline-block; vertical-align: middle; margin-right: 4px;"><title></title><desc></desc><path stroke="none" fill="#3b82f6" d="M0,4h32v24h-32z" class="recharts-legend-icon"></path></svg><span class="recharts-legend-item-text" style="color: rgb(59, 130, 246);">3-5年</span></li></ul></div><svg cx="50%" cy="50%" role="application" tabindex="0" class="recharts-surface" width="441" height="300" viewBox="0 0 441 300" style="width: 100%; height: 100%; display: block;"><title></title><desc></desc><g tabindex="-1" class="recharts-zIndex-layer_-100"></g><g tabindex="-1" class="recharts-zIndex-layer_-50"></g><defs><clipPath id="recharts4-clip"><rect x="5" y="5" height="266" width="431"></rect></clipPath></defs><g tabindex="-1" class="recharts-zIndex-layer_100"><g class="recharts-layer recharts-pie" tabindex="0"><g class="recharts-layer"><g class="recharts-layer recharts-pie-sector" tabindex="-1"><g class="recharts-layer recharts-shape"></g></g></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_200"></g><g tabindex="-1" class="recharts-zIndex-layer_300"></g><g tabindex="-1" class="recharts-zIndex-layer_400"></g><g tabindex="-1" class="recharts-zIndex-layer_500"></g><g tabindex="-1" class="recharts-zIndex-layer_600"></g><g tabindex="-1" class="recharts-zIndex-layer_1000"></g><g tabindex="-1" class="recharts-zIndex-layer_1100"></g><g tabindex="-1" class="recharts-zIndex-layer_1200"></g><g tabindex="-1" class="recharts-zIndex-layer_2000"></g></svg></div></div></div></div></div></div><div class="grid grid-cols-1 gap-4 lg:grid-cols-2"><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6"><div class="text-2xl font-semibold leading-none tracking-tight">热门技能分布</div></div><div class="p-6 pt-0"><div class="recharts-responsive-container" style="width: 100%; height: 260px; min-width: 0px;"><div style="width: 0px; overflow-x: visible;"><div width="443" height="260" class="recharts-wrapper" style="position: relative; cursor: default; width: 443px; height: 260px;"><div xmlns="http://www.w3.org/1999/xhtml" tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"><div class="recharts-default-tooltip" role="status" aria-live="assertive" style="margin: 0px; padding: 10px; background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); white-space: nowrap;"><p class="recharts-tooltip-label" style="margin: 0px;"></p></div></div><svg cx="50%" cy="50%" role="application" tabindex="0" class="recharts-surface" width="443" height="260" viewBox="0 0 443 260" style="width: 100%; height: 100%; display: block;"><title></title><desc></desc><g tabindex="-1" class="recharts-zIndex-layer_-100"></g><g tabindex="-1" class="recharts-zIndex-layer_-50"></g><defs><clipPath id="recharts6-clip"><rect x="5" y="5" height="250" width="433"></rect></clipPath></defs><g tabindex="-1" class="recharts-zIndex-layer_100"><g class="recharts-layer recharts-pie" tabindex="0"><g class="recharts-layer"></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_200"></g><g tabindex="-1" class="recharts-zIndex-layer_300"></g><g tabindex="-1" class="recharts-zIndex-layer_400"></g><g tabindex="-1" class="recharts-zIndex-layer_500"></g><g tabindex="-1" class="recharts-zIndex-layer_600"></g><g tabindex="-1" class="recharts-zIndex-layer_1000"></g><g tabindex="-1" class="recharts-zIndex-layer_1100"></g><g tabindex="-1" class="recharts-zIndex-layer_1200"></g><g tabindex="-1" class="recharts-zIndex-layer_2000"></g></svg></div></div></div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6"><div class="text-2xl font-semibold leading-none tracking-tight">行业需求分布</div></div><div class="p-6 pt-0"><div class="recharts-responsive-container" style="width: 100%; height: 260px; min-width: 0px;"><div style="width: 0px; overflow-x: visible;"><div width="443" height="260" class="recharts-wrapper" style="position: relative; cursor: default; width: 443px; height: 260px;"><div xmlns="http://www.w3.org/1999/xhtml" tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"><div class="recharts-default-tooltip" role="status" aria-live="assertive" style="margin: 0px; padding: 10px; background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); white-space: nowrap;"><p class="recharts-tooltip-label" style="margin: 0px;"></p></div></div><svg role="application" tabindex="0" class="recharts-surface" width="443" height="260" viewBox="0 0 443 260" style="width: 100%; height: 100%; display: block;"><title></title><desc></desc><g tabindex="-1" class="recharts-zIndex-layer_-100"><g class="recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal"><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="85" y="5" width="353" height="220" x1="85" y1="115" x2="438" y2="115"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="85" y="5" width="353" height="220" x1="85" y1="5" x2="438" y2="5"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="85" y="5" width="353" height="220" x1="85" y1="225" x2="438" y2="225"></line></g><g class="recharts-cartesian-grid-vertical"><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="85" y="5" width="353" height="220" x1="85" y1="5" x2="85" y2="225"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="85" y="5" width="353" height="220" x1="173.25" y1="5" x2="173.25" y2="225"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="85" y="5" width="353" height="220" x1="261.5" y1="5" x2="261.5" y2="225"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="85" y="5" width="353" height="220" x1="349.75" y1="5" x2="349.75" y2="225"></line><line stroke-dasharray="3 3" stroke="#ccc" fill="none" x="85" y="5" width="353" height="220" x1="438" y1="5" x2="438" y2="225"></line></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_-50"></g><defs><clipPath id="recharts8-clip"><rect x="85" y="5" height="220" width="353"></rect></clipPath></defs><g tabindex="-1" class="recharts-zIndex-layer_100"></g><g tabindex="-1" class="recharts-zIndex-layer_200"></g><g tabindex="-1" class="recharts-zIndex-layer_300"><g class="recharts-layer recharts-bar" id="recharts-bar-:r2d:"><g class="recharts-layer recharts-bar-rectangles"><g class="recharts-layer"><g class="recharts-layer recharts-bar-rectangle"><g class="recharts-layer recharts-inactive-bar"><path fill="#2563eb" name="岗位数" x="85" y="27" width="343.5903" height="176" class="recharts-rectangle" d="M85,27L 424.5903,27A 4,4,0,0,1,
+        428.5903,31L 428.5903,199A 4,4,0,0,1,
+        424.5903,203L 85,203Z"></path></g></g></g></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_400"></g><g tabindex="-1" class="recharts-zIndex-layer_500"><g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"><line angle="0" height="30" orientation="bottom" x="85" y="225" width="353" class="recharts-cartesian-axis-line" stroke="#666" fill="none" x1="85" y1="225" x2="438" y2="225"></line><g class="recharts-cartesian-axis-ticks recharts-xAxis-ticks"><g class="recharts-cartesian-axis-tick-lines recharts-xAxis-tick-lines"><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" height="30" orientation="bottom" x="85" y="225" width="353" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="85" y1="231" x2="85" y2="225"></line></g><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" height="30" orientation="bottom" x="85" y="225" width="353" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="173.25" y1="231" x2="173.25" y2="225"></line></g><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" height="30" orientation="bottom" x="85" y="225" width="353" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="261.5" y1="231" x2="261.5" y2="225"></line></g><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" height="30" orientation="bottom" x="85" y="225" width="353" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="349.75" y1="231" x2="349.75" y2="225"></line></g><g class="recharts-layer recharts-cartesian-axis-tick"><line angle="0" height="30" orientation="bottom" x="85" y="225" width="353" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="438" y1="231" x2="438" y2="225"></line></g></g></g></g><g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis"><line width="80" angle="0" orientation="left" x="5" y="5" height="220" class="recharts-cartesian-axis-line" stroke="#666" fill="none" x1="85" y1="5" x2="85" y2="225"></line><g class="recharts-cartesian-axis-ticks recharts-yAxis-ticks"><g class="recharts-cartesian-axis-tick-lines recharts-yAxis-tick-lines"><g class="recharts-layer recharts-cartesian-axis-tick"><line width="80" angle="0" orientation="left" x="5" y="5" height="220" class="recharts-cartesian-axis-tick-line" stroke="#666" fill="none" x1="79" y1="115" x2="85" y2="115"></line></g></g></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_600"></g><g tabindex="-1" class="recharts-zIndex-layer_1000"></g><g tabindex="-1" class="recharts-zIndex-layer_1100"></g><g tabindex="-1" class="recharts-zIndex-layer_1200"></g><g tabindex="-1" class="recharts-zIndex-layer_2000"><g class="recharts-cartesian-axis-tick-labels recharts-xAxis-tick-labels"><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="353" stroke="none" x="85" y="233" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#666"><tspan x="85" dy="0.71em">0</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="353" stroke="none" x="173.25" y="233" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#666"><tspan x="173.25" dy="0.71em">0.25</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="353" stroke="none" x="261.5" y="233" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#666"><tspan x="261.5" dy="0.71em">0.5</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="353" stroke="none" x="349.75" y="233" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#666"><tspan x="349.75" dy="0.71em">0.75</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="353" stroke="none" x="438" y="233" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#666"><tspan x="438" dy="0.71em">1</tspan></text></g></g><g class="recharts-cartesian-axis-tick-labels recharts-yAxis-tick-labels"><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="80" orientation="left" height="220" stroke="none" font-size="12" x="77" y="115" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#666"><tspan x="77" dy="0.355em">互联网</tspan></text></g></g></g></svg></div></div></div></div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6"><div class="text-2xl font-semibold leading-none tracking-tight">市场趋势洞察</div></div><div class="p-6 pt-0 space-y-3"><p class="leading-relaxed text-muted-foreground">共分析 1 条岗位数据。平均薪资 20000-35000 元/月，热门技能包括 Python, FastAPI, PostgreSQL, 沟通能力。</p><div class="flex items-center gap-2"><div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">主流薪资范围</div><span class="font-medium">20k-35k</span></div></div></div><div class="rounded-lg border bg-card text-card-foreground shadow-sm"><div class="flex flex-col space-y-1.5 p-6"><div class="text-2xl font-semibold leading-none tracking-tight">热门岗位 TOP10</div></div><div class="p-6 pt-0"><ol class="space-y-3"><li class="flex items-center gap-3"><div class="inline-flex items-center border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80 h-6 w-6 justify-center rounded-full p-0">1</div><span class="text-sm font-medium">Python 后端工程师</span></li></ol></div></div></div></main><section aria-label="Notifications alt+T" tabindex="-1" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></section></div></div>
+    <script type="module" src="/src/main.tsx"></script>
+  
+
+<div data-state="open" class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" data-aria-hidden="true" aria-hidden="true" style="pointer-events: auto;"></div><div role="dialog" id="radix-:r9:" data-state="open" class="fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg max-w-2xl" tabindex="-1" data-aria-hidden="true" aria-hidden="true" aria-describedby="radix-:rb:" aria-labelledby="radix-:ra:" style="pointer-events: none;"><div class="flex flex-col space-y-1.5 text-center sm:text-left"><h2 id="radix-:ra:" class="text-lg font-semibold leading-none tracking-tight">新手引导</h2><p id="radix-:rb:" class="text-sm text-muted-foreground">Step 1：创建你的技能画像</p></div><div class="flex items-center gap-2 py-2"><div class="h-2 flex-1 rounded-full transition-colors bg-primary"></div><div class="h-2 flex-1 rounded-full transition-colors bg-muted"></div><div class="h-2 flex-1 rounded-full transition-colors bg-muted"></div></div><div class="space-y-4"><div class="space-y-2"><label class="text-sm font-medium" for="onboarding-name">画像名称</label><input class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="onboarding-name" placeholder="例如：Java 后端工程师" value=""></div><div class="space-y-2"><label class="text-sm font-medium" for="onboarding-skills">技能</label><textarea class="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="onboarding-skills" placeholder="输入技能，用逗号分隔，例如：Java, Spring Boot, MySQL, Redis"></textarea><div class="text-xs text-muted-foreground">已识别 0 项技能</div></div><div class="grid gap-4 md:grid-cols-2"><div class="space-y-2"><label class="text-sm font-medium">经验</label><button type="button" role="combobox" aria-expanded="false" aria-autocomplete="none" dir="ltr" data-state="closed" class="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&amp;&gt;span]:line-clamp-1"><span style="pointer-events: none;">不限</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-4 w-4 opacity-50" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></div><div class="space-y-2"><label class="text-sm font-medium" for="onboarding-target">目标岗位（可选）</label><input class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="onboarding-target" placeholder="用逗号分隔" value=""></div></div><div class="rounded-lg border border-dashed border-input bg-muted/30 p-4"><div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between"><div><div class="text-sm font-medium">上传简历</div><div class="text-xs text-muted-foreground">支持 PDF、DOCX，上传后自动解析并填充技能</div></div><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload mr-2 h-4 w-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg>选择简历</button></div><input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="hidden"></div></div><div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs">跳过引导</button><div class="flex gap-2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2" disabled="">下一步<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-2 h-4 w-4"><path d="m9 18 6-6-6-6"></path></svg></button></div></div><button type="button" class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x h-4 w-4"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg><span class="sr-only">关闭</span></button></div><div data-state="open" class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" data-aria-hidden="true" aria-hidden="true" style="pointer-events: auto;"></div><div role="dialog" id="radix-:rf:" data-state="open" class="fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg max-w-2xl" tabindex="-1" data-aria-hidden="true" aria-hidden="true" aria-describedby="radix-:rh:" aria-labelledby="radix-:rg:" style="pointer-events: auto;"><div class="flex flex-col space-y-1.5 text-center sm:text-left"><h2 id="radix-:rg:" class="text-lg font-semibold leading-none tracking-tight">新手引导</h2><p id="radix-:rh:" class="text-sm text-muted-foreground">Step 1：创建你的技能画像</p></div><div class="flex items-center gap-2 py-2"><div class="h-2 flex-1 rounded-full transition-colors bg-primary"></div><div class="h-2 flex-1 rounded-full transition-colors bg-muted"></div><div class="h-2 flex-1 rounded-full transition-colors bg-muted"></div></div><div class="space-y-4"><div class="space-y-2"><label class="text-sm font-medium" for="onboarding-name">画像名称</label><input class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="onboarding-name" placeholder="例如：Java 后端工程师" value=""></div><div class="space-y-2"><label class="text-sm font-medium" for="onboarding-skills">技能</label><textarea class="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="onboarding-skills" placeholder="输入技能，用逗号分隔，例如：Java, Spring Boot, MySQL, Redis"></textarea><div class="text-xs text-muted-foreground">已识别 0 项技能</div></div><div class="grid gap-4 md:grid-cols-2"><div class="space-y-2"><label class="text-sm font-medium">经验</label><button type="button" role="combobox" aria-expanded="false" aria-autocomplete="none" dir="ltr" data-state="closed" class="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&amp;&gt;span]:line-clamp-1"><span style="pointer-events: none;">不限</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-4 w-4 opacity-50" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></div><div class="space-y-2"><label class="text-sm font-medium" for="onboarding-target">目标岗位（可选）</label><input class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="onboarding-target" placeholder="用逗号分隔" value=""></div></div><div class="rounded-lg border border-dashed border-input bg-muted/30 p-4"><div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between"><div><div class="text-sm font-medium">上传简历</div><div class="text-xs text-muted-foreground">支持 PDF、DOCX，上传后自动解析并填充技能</div></div><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload mr-2 h-4 w-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg>选择简历</button></div><input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="hidden"></div></div><div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs">跳过引导</button><div class="flex gap-2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2" disabled="">下一步<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-2 h-4 w-4"><path d="m9 18 6-6-6-6"></path></svg></button></div></div><button type="button" class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x h-4 w-4"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg><span class="sr-only">关闭</span></button></div><span data-radix-focus-guard="" tabindex="0" data-aria-hidden="true" aria-hidden="true" style="outline: none; opacity: 0; position: fixed; pointer-events: none;"></span><span id="recharts_measurement_span" aria-hidden="true" style="position: absolute; top: -20000px; left: 0px; padding: 0px; margin: 0px; border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; white-space: pre; font-size: 12px; letter-spacing: normal;">互联网</span></body></html>
