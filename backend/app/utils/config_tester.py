@@ -92,7 +92,8 @@ def _test_database(settings: Settings) -> ConfigTestResult:
         with engine.connect() as conn:
             result = conn.execute(text("SELECT 1"))
             result.scalar()
-        return "数据库连接正常", {"url_type": "mysql" if "mysql" in settings.effective_database_url.lower() else "sqlite"}
+        url_type = "mysql" if "mysql" in settings.effective_database_url.lower() else "sqlite"
+        return "数据库连接正常", {"url_type": url_type}
 
     return _run_test("数据库", "database", configured, _check)
 
@@ -128,7 +129,11 @@ def _test_ollama(settings: Settings) -> ConfigTestResult:
 
 
 def _test_openai(settings: Settings) -> ConfigTestResult:
-    configured = bool(settings.openai_api_key) and not settings.use_local_llm and not settings.use_domestic_llm
+    configured = (
+        bool(settings.openai_api_key)
+        and not settings.use_local_llm
+        and not settings.use_domestic_llm
+    )
 
     def _check() -> tuple[str, dict[str, Any]]:
         r = requests.get(
@@ -183,7 +188,10 @@ def _test_bocha(settings: Settings) -> ConfigTestResult:
     def _check() -> tuple[str, dict[str, Any]]:
         r = requests.post(
             "https://api.bochaai.com/v1/web-search",
-            headers={"Authorization": f"Bearer {settings.bocha_api_key}", "Content-Type": "application/json"},
+            headers={
+                "Authorization": f"Bearer {settings.bocha_api_key}",
+                "Content-Type": "application/json",
+            },
             json={"query": "Python 后端", "count": 1},
             timeout=20,
         )
@@ -231,7 +239,10 @@ def _test_duckduckgo(settings: Settings) -> ConfigTestResult:
 
             with DDGS(timeout=10) as ddgs:
                 results = list(ddgs.text("Python backend", max_results=1))
-            return f"DuckDuckGo 搜索可用，返回 {len(results)} 条结果", {"result_count": len(results)}
+            return (
+                f"DuckDuckGo 搜索可用，返回 {len(results)} 条结果",
+                {"result_count": len(results)},
+            )
         except Exception as exc:  # noqa: BLE001
             raise Exception(f"DuckDuckGo 不可用: {exc}") from exc
 
@@ -289,7 +300,8 @@ def _test_resume_masking(settings: Settings) -> ConfigTestResult:
         from app.utils.content_safety import mask_sensitive_text
 
         masked = mask_sensitive_text("手机号 13800138000，身份证 110101199001011234")
-        return f"简历脱敏功能正常，状态: {'开启' if settings.enable_resume_masking else '关闭'}", {"sample": masked}
+        status = "开启" if settings.enable_resume_masking else "关闭"
+        return f"简历脱敏功能正常，状态: {status}", {"sample": masked}
 
     return _run_test("简历数据脱敏", "safety", configured, _check)
 

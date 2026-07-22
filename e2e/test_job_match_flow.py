@@ -34,14 +34,23 @@ os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", str(ROOT / ".playwright-browse
 
 def find_chrome_executable() -> Path | None:
     """Locate the Chromium binary downloaded by Playwright."""
-    browsers_path = Path(
-        os.environ.get("PLAYWRIGHT_BROWSERS_PATH", Path.home() / ".cache" / "ms-playwright")
-    )
+    search_paths: list[Path] = []
+    env_path = os.environ.get("PLAYWRIGHT_BROWSERS_PATH")
+    if env_path:
+        search_paths.append(Path(env_path))
     if sys.platform == "win32":
-        candidates = list(browsers_path.rglob("chrome.exe"))
+        search_paths.append(Path.home() / "AppData" / "Local" / "ms-playwright")
     else:
-        candidates = [p for p in browsers_path.rglob("chrome") if p.is_file()]
-    return candidates[0] if candidates else None
+        search_paths.append(Path.home() / ".cache" / "ms-playwright")
+
+    for browsers_path in search_paths:
+        if sys.platform == "win32":
+            candidates = list(browsers_path.rglob("chrome.exe"))
+        else:
+            candidates = [p for p in browsers_path.rglob("chrome") if p.is_file()]
+        if candidates:
+            return candidates[0]
+    return None
 
 
 def test_job_match_flow() -> None:
@@ -64,11 +73,14 @@ def test_job_match_flow() -> None:
             page.set_default_timeout(30_000)
 
             try:
+                # 预先标记新手引导已完成，避免首页弹窗阻塞后续断言
+                page.add_init_script("localStorage.setItem('onboarding_completed', 'true');")
+
                 # 1. 仪表盘
                 page.goto("http://127.0.0.1:5173/")
                 page.wait_for_load_state("networkidle")
                 assert "TalentMatch Engine" in page.content()
-                page.wait_for_selector("text=技能图谱仪表盘")
+                page.locator("h2", has_text="技能图谱仪表盘").wait_for()
                 print("Dashboard loaded.")
 
                 # 2. 岗位库

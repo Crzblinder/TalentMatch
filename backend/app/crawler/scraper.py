@@ -25,8 +25,8 @@ from app.data.generator import CITIES, get_skill_pool
 
 # Playwright 为可选依赖；未安装时国内平台抓取自动降级为空列表
 try:
-    from playwright.sync_api import sync_playwright
     from playwright.sync_api import TimeoutError as PWTimeoutError
+    from playwright.sync_api import sync_playwright
 except Exception:  # pragma: no cover
     sync_playwright = None
     PWTimeoutError = Exception
@@ -271,7 +271,9 @@ def _extract_company(title: str, content: str) -> str:
     return ""
 
 
-def _build_skill_matcher(skill_pool: list[tuple[str, str, list[str]]]) -> list[tuple[str, list[str]]]:
+def _build_skill_matcher(
+    skill_pool: list[tuple[str, str, list[str]]],
+) -> list[tuple[str, list[str]]]:
     """构造技能匹配表：[(技能名, [所有匹配形式]), ...]。"""
     matcher = []
     for name, _category, aliases in skill_pool:
@@ -282,7 +284,10 @@ def _build_skill_matcher(skill_pool: list[tuple[str, str, list[str]]]) -> list[t
     return matcher
 
 
-def _extract_skills(text: str, skill_pool: list[tuple[str, str, list[str]]] | None = None) -> list[str]:
+def _extract_skills(
+    text: str,
+    skill_pool: list[tuple[str, str, list[str]]] | None = None,
+) -> list[str]:
     if skill_pool is None:
         skill_pool = get_skill_pool()
     matcher = _build_skill_matcher(skill_pool)
@@ -334,8 +339,14 @@ def _parse_rss_atom_entries(content: bytes) -> list[dict[str, Any]]:
         root = ET.fromstring(content)
         ns = {"atom": "http://www.w3.org/2005/Atom"}
         entries = []
-        for entry in root.findall("atom:entry", ns) or root.findall(".//item") or root.findall("entry"):
-            title = _normalize_text(entry.findtext("atom:title", "", ns) or entry.findtext("title", ""))
+        for entry in (
+            root.findall("atom:entry", ns)
+            or root.findall(".//item")
+            or root.findall("entry")
+        ):
+            title = _normalize_text(
+                entry.findtext("atom:title", "", ns) or entry.findtext("title", "")
+            )
             body = _normalize_text(
                 entry.findtext("atom:content", "", ns)
                 or entry.findtext("content", "", default="")
@@ -347,7 +358,12 @@ def _parse_rss_atom_entries(content: bytes) -> list[dict[str, Any]]:
             link_el = entry.find("atom:link", ns) or entry.find("link")
             if link_el is not None:
                 link = link_el.get("href", "") or link_el.text or ""
-            published = entry.findtext("atom:published", "", ns) or entry.findtext("published", "") or entry.findtext("pubDate", "") or entry.findtext("updated", "")
+            published = (
+                entry.findtext("atom:published", "", ns)
+                or entry.findtext("published", "")
+                or entry.findtext("pubDate", "")
+                or entry.findtext("updated", "")
+            )
             entries.append({
                 "title": title,
                 "content": body,
@@ -890,7 +906,9 @@ def fetch_real_jobs(
 
     # 3. 合并去重：RSS 数据优先（更新鲜），种子数据兜底
     jobs = _merge_jobs(rss_jobs, seed_jobs)
-    logger.info("合并后共 %d 条真实 JD（RSS=%d, seed=%d）", len(jobs), len(rss_jobs), len(seed_jobs))
+    logger.info(
+        "合并后共 %d 条真实 JD（RSS=%d, seed=%d）", len(jobs), len(rss_jobs), len(seed_jobs)
+    )
     return jobs
 
 

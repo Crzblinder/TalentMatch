@@ -216,7 +216,8 @@ class ObstacleDetector(BaseAgent):
             major = str(education[0].get("major", ""))
         target_position = job_intention.get("expected_position", "")
         if major and target_position and not self._major_matches_position(major, target_position):
-            obstacles.append(self._make_obstacle("major_mismatch", f"专业 {major} 与目标岗位 {target_position} 关联度可能较低"))
+            msg = f"专业 {major} 与目标岗位 {target_position} 关联度可能较低"
+            obstacles.append(self._make_obstacle("major_mismatch", msg))
 
         # 空窗期关键词
         if any(kw in self_eval for kw in ("二战", "空窗", "待业", "gap")):

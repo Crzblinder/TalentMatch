@@ -7,7 +7,7 @@ import io
 import logging
 import os
 import re
-from typing import Any
+from typing import Any, Literal
 
 import requests
 from docx import Document
@@ -20,7 +20,7 @@ from app.utils.content_safety import check_text_safety, mask_resume_data
 logger = logging.getLogger(__name__)
 
 
-def should_use_fuzzy_parsing(text: str, content_type: "resume" | "jd") -> bool:
+def should_use_fuzzy_parsing(text: str, content_type: Literal["resume", "jd"]) -> bool:
     """根据文本内容自动判断是否启用模糊解析。
 
     规则优先级：

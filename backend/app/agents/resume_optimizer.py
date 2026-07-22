@@ -25,7 +25,8 @@ class ResumeOptimizer(BaseAgent):
         """根据 JD 优化简历内容。
 
         Args:
-            resume_data: 原始简历数据，包含 project_experience、work_experience、self_evaluation 等字段
+            resume_data: 原始简历数据，包含 project_experience、
+                work_experience、self_evaluation 等字段
             jd_text: 目标岗位描述文本
             field_order: 字段排放顺序，可选值：['project', 'internship', 'advantage'] 的排列组合
 

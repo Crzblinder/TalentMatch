@@ -266,7 +266,9 @@ def fuzzy_parse_jd(payload: JDFuzzyParseRequest) -> ApiResponse:
 @api_router.post("/jobs/upload", response_model=ApiResponse)
 async def upload_jd(
     file: UploadFile = File(...),
-    fuzzy: bool | None = Query(None, description="是否启用模糊识别（应届生友好模式）；不传则自动判定"),
+    fuzzy: bool | None = Query(
+        None, description="是否启用模糊识别（应届生友好模式）；不传则自动判定"
+    ),
 ) -> ApiResponse:
     """上传 JD 文件（支持 PDF、DOCX、图片）并解析。
 
@@ -383,7 +385,9 @@ def parse_resume(payload: ResumeParseRequest) -> ApiResponse:
 @api_router.post("/resumes/upload", response_model=ApiResponse)
 async def upload_resume(
     file: UploadFile = File(...),
-    fuzzy: bool | None = Query(None, description="是否启用模糊识别（应届生友好模式）；不传则自动判定"),
+    fuzzy: bool | None = Query(
+        None, description="是否启用模糊识别（应届生友好模式）；不传则自动判定"
+    ),
 ) -> ApiResponse:
     """上传简历并解析为结构化信息。"""
     file_bytes = await file.read()

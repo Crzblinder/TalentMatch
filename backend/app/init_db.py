@@ -1,14 +1,15 @@
 import logging
 import os
 
+from sqlalchemy import inspect
+from sqlalchemy.sql import text
+
 # 导入所有模型以注册到 Base.metadata
 from app import models  # noqa: F401
 from app.config import get_settings
 from app.data.seed import seed_database
 from app.models.base import Base, SessionLocal, engine
 from app.rag.vector_store import get_vector_store
-from sqlalchemy import inspect
-from sqlalchemy.sql import text
 
 logger = logging.getLogger(__name__)
 

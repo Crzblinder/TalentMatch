@@ -7,7 +7,7 @@ import re
 from typing import Any
 
 from app.agents.base import BaseAgent
-from app.agents.jd_parser import _EDUCATION_PATTERNS, _EXPERIENCE_PATTERNS, _SKILL_KEYWORDS
+from app.agents.jd_parser import _EDUCATION_PATTERNS, _SKILL_KEYWORDS
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,9 @@ class ResumeParser(BaseAgent):
             "basic_info": self._normalize_basic_info(result.get("basic_info") or {}),
             "education": self._normalize_experience_list(result.get("education") or []),
             "work_experience": self._normalize_experience_list(result.get("work_experience") or []),
-            "project_experience": self._normalize_experience_list(result.get("project_experience") or []),
+            "project_experience": self._normalize_experience_list(
+                result.get("project_experience") or []
+            ),
             "skills": result.get("skills") or [],
             "awards": result.get("awards") or [],
             "certifications": result.get("certifications") or [],
@@ -231,7 +233,9 @@ class ResumeParser(BaseAgent):
         return ""
 
     def _extract_email(self, text: str) -> str:
-        m = re.search(r"(?:邮箱|Email|E-mail)[:：\s]*([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})", text, re.I)
+        email_pattern = r"(?:邮箱|Email|E-mail)[:：\s]*"
+        email_pattern += r"([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})"
+        m = re.search(email_pattern, text, re.I)
         if m:
             return m.group(1)
         m = re.search(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", text)
@@ -307,7 +311,13 @@ class ResumeParser(BaseAgent):
                     break
             educations.append({
                 "school": school_match.group(0) if school_match else "",
-                "major": major_match.group(0).replace(school_match.group(0) if school_match else "", "").strip() if major_match else "",
+                "major": (
+                    major_match.group(0)
+                    .replace(school_match.group(0) if school_match else "", "")
+                    .strip()
+                    if major_match
+                    else ""
+                ),
                 "degree": degree,
                 "start_date": m.group(1),
                 "end_date": m.group(2),
@@ -329,7 +339,9 @@ class ResumeParser(BaseAgent):
             # 过滤掉教育经历行（包含大学/学院）
             if re.search(r"大学|学院|学校|研究所", line):
                 continue
-            company_match = re.search(r"[\u4e00-\u9fa5A-Za-z]{2,30}(?:股份|科技|网络|信息|智能|有限公司|公司)", line)
+            company_pattern = r"[\u4e00-\u9fa5A-Za-z]{2,30}"
+            company_pattern += r"(?:股份|科技|网络|信息|智能|有限公司|公司)"
+            company_match = re.search(company_pattern, line)
             position_match = re.search(r"[—\-–]\s*([^\n]{2,30}?)(?:\s*[（(]|$)", line)
             experiences.append({
                 "company": company_match.group(0) if company_match else "",
@@ -395,7 +407,9 @@ class ResumeParser(BaseAgent):
                     langs.append(line)
         # 如果没找到专门段落，搜索 CET/雅思/托福
         if not langs:
-            for m in re.finditer(r"(CET[-]?[46][:：]?\s*\d+|英语四六级|雅思\s*\d+\.?\d*|托福\s*\d+)", text, re.I):
+            lang_pattern = r"(CET[-]?[46][:：]?\s*\d+|英语四六级|"
+            lang_pattern += r"雅思\s*\d+\.?\d*|托福\s*\d+)"
+            for m in re.finditer(lang_pattern, text, re.I):
                 langs.append(m.group(0))
         return langs[:10]
 

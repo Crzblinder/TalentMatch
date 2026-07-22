@@ -117,11 +117,10 @@ export default function Layout({ children }: LayoutProps) {
             </SheetContent>
           </Sheet>
         </header>
-        <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
       </div>
 
-      {/* 桌面端主内容 */}
-      <main className="hidden flex-1 overflow-auto p-6 md:block">{children}</main>
+      {/* 主内容区：移动端与桌面端共享同一份渲染，避免重复挂载 */}
+      <main className="flex-1 overflow-auto p-4 md:block md:p-6">{children}</main>
 
       {/* 全局通知容器 */}
       <Toaster />

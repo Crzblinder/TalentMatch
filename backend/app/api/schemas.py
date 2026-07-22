@@ -253,7 +253,9 @@ class MatchResultListOut(BaseModel):
 # ---------------------------------------------------------------------------
 class JDParseRequest(BaseModel):
     jd_text: str = Field(..., min_length=10)
-    fuzzy: bool | None = Field(None, description="是否启用模糊识别（应届生友好模式）；显式传值时跳过自动判定")
+    fuzzy: bool | None = Field(
+        None, description="是否启用模糊识别（应届生友好模式）；显式传值时跳过自动判定"
+    )
     prompt_variant: str | None = Field(None, description="提示词变体，如 fresh_graduate")
 
 
@@ -443,7 +445,9 @@ class ResumeParseRequest(BaseModel):
     """简历文本解析请求。"""
 
     resume_text: str = Field(..., min_length=10, description="原始简历文本")
-    fuzzy: bool | None = Field(None, description="是否启用模糊识别（应届生友好模式）；显式传值时跳过自动判定")
+    fuzzy: bool | None = Field(
+        None, description="是否启用模糊识别（应届生友好模式）；显式传值时跳过自动判定"
+    )
     prompt_variant: str | None = Field(None, description="提示词变体，如 fresh_graduate")
 
 
@@ -459,7 +463,9 @@ class JDFuzzyParseRequest(BaseModel):
     """JD 模糊识别解析请求。"""
 
     jd_text: str = Field(..., min_length=10, description="原始岗位描述文本")
-    focus: str = Field("auto", description="解析重点：auto/requirements/barriers/fresh_graduate_friendly")
+    focus: str = Field(
+        "auto", description="解析重点：auto/requirements/barriers/fresh_graduate_friendly"
+    )
     detect_obstacles: bool = Field(True, description="是否同步识别岗位门槛")
 
 

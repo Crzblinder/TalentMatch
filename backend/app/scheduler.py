@@ -37,7 +37,7 @@ def fetch_jobs_job() -> dict[str, Any]:
     单个源失败已被 scraper 内部捕获，本函数再做最后一层保护，
     确保任何异常都不会导致调度器线程中断。
     """
-    settings = get_settings()
+    # 配置校验可在需要时从 get_settings() 读取；当前任务不依赖动态配置
     logger.info("开始执行定时岗位采集任务...")
 
     try:
