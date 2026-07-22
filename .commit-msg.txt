@@ -1,7 +1,0 @@
-Fix CI: include shadcn utils and correct Layout responsive structure
-
-- Add !frontend/src/lib/ exception to .gitignore so @/lib/utils.ts is tracked
-- Rewrite Layout.tsx to render children only once while keeping responsive sidebar/header
-- Keep localStorage onboarding skip and h2 locator in E2E test
-
-Verified: npm run build and e2e/test_job_match_flow.py pass locally.
