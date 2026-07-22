@@ -15,6 +15,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from app.config import get_settings
 from app.crawler.scraper import JobScraper, save_jobs
+from app.services.cache_service import invalidate_job_cache
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,8 @@ def fetch_jobs_job() -> dict[str, Any]:
         # BackgroundScheduler 在独立线程中运行，需要新建事件循环执行异步爬虫
         jobs = asyncio.run(_run_scraper())
         save_jobs(jobs)
+        if jobs:
+            invalidate_job_cache()
         logger.info("定时岗位采集完成，共 %d 条岗位已保存", len(jobs))
         return {
             "success": True,

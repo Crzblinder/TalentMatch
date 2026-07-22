@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import logging
 import os
@@ -45,14 +46,26 @@ from app.api.schemas import (
     SearchRequest,
     SkillListOut,
     SkillOut,
+    TaskCreateRequest,
+    TaskOut,
+    TaskStatusOut,
     UserSkillProfileCreate,
     UserSkillProfileListOut,
     UserSkillProfileOut,
+)
+from app.tasks import (
+    match_profile_to_job_task,
+    parse_jd_file_task,
+    parse_jd_text_task,
+    parse_resume_file_task,
+    parse_resume_text_task,
+    web_search_task,
 )
 from app.crawler.scraper import get_status as get_crawler_status
 from app.models import Job, UserSkillProfile
 from app.models.base import get_db
 from app.scheduler import trigger_fetch_jobs
+from app.services.cache_service import CACHE_KEYS, DEFAULT_TTLS, get_cache_client
 from app.services.favorite_service import FavoriteService
 from app.services.jd_service import JDService
 from app.services.job_service import JobService
@@ -117,6 +130,38 @@ def _load_json_list(value: Any) -> list[Any]:
     return []
 
 
+def _get_trend_summary(db: Session) -> dict[str, Any]:
+    """获取趋势统计，结果缓存 1 小时。"""
+    cache = get_cache_client()
+    cached_value = cache.get(CACHE_KEYS["trends"])
+    if cached_value is not None:
+        return cached_value
+
+    job_data = []
+    for job in db.query(Job).all():
+        job_data.append(
+            {
+                "title": job.title,
+                "city": job.city,
+                "salary_min": job.salary_min,
+                "salary_max": job.salary_max,
+                "required_skills": _load_json_list(job.required_skills),
+            }
+        )
+
+    agent = TrendPredictor()
+    trend = agent.predict(job_data)
+    result = {
+        "summary": trend.get("summary", ""),
+        "top_skills": trend.get("top_skills", []),
+        "avg_salary_range": trend.get("avg_salary_range", ""),
+        "hot_job_titles": trend.get("hot_job_titles", []),
+        "key_metrics": trend.get("key_metrics", {}),
+    }
+    cache.set(CACHE_KEYS["trends"], result, ttl=DEFAULT_TTLS["trends"])
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Health
 # ---------------------------------------------------------------------------
@@ -170,6 +215,106 @@ def skills_config() -> ApiResponse:
 def crawler_status() -> ApiResponse:
     """返回 JD 爬虫最近一次运行状态。"""
     return _success(get_crawler_status())
+
+
+# ---------------------------------------------------------------------------
+# Async Tasks
+# ---------------------------------------------------------------------------
+_TASK_DISPATCHERS: dict[str, Any] = {
+    "resume.parse_text": parse_resume_text_task,
+    "resume.parse_file": parse_resume_file_task,
+    "jd.parse_text": parse_jd_text_task,
+    "jd.parse_file": parse_jd_file_task,
+    "match.profile_job": match_profile_to_job_task,
+    "search.web": web_search_task,
+}
+
+
+@api_router.post("/tasks", response_model=ApiResponse)
+def create_task(payload: TaskCreateRequest) -> ApiResponse:
+    """提交异步任务，立即返回任务 ID。"""
+    dispatcher = _TASK_DISPATCHERS.get(payload.task_type)
+    if dispatcher is None:
+        raise HTTPException(status_code=400, detail=f"不支持的任务类型: {payload.task_type}")
+
+    try:
+        task = dispatcher.delay(**payload.payload)
+    except TypeError as exc:
+        logger.warning("任务参数错误: %s", exc)
+        raise HTTPException(status_code=400, detail=f"任务参数错误: {exc}") from exc
+    except Exception as exc:
+        logger.exception("提交任务失败")
+        raise HTTPException(status_code=500, detail=f"提交任务失败: {exc}") from exc
+
+    return _success(
+        TaskOut(task_id=task.id, status=task.status).model_dump(),
+        message="任务已提交",
+    )
+
+
+@api_router.get("/tasks/{task_id}", response_model=ApiResponse)
+def get_task_status(task_id: str) -> ApiResponse:
+    """查询异步任务状态和结果。"""
+    from app.tasks.celery_app import celery_app
+
+    result = celery_app.AsyncResult(task_id)
+    response = TaskStatusOut(
+        task_id=task_id,
+        status=result.status,
+        result=result.result if result.ready() and result.successful() else None,
+        error=str(result.result) if result.ready() and result.failed() else None,
+    )
+    return _success(response.model_dump())
+
+
+@api_router.post("/resumes/upload-async", response_model=ApiResponse)
+async def upload_resume_async(
+    file: UploadFile = File(...),
+    fuzzy: bool | None = Query(
+        None, description="是否启用模糊识别（应届生友好模式）；不传则自动判定"
+    ),
+) -> ApiResponse:
+    """异步上传简历并解析，立即返回任务 ID。"""
+    file_bytes = await file.read()
+
+    if len(file_bytes) > MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=413, detail="文件大小超过 10MB 限制")
+
+    filename = file.filename or ""
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in (".pdf", ".docx"):
+        raise HTTPException(status_code=400, detail="仅支持 PDF 和 DOCX 格式")
+
+    file_b64 = base64.b64encode(file_bytes).decode("utf-8")
+    task = parse_resume_file_task.delay(
+        file_b64=file_b64,
+        filename=filename,
+        fuzzy=fuzzy,
+    )
+    return _success(TaskOut(task_id=task.id, status=task.status).model_dump(), message="解析任务已提交")
+
+
+@api_router.post("/jobs/upload-async", response_model=ApiResponse)
+async def upload_jd_async(
+    file: UploadFile = File(...),
+    fuzzy: bool | None = Query(
+        None, description="是否启用模糊识别（应届生友好模式）；不传则自动判定"
+    ),
+) -> ApiResponse:
+    """异步上传 JD 文件并解析，立即返回任务 ID。"""
+    file_bytes = await file.read()
+
+    if len(file_bytes) > MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=413, detail="文件大小超过 10MB 限制")
+
+    filename = file.filename or ""
+    file_b64 = base64.b64encode(file_bytes).decode("utf-8")
+    task = parse_jd_file_task.delay(
+        file_b64=file_b64,
+        filename=filename,
+        fuzzy=fuzzy,
+    )
+    return _success(TaskOut(task_id=task.id, status=task.status).model_dump(), message="解析任务已提交")
 
 
 @api_router.post("/crawler/trigger", response_model=ApiResponse)
@@ -586,8 +731,11 @@ def get_related_skills(
 @api_router.post("/skills/invalidate-cache", response_model=ApiResponse)
 def invalidate_skill_cache(db: Session = Depends(get_db)) -> ApiResponse:
     """开发调试：手动清空技能图谱缓存，使下次请求重新从数据库构建图谱。"""
+    from app.services.cache_service import invalidate_skill_cache as _invalidate_skill_cache
+
     service = SkillService(db)
     service.invalidate_cache()
+    _invalidate_skill_cache()
     return _success({"invalidated": True}, message="技能图谱缓存已清空")
 
 
@@ -791,29 +939,7 @@ def generate_learning_path(
 # ---------------------------------------------------------------------------
 @api_router.get("/trends", response_model=ApiResponse)
 def get_trends(db: Session = Depends(get_db)) -> ApiResponse:
-    job_data = []
-    for job in db.query(Job).all():
-        job_data.append(
-            {
-                "title": job.title,
-                "city": job.city,
-                "salary_min": job.salary_min,
-                "salary_max": job.salary_max,
-                "required_skills": _load_json_list(job.required_skills),
-            }
-        )
-
-    agent = TrendPredictor()
-    trend = agent.predict(job_data)
-    return _success(
-        {
-            "summary": trend.get("summary", ""),
-            "top_skills": trend.get("top_skills", []),
-            "avg_salary_range": trend.get("avg_salary_range", ""),
-            "hot_job_titles": trend.get("hot_job_titles", []),
-            "key_metrics": trend.get("key_metrics", {}),
-        }
-    )
+    return _success(_get_trend_summary(db))
 
 
 # ---------------------------------------------------------------------------
@@ -826,32 +952,13 @@ def get_dashboard(db: Session = Depends(get_db)) -> ApiResponse:
 
     job_stats = job_service.get_job_statistics()
     skill_stats = skill_service.get_skill_statistics()
-
-    job_data = []
-    for job in db.query(Job).all():
-        job_data.append(
-            {
-                "title": job.title,
-                "city": job.city,
-                "salary_min": job.salary_min,
-                "salary_max": job.salary_max,
-                "required_skills": _load_json_list(job.required_skills),
-            }
-        )
-    agent = TrendPredictor()
-    trend = agent.predict(job_data)
+    trend = _get_trend_summary(db)
 
     return _success(
         {
             "jobs": job_stats,
             "skills": skill_stats,
-            "trends": {
-                "summary": trend.get("summary", ""),
-                "top_skills": trend.get("top_skills", []),
-                "avg_salary_range": trend.get("avg_salary_range", ""),
-                "hot_job_titles": trend.get("hot_job_titles", []),
-                "key_metrics": trend.get("key_metrics", {}),
-            },
+            "trends": trend,
         }
     )
 

@@ -339,6 +339,16 @@ def start_backend(python: str, env: dict, port: int) -> subprocess.Popen:
     )
 
 
+def start_celery_worker(python: str, env: dict) -> subprocess.Popen:
+    """启动 Celery Worker，输出直接继承当前终端"""
+    print_info("正在启动 Celery Worker...")
+    return subprocess.Popen(
+        [python, "-m", "celery", "-A", "app.tasks.celery_app", "worker", "--loglevel=info", "--concurrency=2"],
+        cwd=BACKEND_DIR,
+        env=env,
+    )
+
+
 def start_frontend(npm: str, env: dict, port: int) -> subprocess.Popen:
     """启动前端服务，输出直接继承当前终端"""
     print_info(f"正在启动前端服务（端口 {port}）...")
@@ -451,14 +461,21 @@ def main() -> None:
             else:
                 print_warn(f"端口 {args.port_backend} 已被占用，尝试寻找可用端口...")
                 args.port_backend = find_free_port(args.port_backend + 1)
-        proc = start_backend(python, env, args.port_backend)
+        backend_proc = start_backend(python, env, args.port_backend)
+        worker_proc = start_celery_worker(python, env)
         if wait_for_port(args.port_backend):
             print_ok(f"后端已启动: http://127.0.0.1:{args.port_backend}")
             print_ok(f"API 文档: http://127.0.0.1:{args.port_backend}/docs")
+            print_ok(f"Celery Worker 已启动")
         try:
-            proc.wait()
+            backend_proc.wait()
         except KeyboardInterrupt:
-            proc.terminate()
+            print_info("\n正在停止服务...")
+            backend_proc.terminate()
+            worker_proc.terminate()
+            backend_proc.wait(timeout=10)
+            worker_proc.wait(timeout=10)
+            print_ok("服务已停止")
         return
 
     # 全栈模式
@@ -478,9 +495,11 @@ def main() -> None:
                     args.port_frontend = find_free_port(port + 1)
 
     backend_proc = start_backend(python, env, args.port_backend)
+    worker_proc = start_celery_worker(python, env)
     if not wait_for_port(args.port_backend):
         print_error("后端服务启动超时")
         backend_proc.terminate()
+        worker_proc.terminate()
         sys.exit(1)
 
     frontend_proc = start_frontend(npm, env, args.port_frontend)
@@ -488,6 +507,7 @@ def main() -> None:
         print_error("前端服务启动超时")
         frontend_proc.terminate()
         backend_proc.terminate()
+        worker_proc.terminate()
         sys.exit(1)
 
     url = f"http://127.0.0.1:{args.port_frontend}"
@@ -496,6 +516,7 @@ def main() -> None:
     print_ok(f"  前端: {url}")
     print_ok(f"  后端: http://127.0.0.1:{args.port_backend}")
     print_ok(f"  API 文档: http://127.0.0.1:{args.port_backend}/docs")
+    print_ok(f"  Celery Worker 已启动")
     print_ok("=" * 50)
 
     if args.open_browser:
@@ -510,8 +531,10 @@ def main() -> None:
     except KeyboardInterrupt:
         print_info("\n正在停止服务...")
         backend_proc.terminate()
+        worker_proc.terminate()
         frontend_proc.terminate()
         backend_proc.wait(timeout=10)
+        worker_proc.wait(timeout=10)
         frontend_proc.wait(timeout=10)
         print_ok("服务已停止")
 

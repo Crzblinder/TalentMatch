@@ -17,6 +17,7 @@ from app.graph.skill_graph import (
 )
 from app.models import Job, Skill, SkillRelation
 from app.models.job import parse_required_skills
+from app.services.cache_service import CACHE_KEYS, DEFAULT_TTLS, cached
 
 logger = logging.getLogger(__name__)
 
@@ -118,6 +119,7 @@ class SkillService:
     def get_skill(self, skill_id: int) -> Skill | None:
         return self.db.query(Skill).filter(Skill.id == skill_id).first()
 
+    @cached(prefix=CACHE_KEYS["skill_graph"], ttl=DEFAULT_TTLS["skill_graph"])
     def get_related_skills(
         self,
         skill_name: str,
@@ -139,6 +141,7 @@ class SkillService:
         invalidate_graph_cache()
         logger.info("Skill service cache invalidated")
 
+    @cached(prefix=CACHE_KEYS["skill_statistics"], ttl=DEFAULT_TTLS["skill_statistics"])
     def get_skill_statistics(self) -> dict[str, Any]:
         total_skills = self.db.query(Skill).count()
         total_relations = self.db.query(SkillRelation).count()

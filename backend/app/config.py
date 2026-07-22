@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import ConfigDict
+from pydantic import ConfigDict, model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -49,6 +49,13 @@ class Settings(BaseSettings):
     # Vector store
     vector_db_path: str = "./chroma_data"
     embedding_model: str = "BAAI/bge-small-zh-v1.5"
+    vector_db_provider: str = "chroma"  # chroma | qdrant
+    qdrant_url: str = "http://localhost:6333"
+
+    # Redis / Celery
+    redis_url: str = "redis://localhost:6379/0"
+    celery_result_backend: str = "redis://localhost:6379/0"
+    celery_task_always_eager: bool = False  # 测试环境可设为 true 同步执行任务
 
     # 联网搜索配置（可选）
     # 默认使用 DuckDuckGo（无需 API Key）；如需更稳定结果可配置 Tavily
@@ -76,6 +83,52 @@ class Settings(BaseSettings):
 
     # 简历数据脱敏
     enable_resume_masking: bool = False
+
+    @model_validator(mode="after")
+    def _validate_security(self) -> "Settings":
+        """启动时校验关键安全配置。"""
+        import logging
+        import sys
+
+        logger = logging.getLogger(__name__)
+        errors: list[str] = []
+        warnings: list[str] = []
+
+        # SECRET_KEY 校验
+        secret_key = self.secret_key
+        if not secret_key or secret_key.strip() == "" or secret_key == "change-me-in-production":
+            msg = (
+                "SECRET_KEY 为空或使用了危险默认值。"
+                "请运行 `openssl rand -hex 32` 生成强密钥并设置到环境变量 SECRET_KEY。"
+            )
+            if self.app_env == "production":
+                errors.append(msg)
+            else:
+                warnings.append(msg)
+
+        # 生产环境数据库校验
+        if self.app_env == "production":
+            db_url = self.effective_database_url.lower()
+            if "sqlite" in db_url:
+                errors.append(
+                    "生产环境不允许使用 SQLite。"
+                    "请配置 MySQL/PostgreSQL 数据库连接字符串（如 DATABASE_URL=mysql+pymysql://...）"
+                )
+
+        # 敏感配置最小长度校验
+        if self.app_env == "production":
+            if len(secret_key) < 32:
+                errors.append("生产环境 SECRET_KEY 长度至少 32 位。")
+
+        for warning in warnings:
+            logger.error("[SECURITY WARNING] %s", warning)
+
+        if errors:
+            for error in errors:
+                logger.error("[SECURITY ERROR] %s", error)
+            sys.exit(1)
+
+        return self
 
     model_config = ConfigDict(
         env_file=".env",

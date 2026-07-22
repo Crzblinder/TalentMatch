@@ -501,6 +501,32 @@ class SearchOut(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Async Task
+# ---------------------------------------------------------------------------
+class TaskCreateRequest(BaseModel):
+    """提交异步任务请求。"""
+
+    task_type: str = Field(..., description="任务类型：resume.parse_text | resume.parse_file | jd.parse_text | jd.parse_file | match.profile_job | search.web")
+    payload: dict[str, Any] = Field(default_factory=dict, description="任务参数")
+
+
+class TaskOut(BaseModel):
+    """任务提交响应。"""
+
+    task_id: str
+    status: str
+
+
+class TaskStatusOut(BaseModel):
+    """任务状态查询响应。"""
+
+    task_id: str
+    status: str  # PENDING | STARTED | SUCCESS | FAILURE | RETRY
+    result: Any | None = None
+    error: str | None = None
+
+
+# ---------------------------------------------------------------------------
 # Obstacle Detection
 # ---------------------------------------------------------------------------
 class ObstacleItem(BaseModel):

@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.models import Company, Job
 from app.models.job import parse_required_skills
 from app.rag.retriever import HybridJobRetriever
+from app.services.cache_service import CACHE_KEYS, DEFAULT_TTLS, cached
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ class JobService:
     def __init__(self, db: Session):
         self.db = db
 
+    @cached(prefix=CACHE_KEYS["job_list"], ttl=DEFAULT_TTLS["job_list"])
     def list_jobs(
         self,
         page: int = 1,
@@ -85,6 +87,7 @@ class JobService:
             top_k=top_k,
         )
 
+    @cached(prefix=CACHE_KEYS["job_statistics"], ttl=DEFAULT_TTLS["job_statistics"])
     def get_job_statistics(self) -> dict[str, Any]:
         total_jobs = self.db.query(Job).count()
         total_companies = self.db.query(Company).count()
