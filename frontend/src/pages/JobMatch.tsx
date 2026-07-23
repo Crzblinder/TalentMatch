@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, ArrowUp, ArrowUpDown, ChevronDown, RotateCcw, Scale, Search, Upload } from 'lucide-react'
+import { ArrowLeft, ArrowUp, ArrowUpDown, ChevronDown, RotateCcw, Scale, Search, Upload, User } from 'lucide-react'
 
 import { api } from '../api'
 import { MatchResultCard, SkillRadarChart } from '../components'
 import ExportPDFButton from '@/components/ExportPDFButton'
 import JobCompareSheet from '@/components/JobCompareSheet'
+import { useProfile } from '@/components/ProfileContext'
 import ResumeProfileForm, {
   emptyProfileFormData,
   type ProfileFormData,
   resumeToFormData,
 } from '@/components/ResumeProfileForm'
-import type { Job, MatchResult } from '../types'
+import type { Job, MatchResult, UserSkillProfile } from '../types'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -25,6 +27,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { cn } from '@/lib/utils'
 
 // 页面顶部步骤：填写画像 → 选择岗位 → 查看结果
 const WIZARD_STEPS = [
@@ -70,7 +74,34 @@ const EXAMPLE_PROFILES = [
 type SortKey = 'salary' | 'posted_at' | null
 type SortDirection = 'asc' | 'desc'
 
+function arraysEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false
+  const sortedA = [...a].sort()
+  const sortedB = [...b].sort()
+  return sortedA.every((v, i) => v === sortedB[i])
+}
+
+function formMatchesProfile(form: ProfileFormData, profile: UserSkillProfile): boolean {
+  return (
+    form.name.trim() === profile.name &&
+    form.experienceLevel === profile.experience_level &&
+    arraysEqual(
+      form.skillsText.split(/[,，]/).map((s) => s.trim()).filter(Boolean),
+      profile.skills,
+    ) &&
+    arraysEqual(
+      form.targetJobTitles.split(/[,，]/).map((s) => s.trim()).filter(Boolean),
+      profile.target_job_titles,
+    )
+  )
+}
+
 export default function JobMatch() {
+  // ---- 全局生效画像 ----
+  const { effectiveProfile } = useProfile()
+  const isDesktop = useMediaQuery('(min-width: 768px)')
+  const profilePrefilledRef = useRef(false)
+
   // ---- 画像表单状态 ----
   const [profileFormData, setProfileFormData] = useState<ProfileFormData>(emptyProfileFormData())
 
@@ -121,6 +152,20 @@ export default function JobMatch() {
     loadJobs()
   }, [loadJobs])
 
+  // 预填充生效画像到表单
+  useEffect(() => {
+    if (effectiveProfile && !profilePrefilledRef.current) {
+      setProfileFormData((prev) => ({
+        ...prev,
+        name: effectiveProfile.name,
+        skillsText: effectiveProfile.skills.join(', '),
+        experienceLevel: effectiveProfile.experience_level,
+        targetJobTitles: effectiveProfile.target_job_titles.join(', '),
+      }))
+      profilePrefilledRef.current = true
+    }
+  }, [effectiveProfile])
+
   const selectedJob = jobs.find((j) => j.id === selectedJobId) || null
 
   const skills = useMemo(
@@ -130,6 +175,11 @@ export default function JobMatch() {
   const targetJobTitles = useMemo(
     () => profileFormData.targetJobTitles.split(/[,，]/).map((s) => s.trim()).filter(Boolean),
     [profileFormData.targetJobTitles]
+  )
+
+  const profileMatchesEffective = useMemo(
+    () => (effectiveProfile ? formMatchesProfile(profileFormData, effectiveProfile) : false),
+    [effectiveProfile, profileFormData]
   )
 
   // 排序后的岗位列表
@@ -215,16 +265,22 @@ export default function JobMatch() {
     setStreamCompletedSteps([])
 
     try {
-      const profile = await api.createProfile({
-        name: profileFormData.name.trim(),
-        skills,
-        experience_level: profileFormData.experienceLevel,
-        target_job_titles: targetJobTitles,
-      })
+      let profileId: number
+      if (profileMatchesEffective && effectiveProfile) {
+        profileId = effectiveProfile.id
+      } else {
+        const profile = await api.createProfile({
+          name: profileFormData.name.trim(),
+          skills,
+          experience_level: profileFormData.experienceLevel,
+          target_job_titles: targetJobTitles,
+        })
+        profileId = profile.id
+      }
 
       if (useStream) {
         const res = await api.matchStream(
-          { profile_id: profile.id, job_id: selectedJobId },
+          { profile_id: profileId, job_id: selectedJobId },
           (event) => {
             const node = event.node || event.status
             if (node) {
@@ -235,7 +291,7 @@ export default function JobMatch() {
         )
         if (res) setResult(res)
       } else {
-        const res = await api.createMatch(profile.id, selectedJobId)
+        const res = await api.createMatch(profileId, selectedJobId)
         setResult(res)
       }
       // 匹配成功后进入结果步骤
@@ -269,6 +325,8 @@ export default function JobMatch() {
     setCompareOpen(false)
     setCompareJobs([])
     setProfileFormData(emptyProfileFormData())
+    profilePrefilledRef.current = false
+    // 重置后如果仍有生效画像，允许再次预填充
   }
 
   // 打开岗位对比面板，并预先将当前匹配的岗位加入对比
@@ -315,6 +373,57 @@ export default function JobMatch() {
   const formatPostedAt = (job: Job) =>
     job.posted_at ? new Date(job.posted_at).toLocaleDateString('zh-CN') : '-'
 
+  // 移动端岗位卡片
+  const renderMobileJobCard = (job: Job) => {
+    const selected = selectedJobId === job.id
+    return (
+      <Card
+        key={job.id}
+        className={cn(
+          'cursor-pointer transition-colors',
+          selected ? 'border-primary bg-primary/5' : 'hover:bg-accent'
+        )}
+        onClick={() => setSelectedJobId(job.id)}
+      >
+        <CardContent className="space-y-3 p-4">
+          <div className="flex items-start gap-3">
+            <input
+              type="radio"
+              name="selected-job"
+              checked={selected}
+              onChange={() => setSelectedJobId(job.id)}
+              className="mt-1 h-5 w-5 cursor-pointer accent-primary"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div className="min-w-0 flex-1 space-y-1">
+              <div className="truncate font-medium">{job.title}</div>
+              <div className="text-sm text-muted-foreground">
+                {job.company.name} · {job.city}
+              </div>
+              <div className="text-sm">{formatSalary(job)}</div>
+              <div className="flex flex-wrap gap-1">
+                {job.required_skills.slice(0, 4).map((skill, idx) => (
+                  <Badge key={idx} variant="secondary" className="text-xs">
+                    {skill}
+                  </Badge>
+                ))}
+                {job.required_skills.length > 4 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{job.required_skills.length - 4}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <span>经验：{job.experience_level}</span>
+            <span>发布：{formatPostedAt(job)}</span>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <div className="mx-auto max-w-6xl">
       {/* 页面标题 */}
@@ -357,6 +466,21 @@ export default function JobMatch() {
             <CardTitle className="text-lg">1. 填写技能画像</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {effectiveProfile && (
+              <div className="rounded-lg border bg-primary/5 p-3 text-sm">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-primary" />
+                    当前使用画像：
+                    <span className="font-medium">{effectiveProfile.name}</span>
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    修改下方表单后将基于当前画像创建新匹配
+                  </span>
+                </div>
+              </div>
+            )}
+
             <ResumeProfileForm
               value={profileFormData}
               onChange={setProfileFormData}
@@ -375,6 +499,7 @@ export default function JobMatch() {
                   size="sm"
                   onClick={handleUploadClick}
                   disabled={uploadLoading}
+                  className="min-h-[44px] md:min-h-9"
                 >
                   <Upload className="mr-2 h-4 w-4" />
                   {uploadLoading ? '上传中...' : '选择简历'}
@@ -398,6 +523,7 @@ export default function JobMatch() {
                     size="sm"
                     onClick={() => applyExample(ex)}
                     disabled={loading}
+                    className="min-h-[44px] md:min-h-9"
                   >
                     {ex.label}
                   </Button>
@@ -407,7 +533,7 @@ export default function JobMatch() {
 
             {/* 底部操作 */}
             <div className="flex justify-end pt-2">
-              <Button onClick={nextStep} disabled={!canEnterStep2}>
+              <Button onClick={nextStep} disabled={!canEnterStep2} className="min-h-[44px] md:min-h-10">
                 下一步
               </Button>
             </div>
@@ -429,23 +555,51 @@ export default function JobMatch() {
                   value={jobSearch}
                   onChange={(e) => setJobSearch(e.target.value)}
                   placeholder="搜索岗位"
-                  className="w-full sm:w-64"
+                  className="h-11 w-full sm:w-64"
                   onKeyDown={(e) => e.key === 'Enter' && loadJobs(jobSearch)}
                 />
-                <Button variant="secondary" size="icon" onClick={() => loadJobs(jobSearch)} disabled={jobsLoading}>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  onClick={() => loadJobs(jobSearch)}
+                  disabled={jobsLoading}
+                  className="h-11 w-11 shrink-0"
+                >
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="stream"
-                  checked={useStream}
-                  onCheckedChange={(checked) => setUseStream(Boolean(checked))}
-                  disabled={loading}
-                />
-                <label htmlFor="stream" className="text-sm text-muted-foreground">
-                  流式分析
-                </label>
+              <div className="flex items-center gap-3">
+                {!isDesktop && (
+                  <div className="flex flex-1 items-center gap-2">
+                    <Button
+                      variant={sortConfig.key === 'salary' ? 'secondary' : 'outline'}
+                      size="sm"
+                      onClick={() => toggleSort('salary')}
+                      className="h-10 flex-1"
+                    >
+                      薪资 {sortIcon('salary')}
+                    </Button>
+                    <Button
+                      variant={sortConfig.key === 'posted_at' ? 'secondary' : 'outline'}
+                      size="sm"
+                      onClick={() => toggleSort('posted_at')}
+                      className="h-10 flex-1"
+                    >
+                      时间 {sortIcon('posted_at')}
+                    </Button>
+                  </div>
+                )}
+                <div className="flex shrink-0 items-center gap-2">
+                  <Checkbox
+                    id="stream"
+                    checked={useStream}
+                    onCheckedChange={(checked) => setUseStream(Boolean(checked))}
+                    disabled={loading}
+                  />
+                  <label htmlFor="stream" className="text-sm text-muted-foreground">
+                    流式分析
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -454,8 +608,8 @@ export default function JobMatch() {
               共 {jobs.length} 个岗位{selectedJob ? `，已选择：${selectedJob.title}` : ''}
             </div>
 
-            {/* 岗位表格 */}
-            <div className="max-h-[420px] overflow-auto rounded-md border">
+            {/* 桌面端岗位表格 */}
+            <div className="hidden max-h-[420px] overflow-auto rounded-md border md:block">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -528,6 +682,19 @@ export default function JobMatch() {
               </Table>
             </div>
 
+            {/* 移动端岗位卡片列表 */}
+            <div className="space-y-3 md:hidden">
+              {jobsLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-36 w-full rounded-lg" />
+                ))
+              ) : sortedJobs.length ? (
+                sortedJobs.map((job) => renderMobileJobCard(job))
+              ) : (
+                <div className="py-12 text-center text-muted-foreground">暂无岗位</div>
+              )}
+            </div>
+
             {/* 流式进度 */}
             {loading && useStream && (
               <Card className="border-primary/20 bg-primary/5">
@@ -545,11 +712,11 @@ export default function JobMatch() {
 
             {/* 底部操作 */}
             <div className="flex justify-between pt-2">
-              <Button variant="outline" onClick={prevStep}>
+              <Button variant="outline" onClick={prevStep} className="min-h-[44px] md:min-h-10">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 上一步
               </Button>
-              <Button onClick={handleMatch} disabled={!selectedJobId || loading}>
+              <Button onClick={handleMatch} disabled={!selectedJobId || loading} className="min-h-[44px] md:min-h-10">
                 {loading ? '匹配中...' : `开始匹配${useStream ? '（流式）' : ''}`}
               </Button>
             </div>
@@ -562,8 +729,8 @@ export default function JobMatch() {
         <div className="space-y-6">
           {result && (
             <>
-              <div className="flex items-center justify-end gap-3">
-                <Button variant="outline" onClick={openCompareWithCurrentJob}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                <Button variant="outline" onClick={openCompareWithCurrentJob} className="min-h-[44px] md:min-h-10">
                   <Scale className="mr-2 h-4 w-4" />
                   与其他岗位对比
                 </Button>
@@ -589,12 +756,12 @@ export default function JobMatch() {
               </CardContent>
             </Card>
           )}
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={() => setWizardStep(2)}>
+          <div className="flex flex-col-reverse justify-between gap-3 sm:flex-row">
+            <Button variant="outline" onClick={() => setWizardStep(2)} className="min-h-[44px] md:min-h-10">
               <ArrowLeft className="mr-2 h-4 w-4" />
               返回选择岗位
             </Button>
-            <Button onClick={resetMatch}>
+            <Button onClick={resetMatch} className="min-h-[44px] md:min-h-10">
               <RotateCcw className="mr-2 h-4 w-4" />
               重新匹配
             </Button>

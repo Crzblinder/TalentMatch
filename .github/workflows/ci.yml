@@ -24,13 +24,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Lint
-        run: python -m ruff check app tests
+        run: python -m ruff check app tests perf ../e2e ../scripts
       - name: Test
         env:
           OPENAI_API_KEY: ""
+          USE_LOCAL_LLM: "false"
           DATABASE_URL: "sqlite:///./test_talentmatch.db"
           VECTOR_DB_PATH: "./test_chroma_data"
         run: pytest -q
+      - name: Eval smoke test
+        env:
+          OPENAI_API_KEY: ""
+          USE_LOCAL_LLM: "false"
+        run: python -m eval.run_eval
 
   frontend:
     runs-on: ubuntu-latest

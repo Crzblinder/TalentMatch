@@ -11,6 +11,7 @@ alembic>=1.13.1
 
 # Vector / RAG
 chromadb>=0.5.0
+qdrant-client>=1.10.0
 sentence-transformers>=3.0.0
 transformers>=4.41.0
 torch>=2.3.0
@@ -47,14 +48,28 @@ mypy>=1.10.0
 python-docx>=1.1.0
 PyPDF2>=3.0.0
 
+# PDF generation
+reportlab>=4.2.0
+
 # Scheduler
 apscheduler>=3.10.0
+
+# Async task queue & cache
+celery[redis]>=5.4.0
+redis>=5.0.0
+
+# Observability
+prometheus-client>=0.20.0
+structlog>=24.1.0
 
 # Web search
 # DuckDuckGo 免费搜索（无需 API Key）
 duckduckgo-search>=6.0.0
 # Tavily 提供更稳定的结构化搜索（可选，需配置 TAVILY_API_KEY）
 # tavily-python>=0.5.0
+
+# HTTP client used by alert service, load test and several utilities
+requests>=2.31.0
 
 # MCP Server
 mcp>=1.0.0
@@ -64,3 +79,4 @@ pydantic>=2.7.1
 pydantic-settings>=2.2.1
 python-dotenv>=1.0.1
 tenacity>=8.3.0
+structlog>=24.1.0

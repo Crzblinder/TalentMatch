@@ -218,17 +218,17 @@ export default function JDUploader({ onParseComplete, initialJD }: JDUploaderPro
               <Search className="h-4 w-4 text-primary" />
               联网求职情报
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="输入公司/岗位关键词搜索"
-                className="flex-1"
+                className="h-11 min-w-0 flex-1"
               />
               <select
                 value={searchIntent}
                 onChange={(e) => setSearchIntent(e.target.value)}
-                className="rounded-md border bg-background px-2 text-sm"
+                className="h-11 min-w-[6rem] rounded-md border bg-background px-2 text-sm"
               >
                 {SEARCH_INTENTS.map((item) => (
                   <option key={item.value} value={item.value}>
@@ -236,7 +236,11 @@ export default function JDUploader({ onParseComplete, initialJD }: JDUploaderPro
                   </option>
                 ))}
               </select>
-              <Button onClick={handleSearch} disabled={searchLoading || !searchQuery.trim()}>
+              <Button
+                onClick={handleSearch}
+                disabled={searchLoading || !searchQuery.trim()}
+                className="h-11"
+              >
                 {searchLoading ? '搜索中...' : '搜索'}
               </Button>
             </div>

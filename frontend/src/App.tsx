@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import OnboardingDialog from './components/OnboardingDialog'
+import { ProfileProvider } from './components/ProfileContext'
+import ConfigTests from './pages/ConfigTests'
 import JobLibrary from './pages/JobLibrary'
 import JobMatch from './pages/JobMatch'
+import ProfileManager from './pages/ProfileManager'
 import ResumeEditor from './pages/ResumeEditor'
 import SkillDashboard from './pages/SkillDashboard'
 import SkillGraph from './pages/SkillGraph'
 import TrendAnalysis from './pages/TrendAnalysis'
-import ConfigTests from './pages/ConfigTests'
 
 // localStorage 键名，用于判断是否需要展示新手引导
 const STORAGE_KEY_COMPLETED = 'onboarding_completed'
@@ -28,20 +30,23 @@ export default function App() {
   }, [])
 
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<SkillDashboard />} />
-        <Route path="/match" element={<JobMatch />} />
-        <Route path="/jobs" element={<JobLibrary />} />
-        <Route path="/favorites" element={<Navigate to="/jobs?favorites=1" replace />} />
-        <Route path="/skills" element={<SkillGraph />} />
-        <Route path="/trends" element={<TrendAnalysis />} />
-        <Route path="/resume-editor" element={<ResumeEditor />} />
-        <Route path="/config-tests" element={<ConfigTests />} />
-      </Routes>
-      {showOnboarding && (
-        <OnboardingDialog onComplete={() => setShowOnboarding(false)} />
-      )}
-    </Layout>
+    <ProfileProvider>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<SkillDashboard />} />
+          <Route path="/match" element={<JobMatch />} />
+          <Route path="/jobs" element={<JobLibrary />} />
+          <Route path="/favorites" element={<Navigate to="/jobs?favorites=1" replace />} />
+          <Route path="/skills" element={<SkillGraph />} />
+          <Route path="/trends" element={<TrendAnalysis />} />
+          <Route path="/resume-editor" element={<ResumeEditor />} />
+          <Route path="/profiles" element={<ProfileManager />} />
+          <Route path="/config-tests" element={<ConfigTests />} />
+        </Routes>
+        {showOnboarding && (
+          <OnboardingDialog onComplete={() => setShowOnboarding(false)} />
+        )}
+      </Layout>
+    </ProfileProvider>
   )
 }

@@ -23,6 +23,20 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: talentmatch_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -34,6 +48,8 @@ services:
     environment:
       - DATABASE_URL=mysql+pymysql://talentmatch:talentmatch@mysql:3306/talentmatch?charset=utf8mb4
       - VECTOR_DB_PATH=/app/chroma_data
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     volumes:
       - chroma_data:/app/chroma_data
       - ./backend:/app
@@ -42,8 +58,34 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     command: >
       sh -c "python scripts/init_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: talentmatch_worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=mysql+pymysql://talentmatch:talentmatch@mysql:3306/talentmatch?charset=utf8mb4
+      - VECTOR_DB_PATH=/app/chroma_data
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+      - chroma_data:/app/chroma_data
+      - ./backend:/app
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "celery -A app.tasks.celery_app worker --loglevel=info --concurrency=2"
 
   frontend:
     build:
@@ -70,3 +112,4 @@ services:
 volumes:
   mysql_data:
   chroma_data:
+  redis_data:

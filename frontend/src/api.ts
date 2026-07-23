@@ -17,6 +17,7 @@ import type {
   ParsedJD,
   ProfileCreateRequest,
   ProfileResponse,
+  ProfileUpdateRequest,
   RelatedSkill,
   ResumeOptimizeOut,
   ResumeOptimizeRequest,
@@ -172,11 +173,35 @@ export const api = {
   /* ---- Profiles ---- */
   listProfiles: (): Promise<UserSkillProfileListResponse> => request('/profiles'),
 
+  getActiveProfile: (): Promise<ProfileResponse | null> => request('/profiles/active'),
+
+  getProfile: (profileId: number): Promise<ProfileResponse> =>
+    request(`/profiles/${profileId}`),
+
   // 创建用户画像，返回完整画像信息
   createProfile: (payload: ProfileCreateRequest): Promise<ProfileResponse> =>
     request('/profiles', {
       method: 'POST',
       body: JSON.stringify(payload),
+    }),
+
+  // 更新用户画像
+  updateProfile: (profileId: number, payload: ProfileUpdateRequest): Promise<ProfileResponse> =>
+    request(`/profiles/${profileId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  // 设置活跃画像
+  setActiveProfile: (profileId: number): Promise<ProfileResponse> =>
+    request(`/profiles/${profileId}/set-active`, {
+      method: 'POST',
+    }),
+
+  // 删除用户画像
+  deleteProfile: (profileId: number): Promise<{ deleted: boolean }> =>
+    request(`/profiles/${profileId}`, {
+      method: 'DELETE',
     }),
 
   // 根据画像 ID 获取智能推荐岗位列表

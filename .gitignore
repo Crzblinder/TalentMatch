@@ -70,6 +70,10 @@ backend/package-lock.json
 # Crawled real job data (auto-generated; keep sample file in repo)
 backend/data/raw_jobs.json
 
+# Eval / perf reports (generated at runtime)
+backend/eval/reports/
+backend/perf/reports/
+
 # Logs
 logs/
 *.log

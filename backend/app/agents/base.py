@@ -1,15 +1,21 @@
 import json
-import logging
 import time
 from abc import ABC, abstractmethod
 from typing import Any
 
+import structlog
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.config import get_settings
 from app.prompts.loader import PromptLoader
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger("app.agents")
+
+try:
+    from app.api.metrics import record_llm_call
+except Exception:  # pragma: no cover - 允许未安装 prometheus_client 时降级
+    def record_llm_call(agent: str, duration_ms: float, success: bool) -> None:  # noqa: ARG001
+        """Metrics 不可用时的空实现。"""
 
 
 class LLMToolCallError(Exception):
@@ -46,6 +52,29 @@ class BaseAgent(ABC):
         return bool(self.settings.openai_api_key and self.settings.openai_api_key != "dummy")
 
     # ------------------------------------------------------------------
+    # 日志辅助方法
+    # ------------------------------------------------------------------
+    def _resolve_model_name(self) -> str:
+        """返回当前实际使用的模型名，用于结构化日志。"""
+        if self.settings.use_local_llm:
+            return self.settings.ollama_model
+        if self.settings.use_domestic_llm:
+            return self.settings.dashscope_model or self.settings.zhipu_model
+        return self.settings.openai_model
+
+    @staticmethod
+    def _summarize_output(parsed: dict[str, Any]) -> str:
+        """对 LLM 输出做简短摘要，避免日志过长。"""
+        if not parsed:
+            return "empty"
+        # 优先取代表性字段
+        for key in ("summary", "analysis_summary", "note", "raw"):
+            value = parsed.get(key)
+            if isinstance(value, str) and value:
+                return value[:80] + "..." if len(value) > 80 else value
+        return "structured_json"
+
+    # ------------------------------------------------------------------
     # 标准化链式调用（提示词组装 -> LLM -> JSON 解析 -> 容灾降级）
     # ------------------------------------------------------------------
     @retry(
@@ -64,12 +93,33 @@ class BaseAgent(ABC):
         from langchain_core.messages import HumanMessage, SystemMessage
 
         start = time.time()
+        agent_name = self.name or "unknown"
+        model_name = self._resolve_model_name()
+        input_length = len(system_prompt) + len(user_prompt)
+
+        logger.info(
+            "agent_call_started",
+            agent=agent_name,
+            model=model_name,
+            input_length=input_length,
+            temperature=temperature,
+        )
 
         # ---- 无 LLM 配置时直接走确定性降级 ----
         if not self._has_real_llm():
-            logger.warning("No LLM configured (use_local_llm=%s); deterministic fallback",
-                           self.settings.use_local_llm)
-            return self._simulate_response(system_prompt, user_prompt)
+            elapsed_ms = int((time.time() - start) * 1000)
+            logger.warning(
+                "agent_fallback",
+                agent=agent_name,
+                reason="llm_not_configured",
+                use_local_llm=self.settings.use_local_llm,
+                duration_ms=elapsed_ms,
+            )
+            record_llm_call(agent_name, elapsed_ms, success=False)
+            fallback = self._simulate_response(system_prompt, user_prompt)
+            fallback["_latency_ms"] = elapsed_ms
+            fallback["_fallback_reason"] = "llm_not_configured"
+            return fallback
 
         # ---- 组装 LangChain 消息列表 ----
         messages = [
@@ -85,23 +135,48 @@ class BaseAgent(ABC):
             elapsed_ms = int((time.time() - start) * 1000)
             parsed = self._parse_json(content)
             parsed["_latency_ms"] = elapsed_ms
+            output_summary = self._summarize_output(parsed)
+
+            logger.info(
+                "agent_call_completed",
+                agent=agent_name,
+                model=model_name,
+                input_length=input_length,
+                output_length=len(content),
+                output_summary=output_summary,
+                duration_ms=elapsed_ms,
+            )
 
             # 若 JSON 解析失败（返回了 raw wrapper），视为异常触发降级
             if parsed.get("parsed") is False:
-                logger.warning("LLM returned non-JSON content; triggering fallback")
+                logger.warning(
+                    "agent_fallback",
+                    agent=agent_name,
+                    reason="non_json_response",
+                    duration_ms=elapsed_ms,
+                )
+                record_llm_call(agent_name, elapsed_ms, success=False)
                 fallback = self._simulate_response(system_prompt, user_prompt)
                 fallback["_latency_ms"] = elapsed_ms
                 fallback["_fallback_reason"] = "non_json_response"
                 return fallback
 
+            record_llm_call(agent_name, elapsed_ms, success=True)
             return parsed
 
-        except Exception as e:
-            logger.error("LLM call failed: %s; triggering deterministic fallback", e)
+        except Exception as exc:
             elapsed_ms = int((time.time() - start) * 1000)
+            logger.exception(
+                "agent_call_failed",
+                agent=agent_name,
+                model=model_name,
+                exception_type=type(exc).__name__,
+                duration_ms=elapsed_ms,
+            )
+            record_llm_call(agent_name, elapsed_ms, success=False)
             fallback = self._simulate_response(system_prompt, user_prompt)
             fallback["_latency_ms"] = elapsed_ms
-            fallback["_fallback_reason"] = str(e)
+            fallback["_fallback_reason"] = str(exc)
             return fallback
 
     # ------------------------------------------------------------------
@@ -132,7 +207,7 @@ class BaseAgent(ABC):
         from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
         if not self._has_real_llm():
-            logger.warning("No LLM configured; skip function calling")
+            logger.warning("tool_call_fallback", reason="llm_not_configured")
             return {
                 "content": "",
                 "tool_calls": [],
@@ -149,7 +224,7 @@ class BaseAgent(ABC):
         try:
             llm_with_tools = self.llm.bind_tools(tools, tool_choice=tool_choice)
         except Exception as exc:
-            logger.warning("LLM does not support tool binding: %s", exc)
+            logger.warning("tool_binding_failed", exception_type=type(exc).__name__, error=str(exc))
             return {
                 "content": "",
                 "tool_calls": [],
@@ -236,9 +311,10 @@ class BaseAgent(ABC):
     # 提示词加载（从外部 .txt 文件读取）
     # ------------------------------------------------------------------
     def _load_prompt(self) -> str:
-        """根据 Agent 名称和当前变体，从外部文件加载提示词模板。"""
+        """根据 Agent 名称、当前变体和配置版本，从外部文件加载提示词模板。"""
         variant = self._resolve_variant()
-        return self.loader.load(self.name, variant)
+        version = self.settings.prompt_version or None
+        return self.loader.load(self.name, variant, version=version)
 
     def _resolve_variant(self) -> str:
         """将 prompt_variant 标准化为文件名格式。"""

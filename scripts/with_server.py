@@ -14,7 +14,7 @@ import sys
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Generator
+from collections.abc import Generator
 
 ROOT = Path(__file__).resolve().parent.parent
 BACKEND_DIR = ROOT / "backend"
@@ -53,7 +53,15 @@ def server_context() -> Generator[tuple[subprocess.Popen, subprocess.Popen], Non
     """启动前后端服务并 yield 进程元组，退出时自动停止。"""
     env = {**os.environ, "OPENAI_API_KEY": ""}
 
-    # 1. 初始化数据库并注入最小测试数据
+    # 1. 清理持久化数据，确保 E2E 测试在干净环境中运行
+    db_path = BACKEND_DIR / "talentmatch.db"
+    if db_path.exists():
+        db_path.unlink()
+    vector_dir = BACKEND_DIR / "chroma_data"
+    if vector_dir.exists():
+        shutil.rmtree(vector_dir, ignore_errors=True)
+
+    # 2. 初始化数据库并注入最小测试数据
     subprocess.run(
         [PYTHON, "scripts/init_db.py"],
         cwd=BACKEND_DIR,
@@ -69,7 +77,10 @@ def server_context() -> Generator[tuple[subprocess.Popen, subprocess.Popen], Non
 
     # 2. 启动后端
     backend_proc = subprocess.Popen(
-        [PYTHON, "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", str(BACKEND_PORT)],
+        [
+            PYTHON, "-m", "uvicorn", "app.main:app",
+            "--host", "127.0.0.1", "--port", str(BACKEND_PORT),
+        ],
         cwd=BACKEND_DIR,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,

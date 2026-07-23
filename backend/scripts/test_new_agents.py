@@ -19,7 +19,7 @@ from app.agents import (
     run_job_match_sync,
 )
 from app.data.seed import seed_database
-from app.models.base import Base, SessionLocal
+from app.models.base import Base
 from app.models.job import Job
 
 
@@ -27,9 +27,9 @@ def main():
     # 使用内存 SQLite 避免污染项目数据库
     db_url = "sqlite:///:memory:"
     engine = create_engine(db_url, connect_args={"check_same_thread": False})
-    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    testing_session_local = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     Base.metadata.create_all(bind=engine)
-    session = TestingSessionLocal()
+    session = testing_session_local()
 
     try:
         # 1. 准备测试数据
@@ -97,7 +97,8 @@ def main():
         final_state = run_job_match_sync(session, state)
         print(f"  Parsed JD title: {final_state.get('parsed_jd', {}).get('title')}")
         print(f"  Match score: {final_state.get('match_result', {}).get('match_score')}")
-        print(f"  Trend summary: {final_state.get('trend_analysis', {}).get('summary', '')[:60]}...")
+        trend_summary = final_state.get('trend_analysis', {}).get('summary', '')[:60]
+        print(f"  Trend summary: {trend_summary}...")
         print(f"  Learning path length: {len(final_state.get('learning_path', []))}")
         print(f"  Advice length: {len(final_state.get('advice', ''))}")
         assert final_state.get("parsed_jd"), "Workflow should produce parsed_jd"

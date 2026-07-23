@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import logging
 import os
+from datetime import datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.agents.graph_state import JobMatchState
@@ -30,6 +32,7 @@ from app.api.schemas import (
     JobSearchResult,
     LearningPathOut,
     LearningPathRequest,
+    MatchReportPDFRequest,
     MatchRequest,
     MatchResultListOut,
     MatchResultOut,
@@ -45,20 +48,35 @@ from app.api.schemas import (
     SearchRequest,
     SkillListOut,
     SkillOut,
+    TaskCreateRequest,
+    TaskOut,
+    TaskStatusOut,
     UserSkillProfileCreate,
     UserSkillProfileListOut,
     UserSkillProfileOut,
+    UserSkillProfileUpdate,
 )
 from app.crawler.scraper import get_status as get_crawler_status
-from app.models import Job, UserSkillProfile
+from app.models import Job, MatchResult, UserSkillProfile
 from app.models.base import get_db
 from app.scheduler import trigger_fetch_jobs
+from app.services.alert_service import run_alert_evaluation
+from app.services.cache_service import CACHE_KEYS, DEFAULT_TTLS, get_cache_client
 from app.services.favorite_service import FavoriteService
 from app.services.jd_service import JDService
 from app.services.job_service import JobService
 from app.services.matching_service import MatchingService
+from app.services.report_service import generate_match_report_pdf
 from app.services.resume_service import ResumeService, should_use_fuzzy_parsing
 from app.services.skill_service import SkillService
+from app.tasks import (
+    match_profile_to_job_task,
+    parse_jd_file_task,
+    parse_jd_text_task,
+    parse_resume_file_task,
+    parse_resume_text_task,
+    web_search_task,
+)
 from app.utils.content_safety import check_text_safety
 
 logger = logging.getLogger(__name__)
@@ -102,6 +120,7 @@ def _profile_to_dict(profile: UserSkillProfile) -> dict[str, Any]:
         "skills": _load_json_list(profile.skills),
         "experience_level": profile.experience_level,
         "target_job_titles": _load_json_list(profile.target_job_titles),
+        "is_active": profile.is_active,
         "created_at": profile.created_at,
     }
 
@@ -115,6 +134,38 @@ def _load_json_list(value: Any) -> list[Any]:
         except json.JSONDecodeError:
             return []
     return []
+
+
+def _get_trend_summary(db: Session) -> dict[str, Any]:
+    """获取趋势统计，结果缓存 1 小时。"""
+    cache = get_cache_client()
+    cached_value = cache.get(CACHE_KEYS["trends"])
+    if cached_value is not None:
+        return cached_value
+
+    job_data = []
+    for job in db.query(Job).all():
+        job_data.append(
+            {
+                "title": job.title,
+                "city": job.city,
+                "salary_min": job.salary_min,
+                "salary_max": job.salary_max,
+                "required_skills": _load_json_list(job.required_skills),
+            }
+        )
+
+    agent = TrendPredictor()
+    trend = agent.predict(job_data)
+    result = {
+        "summary": trend.get("summary", ""),
+        "top_skills": trend.get("top_skills", []),
+        "avg_salary_range": trend.get("avg_salary_range", ""),
+        "hot_job_titles": trend.get("hot_job_titles", []),
+        "key_metrics": trend.get("key_metrics", {}),
+    }
+    cache.set(CACHE_KEYS["trends"], result, ttl=DEFAULT_TTLS["trends"])
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -155,6 +206,20 @@ def config_tests() -> ApiResponse:
     )
 
 
+@api_router.post("/alerts/evaluate", response_model=ApiResponse)
+def evaluate_alerts() -> ApiResponse:
+    """手动触发一次告警规则评估并发送邮件/Webhook通知。"""
+    result = run_alert_evaluation()
+    return _success(
+        result,
+        message=(
+            f"告警评估完成：触发 {len(result.get('events', []))} 条规则"
+            if result.get("enabled")
+            else "告警功能未启用"
+        ),
+    )
+
+
 @api_router.get("/skills/config")
 def skills_config() -> ApiResponse:
     """返回 TalentMatch Skills 与 MCP 配置。"""
@@ -170,6 +235,112 @@ def skills_config() -> ApiResponse:
 def crawler_status() -> ApiResponse:
     """返回 JD 爬虫最近一次运行状态。"""
     return _success(get_crawler_status())
+
+
+# ---------------------------------------------------------------------------
+# Async Tasks
+# ---------------------------------------------------------------------------
+_TASK_DISPATCHERS: dict[str, Any] = {
+    "resume.parse_text": parse_resume_text_task,
+    "resume.parse_file": parse_resume_file_task,
+    "jd.parse_text": parse_jd_text_task,
+    "jd.parse_file": parse_jd_file_task,
+    "match.profile_job": match_profile_to_job_task,
+    "search.web": web_search_task,
+}
+
+
+@api_router.post("/tasks", response_model=ApiResponse)
+def create_task(payload: TaskCreateRequest) -> ApiResponse:
+    """提交异步任务，立即返回任务 ID。"""
+    dispatcher = _TASK_DISPATCHERS.get(payload.task_type)
+    if dispatcher is None:
+        raise HTTPException(status_code=400, detail=f"不支持的任务类型: {payload.task_type}")
+
+    try:
+        task = dispatcher.delay(**payload.payload)
+    except TypeError as exc:
+        logger.warning("任务参数错误: %s", exc)
+        raise HTTPException(status_code=400, detail=f"任务参数错误: {exc}") from exc
+    except Exception as exc:
+        logger.exception("提交任务失败")
+        raise HTTPException(status_code=500, detail=f"提交任务失败: {exc}") from exc
+
+    return _success(
+        TaskOut(task_id=task.id, status=task.status).model_dump(),
+        message="任务已提交",
+    )
+
+
+@api_router.get("/tasks/{task_id}", response_model=ApiResponse)
+def get_task_status(task_id: str) -> ApiResponse:
+    """查询异步任务状态和结果。"""
+    from app.tasks.celery_app import celery_app
+
+    result = celery_app.AsyncResult(task_id)
+    response = TaskStatusOut(
+        task_id=task_id,
+        status=result.status,
+        result=result.result if result.ready() and result.successful() else None,
+        error=str(result.result) if result.ready() and result.failed() else None,
+    )
+    return _success(response.model_dump())
+
+
+@api_router.post("/resumes/upload-async", response_model=ApiResponse)
+async def upload_resume_async(
+    file: UploadFile = File(...),
+    fuzzy: bool | None = Query(
+        None, description="是否启用模糊识别（应届生友好模式）；不传则自动判定"
+    ),
+) -> ApiResponse:
+    """异步上传简历并解析，立即返回任务 ID。"""
+    file_bytes = await file.read()
+
+    if len(file_bytes) > MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=413, detail="文件大小超过 10MB 限制")
+
+    filename = file.filename or ""
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in (".pdf", ".docx"):
+        raise HTTPException(status_code=400, detail="仅支持 PDF 和 DOCX 格式")
+
+    file_b64 = base64.b64encode(file_bytes).decode("utf-8")
+    task = parse_resume_file_task.delay(
+        file_b64=file_b64,
+        filename=filename,
+        fuzzy=fuzzy,
+    )
+    return _success(
+        TaskOut(task_id=task.id, status=task.status).model_dump(),
+        message="解析任务已提交",
+    )
+
+
+@api_router.post("/jobs/upload-async", response_model=ApiResponse)
+async def upload_jd_async(
+    file: UploadFile = File(...),
+    fuzzy: bool | None = Query(
+        None, description="是否启用模糊识别（应届生友好模式）；不传则自动判定"
+    ),
+) -> ApiResponse:
+    """异步上传 JD 文件并解析，立即返回任务 ID。"""
+    file_bytes = await file.read()
+
+    if len(file_bytes) > MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=413, detail="文件大小超过 10MB 限制")
+
+    filename = file.filename or ""
+    file_b64 = base64.b64encode(file_bytes).decode("utf-8")
+    task = parse_jd_file_task.delay(
+        file_b64=file_b64,
+        filename=filename,
+        fuzzy=fuzzy,
+    )
+    return _success(
+        TaskOut(task_id=task.id, status=task.status).model_dump(),
+        message="解析任务已提交",
+    )
 
 
 @api_router.post("/crawler/trigger", response_model=ApiResponse)
@@ -199,7 +370,14 @@ def list_jobs(
         industry=params.industry,
         experience_level=params.experience_level,
     )
-    result["items"] = [JobOut.model_validate(_job_to_dict(job)) for job in result["items"]]
+    # items 已由 JobService 序列化为 dict；兼容 ORM 实例兜底
+    result = {
+        **result,
+        "items": [
+            JobOut.model_validate(job if isinstance(job, dict) else _job_to_dict(job)).model_dump()
+            for job in result["items"]
+        ],
+    }
     return _success(JobListOut.model_validate(result).model_dump())
 
 
@@ -586,14 +764,29 @@ def get_related_skills(
 @api_router.post("/skills/invalidate-cache", response_model=ApiResponse)
 def invalidate_skill_cache(db: Session = Depends(get_db)) -> ApiResponse:
     """开发调试：手动清空技能图谱缓存，使下次请求重新从数据库构建图谱。"""
+    from app.services.cache_service import invalidate_skill_cache as _invalidate_skill_cache
+
     service = SkillService(db)
     service.invalidate_cache()
+    _invalidate_skill_cache()
     return _success({"invalidated": True}, message="技能图谱缓存已清空")
 
 
 # ---------------------------------------------------------------------------
 # Profiles
 # ---------------------------------------------------------------------------
+def _ensure_single_active_profile(
+    db: Session,
+    active_profile_id: int | None = None,
+) -> None:
+    """全局保证只有一个活跃画像（当前未接入用户认证，按全局单活跃处理）。"""
+    query = db.query(UserSkillProfile).filter(UserSkillProfile.is_active.is_(True))
+    if active_profile_id is not None:
+        query = query.filter(UserSkillProfile.id != active_profile_id)
+    for profile in query.all():
+        profile.is_active = False
+
+
 @api_router.post("/profiles", response_model=ApiResponse)
 def create_profile(
     payload: UserSkillProfileCreate,
@@ -606,7 +799,10 @@ def create_profile(
         skills=_json.dumps(payload.skills, ensure_ascii=False),
         experience_level=payload.experience_level,
         target_job_titles=_json.dumps(payload.target_job_titles, ensure_ascii=False),
+        is_active=payload.is_active,
     )
+    if profile.is_active:
+        _ensure_single_active_profile(db, active_profile_id=None)
     db.add(profile)
     db.commit()
     db.refresh(profile)
@@ -622,6 +818,92 @@ def list_profiles(db: Session = Depends(get_db)) -> ApiResponse:
             items=[UserSkillProfileOut.model_validate(p) for p in items],
         ).model_dump()
     )
+
+
+@api_router.get("/profiles/active", response_model=ApiResponse)
+def get_active_profile(db: Session = Depends(get_db)) -> ApiResponse:
+    """获取当前活跃画像；不存在时返回 None。"""
+    profile = (
+        db.query(UserSkillProfile)
+        .filter(UserSkillProfile.is_active.is_(True))
+        .first()
+    )
+    if profile is None:
+        return _success(None, message="当前未设置活跃画像")
+    return _success(UserSkillProfileOut.model_validate(profile).model_dump())
+
+
+@api_router.get("/profiles/{profile_id}", response_model=ApiResponse)
+def get_profile(profile_id: int, db: Session = Depends(get_db)) -> ApiResponse:
+    """获取单个画像详情。"""
+    profile = db.query(UserSkillProfile).filter(UserSkillProfile.id == profile_id).first()
+    if profile is None:
+        raise HTTPException(status_code=404, detail=f"用户画像不存在: {profile_id}")
+    return _success(UserSkillProfileOut.model_validate(profile).model_dump())
+
+
+@api_router.put("/profiles/{profile_id}", response_model=ApiResponse)
+def update_profile(
+    profile_id: int,
+    payload: UserSkillProfileUpdate,
+    db: Session = Depends(get_db),
+) -> ApiResponse:
+    """更新画像信息，支持切换活跃状态。"""
+    import json as _json
+
+    profile = db.query(UserSkillProfile).filter(UserSkillProfile.id == profile_id).first()
+    if profile is None:
+        raise HTTPException(status_code=404, detail=f"用户画像不存在: {profile_id}")
+
+    if payload.name is not None:
+        profile.name = payload.name
+    if payload.skills is not None:
+        profile.skills = _json.dumps(payload.skills, ensure_ascii=False)
+    if payload.experience_level is not None:
+        profile.experience_level = payload.experience_level
+    if payload.target_job_titles is not None:
+        profile.target_job_titles = _json.dumps(payload.target_job_titles, ensure_ascii=False)
+    if payload.is_active is not None:
+        if payload.is_active:
+            _ensure_single_active_profile(db, active_profile_id=profile_id)
+        profile.is_active = payload.is_active
+
+    db.commit()
+    db.refresh(profile)
+    return _success(UserSkillProfileOut.model_validate(profile).model_dump())
+
+
+@api_router.post("/profiles/{profile_id}/set-active", response_model=ApiResponse)
+def set_active_profile(profile_id: int, db: Session = Depends(get_db)) -> ApiResponse:
+    """将指定画像设为活跃，并取消其他画像的活跃状态。"""
+    profile = db.query(UserSkillProfile).filter(UserSkillProfile.id == profile_id).first()
+    if profile is None:
+        raise HTTPException(status_code=404, detail=f"用户画像不存在: {profile_id}")
+
+    _ensure_single_active_profile(db, active_profile_id=profile_id)
+    profile.is_active = True
+    db.commit()
+    db.refresh(profile)
+    return _success(
+        UserSkillProfileOut.model_validate(profile).model_dump(),
+        message="已设为活跃画像",
+    )
+
+
+@api_router.delete("/profiles/{profile_id}", response_model=ApiResponse)
+def delete_profile(profile_id: int, db: Session = Depends(get_db)) -> ApiResponse:
+    """删除指定画像及其关联的匹配记录与收藏。"""
+    profile = db.query(UserSkillProfile).filter(UserSkillProfile.id == profile_id).first()
+    if profile is None:
+        raise HTTPException(status_code=404, detail=f"用户画像不存在: {profile_id}")
+
+    # 级联删除关联的匹配记录（画像 FavoriteJob 已配置 cascade）
+    db.query(MatchResult).filter(MatchResult.user_profile_id == profile_id).delete(
+        synchronize_session=False
+    )
+    db.delete(profile)
+    db.commit()
+    return _success({"deleted": True}, message="画像已删除")
 
 
 @api_router.get("/profiles/{profile_id}/recommendations", response_model=ApiResponse)
@@ -723,6 +1005,23 @@ def list_favorites(
 # ---------------------------------------------------------------------------
 # Matches
 # ---------------------------------------------------------------------------
+def _resolve_profile_id(
+    db: Session,
+    profile_id: int | None,
+) -> int:
+    """解析匹配请求中的画像 ID：显式传入 > 活跃画像。"""
+    if profile_id is not None:
+        return profile_id
+    active = (
+        db.query(UserSkillProfile)
+        .filter(UserSkillProfile.is_active.is_(True))
+        .first()
+    )
+    if active is None:
+        raise HTTPException(status_code=400, detail="未提供 profile_id 且未设置活跃画像")
+    return active.id
+
+
 @api_router.post("/matches", response_model=ApiResponse)
 def create_match(
     payload: MatchRequest,
@@ -730,11 +1029,14 @@ def create_match(
 ) -> ApiResponse:
     service = MatchingService(db)
     try:
+        resolved_profile_id = _resolve_profile_id(db, payload.profile_id)
         match_result = service.match_profile_to_job(
-            profile_id=payload.profile_id,
+            profile_id=resolved_profile_id,
             job_id=payload.job_id,
             profile_override=payload.profile,
         )
+    except HTTPException:
+        raise
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:
@@ -750,6 +1052,52 @@ def get_match(match_id: int, db: Session = Depends(get_db)) -> ApiResponse:
     if match_result is None:
         raise HTTPException(status_code=404, detail=f"匹配结果不存在: {match_id}")
     return _success(MatchResultOut.model_validate(match_result).model_dump())
+
+
+@api_router.post("/reports/match/pdf")
+def export_match_report_pdf(
+    payload: MatchReportPDFRequest,
+    db: Session = Depends(get_db),
+) -> Response:
+    """生成匹配报告 PDF，支持按 match_id 从数据库拉取或传入结构化数据。"""
+    if payload.match_id is not None:
+        match_result = db.query(MatchResult).filter(MatchResult.id == payload.match_id).first()
+        if match_result is None:
+            raise HTTPException(status_code=404, detail=f"匹配结果不存在: {payload.match_id}")
+
+        match_data = MatchResultOut.model_validate(match_result).model_dump()
+        job = db.query(Job).filter(Job.id == match_result.job_id).first()
+        job_data = _job_to_dict(job) if job else None
+        profile = (
+            db.query(UserSkillProfile)
+            .filter(UserSkillProfile.id == match_result.user_profile_id)
+            .first()
+        )
+        profile_data = _profile_to_dict(profile) if profile else None
+    else:
+        if payload.match_data is None:
+            raise HTTPException(status_code=400, detail="请提供 match_id 或 match_data")
+        match_data = payload.match_data
+        job_data = payload.job_data
+        profile_data = payload.profile_data
+
+    try:
+        pdf_bytes = generate_match_report_pdf(
+            match_data=match_data,
+            job_data=job_data,
+            profile_data=profile_data,
+        )
+    except Exception as exc:
+        logger.exception("生成 PDF 报告失败")
+        raise HTTPException(status_code=500, detail=f"生成 PDF 失败: {exc}") from exc
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"talentmatch-report-{timestamp}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
 
 
 @api_router.get("/matches", response_model=ApiResponse)
@@ -774,10 +1122,13 @@ def generate_learning_path(
 ) -> ApiResponse:
     service = MatchingService(db)
     try:
+        resolved_profile_id = _resolve_profile_id(db, payload.profile_id)
         result = service.generate_learning_path(
-            profile_id=payload.profile_id,
+            profile_id=resolved_profile_id,
             job_id=payload.job_id,
         )
+    except HTTPException:
+        raise
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:
@@ -791,29 +1142,7 @@ def generate_learning_path(
 # ---------------------------------------------------------------------------
 @api_router.get("/trends", response_model=ApiResponse)
 def get_trends(db: Session = Depends(get_db)) -> ApiResponse:
-    job_data = []
-    for job in db.query(Job).all():
-        job_data.append(
-            {
-                "title": job.title,
-                "city": job.city,
-                "salary_min": job.salary_min,
-                "salary_max": job.salary_max,
-                "required_skills": _load_json_list(job.required_skills),
-            }
-        )
-
-    agent = TrendPredictor()
-    trend = agent.predict(job_data)
-    return _success(
-        {
-            "summary": trend.get("summary", ""),
-            "top_skills": trend.get("top_skills", []),
-            "avg_salary_range": trend.get("avg_salary_range", ""),
-            "hot_job_titles": trend.get("hot_job_titles", []),
-            "key_metrics": trend.get("key_metrics", {}),
-        }
-    )
+    return _success(_get_trend_summary(db))
 
 
 # ---------------------------------------------------------------------------
@@ -826,32 +1155,13 @@ def get_dashboard(db: Session = Depends(get_db)) -> ApiResponse:
 
     job_stats = job_service.get_job_statistics()
     skill_stats = skill_service.get_skill_statistics()
-
-    job_data = []
-    for job in db.query(Job).all():
-        job_data.append(
-            {
-                "title": job.title,
-                "city": job.city,
-                "salary_min": job.salary_min,
-                "salary_max": job.salary_max,
-                "required_skills": _load_json_list(job.required_skills),
-            }
-        )
-    agent = TrendPredictor()
-    trend = agent.predict(job_data)
+    trend = _get_trend_summary(db)
 
     return _success(
         {
             "jobs": job_stats,
             "skills": skill_stats,
-            "trends": {
-                "summary": trend.get("summary", ""),
-                "top_skills": trend.get("top_skills", []),
-                "avg_salary_range": trend.get("avg_salary_range", ""),
-                "hot_job_titles": trend.get("hot_job_titles", []),
-                "key_metrics": trend.get("key_metrics", {}),
-            },
+            "trends": trend,
         }
     )
 

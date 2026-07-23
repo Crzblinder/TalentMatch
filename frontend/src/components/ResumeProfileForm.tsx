@@ -9,6 +9,7 @@ import {
   User,
 } from 'lucide-react'
 
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,6 +23,12 @@ import {
 } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import type {
   ResumeBasicInfo,
   ResumeEducation,
@@ -258,6 +265,8 @@ function FieldTip({ empty, tip }: { empty: boolean; tip: string }) {
 
 export default function ResumeProfileForm({ value, onChange, disabled }: ResumeProfileFormProps) {
   const [activeTab, setActiveTab] = useState('basic')
+  const [openAccordion, setOpenAccordion] = useState<string[]>(['basic'])
+  const isDesktop = useMediaQuery('(min-width: 768px)')
 
   // 当基本信息变化时，自动更新目标岗位为期望岗位
   useEffect(() => {
@@ -370,6 +379,427 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
     (section) => progress[section.id as keyof typeof progress].filled < progress[section.id as keyof typeof progress].total
   )
 
+  const inputClass = 'min-h-[44px] md:min-h-10'
+  const selectTriggerClass = 'min-h-[44px] md:min-h-10'
+  const addBtnClass = 'min-h-[44px] md:min-h-9'
+
+  const sectionContent = (sectionId: string) => {
+    switch (sectionId) {
+      case 'basic':
+        return (
+          <div className="space-y-4">
+            <h3 className="text-base font-semibold">
+              基本信息
+              <FieldTip empty={progress.basic.filled < progress.basic.total} tip="建议补充完整，提升匹配准确度" />
+            </h3>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>
+                  姓名
+                  {!value.name && <span className="text-amber-600"> *</span>}
+                </Label>
+                <Input
+                  value={value.name}
+                  onChange={(e) => update('name', e.target.value)}
+                  placeholder="请输入姓名"
+                  disabled={disabled}
+                  className={inputClass}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>性别</Label>
+                <Select value={value.gender} onValueChange={(v) => update('gender', v)} disabled={disabled}>
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择性别" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GENDER_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>
+                  手机号
+                  {!value.phone && <span className="text-xs text-muted-foreground">（建议补充）</span>}
+                </Label>
+                <Input
+                  value={value.phone}
+                  onChange={(e) => update('phone', e.target.value)}
+                  placeholder="请输入手机号"
+                  disabled={disabled}
+                  className={inputClass}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>
+                  邮箱
+                  {!value.email && <span className="text-xs text-muted-foreground">（建议补充）</span>}
+                </Label>
+                <Input
+                  value={value.email}
+                  onChange={(e) => update('email', e.target.value)}
+                  placeholder="请输入邮箱"
+                  disabled={disabled}
+                  className={inputClass}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>出生日期</Label>
+                <Input type="date" value={value.birthDate} onChange={(e) => update('birthDate', e.target.value)} disabled={disabled} className={inputClass} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>政治面貌</Label>
+                <Select value={value.politicalStatus} onValueChange={(v) => update('politicalStatus', v)} disabled={disabled}>
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择政治面貌" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {POLITICAL_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>婚姻状况</Label>
+                <Select value={value.marriage} onValueChange={(v) => update('marriage', v)} disabled={disabled}>
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择婚姻状况" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MARRIAGE_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>身份证类型</Label>
+                <Select value={value.idCardType} onValueChange={(v) => update('idCardType', v)} disabled={disabled}>
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择身份证类型" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ID_CARD_TYPE_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>户口所在地</Label>
+                <Select value={value.hukou} onValueChange={(v) => update('hukou', v)} disabled={disabled}>
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择户口所在地" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROVINCE_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>籍贯</Label>
+                <Select value={value.jiguan} onValueChange={(v) => update('jiguan', v)} disabled={disabled}>
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择籍贯" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROVINCE_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )
+
+      case 'intention':
+        return (
+          <div className="space-y-4">
+            <h3 className="text-base font-semibold">
+              求职意向
+              <FieldTip empty={progress.intention.filled < progress.intention.total} tip="填写意向可提升岗位推荐精准度" />
+            </h3>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>
+                  期望岗位
+                  {!value.expectedPosition && <span className="text-xs text-muted-foreground">（建议补充）</span>}
+                </Label>
+                <Input
+                  value={value.expectedPosition}
+                  onChange={(e) => update('expectedPosition', e.target.value)}
+                  placeholder="例如：产品经理"
+                  disabled={disabled}
+                  className={inputClass}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>经验级别</Label>
+                <Select value={value.experienceLevel} onValueChange={(v) => update('experienceLevel', v)} disabled={disabled}>
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择经验" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EXPERIENCE_LEVELS.map((level) => (
+                      <SelectItem key={level} value={level}>
+                        {level}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>期望城市</Label>
+                <Input value={value.expectedCity} onChange={(e) => update('expectedCity', e.target.value)} placeholder="例如：上海" disabled={disabled} className={inputClass} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>期望薪资</Label>
+                <Input value={value.expectedSalary} onChange={(e) => update('expectedSalary', e.target.value)} placeholder="例如：15k-25k" disabled={disabled} className={inputClass} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>期望行业</Label>
+                <Input value={value.expectedIndustry} onChange={(e) => update('expectedIndustry', e.target.value)} placeholder="例如：互联网" disabled={disabled} className={inputClass} />
+              </div>
+            </div>
+          </div>
+        )
+
+      case 'education':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold">
+                教育经历
+                <FieldTip empty={progress.education.filled < progress.education.total} tip="教育背景影响岗位学历匹配" />
+              </h3>
+              <Button type="button" variant="outline" size="sm" onClick={addEducation} disabled={disabled} className={addBtnClass}>
+                + 添加
+              </Button>
+            </div>
+            {value.education.map((edu, idx) => (
+              <div key={idx} className="relative rounded-lg border p-3">
+                {value.education.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-2 h-8 text-destructive md:h-7"
+                    onClick={() => removeEducation(idx)}
+                    disabled={disabled}
+                  >
+                    删除
+                  </Button>
+                )}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label>学校</Label>
+                    <Input value={edu.school} onChange={(e) => updateEducation(idx, 'school', e.target.value)} placeholder="学校名称" disabled={disabled} className={inputClass} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>专业</Label>
+                    <Input value={edu.major} onChange={(e) => updateEducation(idx, 'major', e.target.value)} placeholder="专业" disabled={disabled} className={inputClass} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>学历</Label>
+                    <Input value={edu.degree} onChange={(e) => updateEducation(idx, 'degree', e.target.value)} placeholder="本科 / 硕士" disabled={disabled} className={inputClass} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>起止时间</Label>
+                    <div className="flex items-center gap-2">
+                      <Input value={edu.start_date} onChange={(e) => updateEducation(idx, 'start_date', e.target.value)} placeholder="2020-09" disabled={disabled} className={inputClass} />
+                      <span className="text-muted-foreground">~</span>
+                      <Input value={edu.end_date} onChange={(e) => updateEducation(idx, 'end_date', e.target.value)} placeholder="2024-06" disabled={disabled} className={inputClass} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+
+      case 'work':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold">
+                工作经历
+                <FieldTip empty={progress.work.filled < progress.work.total} tip="工作经历是经验判断的重要依据" />
+              </h3>
+              <Button type="button" variant="outline" size="sm" onClick={addWork} disabled={disabled} className={addBtnClass}>
+                + 添加
+              </Button>
+            </div>
+            {value.workExperience.map((work, idx) => (
+              <div key={idx} className="relative rounded-lg border p-3">
+                {value.workExperience.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-2 h-8 text-destructive md:h-7"
+                    onClick={() => removeWork(idx)}
+                    disabled={disabled}
+                  >
+                    删除
+                  </Button>
+                )}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label>公司</Label>
+                    <Input value={work.company} onChange={(e) => updateWork(idx, 'company', e.target.value)} placeholder="公司名称" disabled={disabled} className={inputClass} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>职位</Label>
+                    <Input value={work.position} onChange={(e) => updateWork(idx, 'position', e.target.value)} placeholder="职位" disabled={disabled} className={inputClass} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>起止时间</Label>
+                    <div className="flex items-center gap-2">
+                      <Input value={work.start_date} onChange={(e) => updateWork(idx, 'start_date', e.target.value)} placeholder="2022-07" disabled={disabled} className={inputClass} />
+                      <span className="text-muted-foreground">~</span>
+                      <Input value={work.end_date} onChange={(e) => updateWork(idx, 'end_date', e.target.value)} placeholder="至今" disabled={disabled} className={inputClass} />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label>工作内容</Label>
+                    <Textarea value={work.description} onChange={(e) => updateWork(idx, 'description', e.target.value)} placeholder="简述工作内容和成果" disabled={disabled} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+
+      case 'project':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold">
+                项目经历
+                <FieldTip empty={progress.project.filled < progress.project.total} tip="项目经历能补充技能匹配维度" />
+              </h3>
+              <Button type="button" variant="outline" size="sm" onClick={addProject} disabled={disabled} className={addBtnClass}>
+                + 添加
+              </Button>
+            </div>
+            {value.projectExperience.map((proj, idx) => (
+              <div key={idx} className="relative rounded-lg border p-3">
+                {value.projectExperience.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-2 h-8 text-destructive md:h-7"
+                    onClick={() => removeProject(idx)}
+                    disabled={disabled}
+                  >
+                    删除
+                  </Button>
+                )}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label>项目名称</Label>
+                    <Input value={proj.name} onChange={(e) => updateProject(idx, 'name', e.target.value)} placeholder="项目名称" disabled={disabled} className={inputClass} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>担任角色</Label>
+                    <Input value={proj.role} onChange={(e) => updateProject(idx, 'role', e.target.value)} placeholder="负责人 / 开发者" disabled={disabled} className={inputClass} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>起止时间</Label>
+                    <div className="flex items-center gap-2">
+                      <Input value={proj.start_date} onChange={(e) => updateProject(idx, 'start_date', e.target.value)} placeholder="2023-03" disabled={disabled} className={inputClass} />
+                      <span className="text-muted-foreground">~</span>
+                      <Input value={proj.end_date} onChange={(e) => updateProject(idx, 'end_date', e.target.value)} placeholder="至今" disabled={disabled} className={inputClass} />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label>项目描述</Label>
+                    <Textarea value={proj.description} onChange={(e) => updateProject(idx, 'description', e.target.value)} placeholder="简述项目背景、职责和成果" disabled={disabled} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+
+      case 'skills':
+        return (
+          <div className="space-y-4">
+            <h3 className="text-base font-semibold">
+              技能优势
+              <FieldTip empty={progress.skills.filled < progress.skills.total} tip="技能是岗位匹配的核心依据" />
+            </h3>
+            <div className="space-y-1.5">
+              <Label>
+                技能
+                {!value.skillsText && <span className="text-amber-600"> *</span>}
+              </Label>
+              <Textarea
+                value={value.skillsText}
+                onChange={(e) => update('skillsText', e.target.value)}
+                placeholder="输入技能，用逗号分隔，例如：Python, MySQL, 数据分析"
+                disabled={disabled}
+              />
+              <p className="text-xs text-muted-foreground">多个技能请用中文或英文逗号分隔</p>
+            </div>
+            <div className="space-y-1.5">
+              <Label>个人优势 / 自我评价</Label>
+              <Textarea
+                value={value.selfEvaluation}
+                onChange={(e) => update('selfEvaluation', e.target.value)}
+                placeholder="简述你的核心优势和特点"
+                disabled={disabled}
+              />
+            </div>
+          </div>
+        )
+
+      case 'other':
+        return (
+          <div className="space-y-4">
+            <h3 className="text-base font-semibold">
+              其他信息
+              <FieldTip empty={progress.other.filled < progress.other.total} tip="补充信息可让匹配更立体" />
+            </h3>
+            <div className="space-y-1.5">
+              <Label>获奖情况（每行一条）</Label>
+              <Textarea value={value.awardsText} onChange={(e) => update('awardsText', e.target.value)} placeholder="例如：全国人工智能应用创新大赛 国家级二等奖" disabled={disabled} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>资格证书（每行一条）</Label>
+              <Textarea value={value.certificationsText} onChange={(e) => update('certificationsText', e.target.value)} placeholder="例如：计算机二级" disabled={disabled} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>语言能力（每行一条）</Label>
+              <Textarea value={value.languageSkillsText} onChange={(e) => update('languageSkillsText', e.target.value)} placeholder="例如：CET-6: 601" disabled={disabled} />
+            </div>
+          </div>
+        )
+
+      default:
+        return null
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* 顶部未填项提醒与跳转指引 */}
@@ -389,8 +819,13 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-7 gap-1 border-amber-200 bg-white text-xs hover:bg-amber-100"
-                  onClick={() => setActiveTab(section.id)}
+                  className="h-9 gap-1 border-amber-200 bg-white text-xs hover:bg-amber-100 md:h-7"
+                  onClick={() => {
+                    setActiveTab(section.id)
+                    setOpenAccordion((prev) =>
+                      prev.includes(section.id) ? prev : [...prev, section.id]
+                    )
+                  }}
                 >
                   <Icon className="h-3.5 w-3.5" />
                   {section.label}
@@ -404,401 +839,76 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
         </div>
       )}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex min-h-[560px] flex-col gap-4 md:flex-row">
-        {/* 左侧导航 */}
-        <TabsList className="flex h-auto flex-col items-stretch justify-start gap-1.5 rounded-xl border bg-muted/40 p-2 shadow-sm md:w-48">
+      {isDesktop ? (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex min-h-[560px] flex-col gap-4 md:flex-row">
+          {/* 左侧导航 */}
+          <TabsList className="flex h-auto flex-col items-stretch justify-start gap-1.5 rounded-xl border bg-muted/40 p-2 shadow-sm md:w-48">
+            {SECTIONS.map((section) => {
+              const Icon = section.icon
+              const p = progress[section.id as keyof typeof progress]
+              const incomplete = p.filled < p.total
+              return (
+                <TabsTrigger
+                  key={section.id}
+                  value={section.id}
+                  className="relative flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all hover:bg-muted data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                >
+                  <span className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    {section.label}
+                  </span>
+                  {incomplete && (
+                    <Badge variant="outline" className="h-5 px-1.5 text-[10px] text-amber-600 border-amber-200 bg-amber-50 data-[state=active]:border-primary-foreground/30 data-[state=active]:bg-primary-foreground/20 data-[state=active]:text-primary-foreground">
+                      {p.filled}/{p.total}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+              )
+            })}
+          </TabsList>
+
+          {/* 右侧内容 */}
+          <div className="flex-1 rounded-xl border bg-card p-4 shadow-sm md:p-6">
+            {SECTIONS.map((section) => (
+              <TabsContent key={section.id} value={section.id} className="mt-0 space-y-4">
+                {sectionContent(section.id)}
+              </TabsContent>
+            ))}
+          </div>
+        </Tabs>
+      ) : (
+        /* 移动端：折叠面板 */
+        <Accordion
+          type="multiple"
+          value={openAccordion}
+          onValueChange={setOpenAccordion}
+          className="rounded-xl border bg-card p-2 shadow-sm"
+        >
           {SECTIONS.map((section) => {
             const Icon = section.icon
             const p = progress[section.id as keyof typeof progress]
             const incomplete = p.filled < p.total
             return (
-              <TabsTrigger
-                key={section.id}
-                value={section.id}
-                className="relative flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all hover:bg-muted data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-              >
-                <span className="flex items-center gap-2">
-                  <Icon className="h-4 w-4" />
-                  {section.label}
-                </span>
-                {incomplete && (
-                  <Badge variant="outline" className="h-5 px-1.5 text-[10px] text-amber-600 border-amber-200 bg-amber-50 data-[state=active]:border-primary-foreground/30 data-[state=active]:bg-primary-foreground/20 data-[state=active]:text-primary-foreground">
-                    {p.filled}/{p.total}
-                  </Badge>
-                )}
-              </TabsTrigger>
+              <AccordionItem key={section.id} value={section.id} className="border-b-0 px-2">
+                <AccordionTrigger className="py-3 text-sm font-medium hover:no-underline">
+                  <span className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    {section.label}
+                    {incomplete && (
+                      <Badge variant="outline" className="h-5 px-1.5 text-[10px] text-amber-600 border-amber-200 bg-amber-50">
+                        {p.filled}/{p.total}
+                      </Badge>
+                    )}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="px-1 pb-4">
+                  {sectionContent(section.id)}
+                </AccordionContent>
+              </AccordionItem>
             )
           })}
-        </TabsList>
-
-        {/* 右侧内容 */}
-        <div className="flex-1 rounded-xl border bg-card p-4 shadow-sm md:p-6">
-          <TabsContent value="basic" className="mt-0 space-y-4">
-          <h3 className="text-base font-semibold">
-            基本信息
-            <FieldTip empty={progress.basic.filled < progress.basic.total} tip="建议补充完整，提升匹配准确度" />
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label>
-                姓名
-                {!value.name && <span className="text-amber-600"> *</span>}
-              </Label>
-              <Input value={value.name} onChange={(e) => update('name', e.target.value)} placeholder="请输入姓名" disabled={disabled} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>性别</Label>
-              <Select value={value.gender} onValueChange={(v) => update('gender', v)} disabled={disabled}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择性别" />
-                </SelectTrigger>
-                <SelectContent>
-                  {GENDER_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>
-                手机号
-                {!value.phone && <span className="text-xs text-muted-foreground">（建议补充）</span>}
-              </Label>
-              <Input value={value.phone} onChange={(e) => update('phone', e.target.value)} placeholder="请输入手机号" disabled={disabled} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>
-                邮箱
-                {!value.email && <span className="text-xs text-muted-foreground">（建议补充）</span>}
-              </Label>
-              <Input value={value.email} onChange={(e) => update('email', e.target.value)} placeholder="请输入邮箱" disabled={disabled} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>出生日期</Label>
-              <Input type="date" value={value.birthDate} onChange={(e) => update('birthDate', e.target.value)} disabled={disabled} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>政治面貌</Label>
-              <Select value={value.politicalStatus} onValueChange={(v) => update('politicalStatus', v)} disabled={disabled}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择政治面貌" />
-                </SelectTrigger>
-                <SelectContent>
-                  {POLITICAL_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>婚姻状况</Label>
-              <Select value={value.marriage} onValueChange={(v) => update('marriage', v)} disabled={disabled}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择婚姻状况" />
-                </SelectTrigger>
-                <SelectContent>
-                  {MARRIAGE_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>身份证类型</Label>
-              <Select value={value.idCardType} onValueChange={(v) => update('idCardType', v)} disabled={disabled}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择身份证类型" />
-                </SelectTrigger>
-                <SelectContent>
-                  {ID_CARD_TYPE_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>户口所在地</Label>
-              <Select value={value.hukou} onValueChange={(v) => update('hukou', v)} disabled={disabled}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择户口所在地" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PROVINCE_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>籍贯</Label>
-              <Select value={value.jiguan} onValueChange={(v) => update('jiguan', v)} disabled={disabled}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择籍贯" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PROVINCE_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="intention" className="mt-0 space-y-4">
-          <h3 className="text-base font-semibold">
-            求职意向
-            <FieldTip empty={progress.intention.filled < progress.intention.total} tip="填写意向可提升岗位推荐精准度" />
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label>
-                期望岗位
-                {!value.expectedPosition && <span className="text-xs text-muted-foreground">（建议补充）</span>}
-              </Label>
-              <Input value={value.expectedPosition} onChange={(e) => update('expectedPosition', e.target.value)} placeholder="例如：产品经理" disabled={disabled} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>经验级别</Label>
-              <Select value={value.experienceLevel} onValueChange={(v) => update('experienceLevel', v)} disabled={disabled}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择经验" />
-                </SelectTrigger>
-                <SelectContent>
-                  {EXPERIENCE_LEVELS.map((level) => (
-                    <SelectItem key={level} value={level}>
-                      {level}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>期望城市</Label>
-              <Input value={value.expectedCity} onChange={(e) => update('expectedCity', e.target.value)} placeholder="例如：上海" disabled={disabled} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>期望薪资</Label>
-              <Input value={value.expectedSalary} onChange={(e) => update('expectedSalary', e.target.value)} placeholder="例如：15k-25k" disabled={disabled} />
-            </div>
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label>期望行业</Label>
-              <Input value={value.expectedIndustry} onChange={(e) => update('expectedIndustry', e.target.value)} placeholder="例如：互联网" disabled={disabled} />
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="education" className="mt-0 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold">
-              教育经历
-              <FieldTip empty={progress.education.filled < progress.education.total} tip="教育背景影响岗位学历匹配" />
-            </h3>
-            <Button type="button" variant="outline" size="sm" onClick={addEducation} disabled={disabled}>
-              + 添加
-            </Button>
-          </div>
-          {value.education.map((edu, idx) => (
-            <div key={idx} className="relative rounded-lg border p-3">
-              {value.education.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-2 h-7 text-destructive"
-                  onClick={() => removeEducation(idx)}
-                  disabled={disabled}
-                >
-                  删除
-                </Button>
-              )}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label>学校</Label>
-                  <Input value={edu.school} onChange={(e) => updateEducation(idx, 'school', e.target.value)} placeholder="学校名称" disabled={disabled} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>专业</Label>
-                  <Input value={edu.major} onChange={(e) => updateEducation(idx, 'major', e.target.value)} placeholder="专业" disabled={disabled} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>学历</Label>
-                  <Input value={edu.degree} onChange={(e) => updateEducation(idx, 'degree', e.target.value)} placeholder="本科 / 硕士" disabled={disabled} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>起止时间</Label>
-                  <div className="flex items-center gap-2">
-                    <Input value={edu.start_date} onChange={(e) => updateEducation(idx, 'start_date', e.target.value)} placeholder="2020-09" disabled={disabled} />
-                    <span className="text-muted-foreground">~</span>
-                    <Input value={edu.end_date} onChange={(e) => updateEducation(idx, 'end_date', e.target.value)} placeholder="2024-06" disabled={disabled} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="work" className="mt-0 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold">
-              工作经历
-              <FieldTip empty={progress.work.filled < progress.work.total} tip="工作经历是经验判断的重要依据" />
-            </h3>
-            <Button type="button" variant="outline" size="sm" onClick={addWork} disabled={disabled}>
-              + 添加
-            </Button>
-          </div>
-          {value.workExperience.map((work, idx) => (
-            <div key={idx} className="relative rounded-lg border p-3">
-              {value.workExperience.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-2 h-7 text-destructive"
-                  onClick={() => removeWork(idx)}
-                  disabled={disabled}
-                >
-                  删除
-                </Button>
-              )}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label>公司</Label>
-                  <Input value={work.company} onChange={(e) => updateWork(idx, 'company', e.target.value)} placeholder="公司名称" disabled={disabled} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>职位</Label>
-                  <Input value={work.position} onChange={(e) => updateWork(idx, 'position', e.target.value)} placeholder="职位" disabled={disabled} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>起止时间</Label>
-                  <div className="flex items-center gap-2">
-                    <Input value={work.start_date} onChange={(e) => updateWork(idx, 'start_date', e.target.value)} placeholder="2022-07" disabled={disabled} />
-                    <span className="text-muted-foreground">~</span>
-                    <Input value={work.end_date} onChange={(e) => updateWork(idx, 'end_date', e.target.value)} placeholder="至今" disabled={disabled} />
-                  </div>
-                </div>
-                <div className="space-y-1.5 sm:col-span-2">
-                  <Label>工作内容</Label>
-                  <Textarea value={work.description} onChange={(e) => updateWork(idx, 'description', e.target.value)} placeholder="简述工作内容和成果" disabled={disabled} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="project" className="mt-0 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold">
-              项目经历
-              <FieldTip empty={progress.project.filled < progress.project.total} tip="项目经历能补充技能匹配维度" />
-            </h3>
-            <Button type="button" variant="outline" size="sm" onClick={addProject} disabled={disabled}>
-              + 添加
-            </Button>
-          </div>
-          {value.projectExperience.map((proj, idx) => (
-            <div key={idx} className="relative rounded-lg border p-3">
-              {value.projectExperience.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-2 h-7 text-destructive"
-                  onClick={() => removeProject(idx)}
-                  disabled={disabled}
-                >
-                  删除
-                </Button>
-              )}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label>项目名称</Label>
-                  <Input value={proj.name} onChange={(e) => updateProject(idx, 'name', e.target.value)} placeholder="项目名称" disabled={disabled} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>担任角色</Label>
-                  <Input value={proj.role} onChange={(e) => updateProject(idx, 'role', e.target.value)} placeholder="负责人 / 开发者" disabled={disabled} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>起止时间</Label>
-                  <div className="flex items-center gap-2">
-                    <Input value={proj.start_date} onChange={(e) => updateProject(idx, 'start_date', e.target.value)} placeholder="2023-03" disabled={disabled} />
-                    <span className="text-muted-foreground">~</span>
-                    <Input value={proj.end_date} onChange={(e) => updateProject(idx, 'end_date', e.target.value)} placeholder="至今" disabled={disabled} />
-                  </div>
-                </div>
-                <div className="space-y-1.5 sm:col-span-2">
-                  <Label>项目描述</Label>
-                  <Textarea value={proj.description} onChange={(e) => updateProject(idx, 'description', e.target.value)} placeholder="简述项目背景、职责和成果" disabled={disabled} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="skills" className="mt-0 space-y-4">
-          <h3 className="text-base font-semibold">
-            技能优势
-            <FieldTip empty={progress.skills.filled < progress.skills.total} tip="技能是岗位匹配的核心依据" />
-          </h3>
-          <div className="space-y-1.5">
-            <Label>
-              技能
-              {!value.skillsText && <span className="text-amber-600"> *</span>}
-            </Label>
-            <Textarea
-              value={value.skillsText}
-              onChange={(e) => update('skillsText', e.target.value)}
-              placeholder="输入技能，用逗号分隔，例如：Python, MySQL, 数据分析"
-              disabled={disabled}
-            />
-            <p className="text-xs text-muted-foreground">多个技能请用中文或英文逗号分隔</p>
-          </div>
-          <div className="space-y-1.5">
-            <Label>个人优势 / 自我评价</Label>
-            <Textarea
-              value={value.selfEvaluation}
-              onChange={(e) => update('selfEvaluation', e.target.value)}
-              placeholder="简述你的核心优势和特点"
-              disabled={disabled}
-            />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="other" className="mt-0 space-y-4">
-          <h3 className="text-base font-semibold">
-            其他信息
-            <FieldTip empty={progress.other.filled < progress.other.total} tip="补充信息可让匹配更立体" />
-          </h3>
-          <div className="space-y-1.5">
-            <Label>获奖情况（每行一条）</Label>
-            <Textarea value={value.awardsText} onChange={(e) => update('awardsText', e.target.value)} placeholder="例如：全国人工智能应用创新大赛 国家级二等奖" disabled={disabled} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>资格证书（每行一条）</Label>
-            <Textarea value={value.certificationsText} onChange={(e) => update('certificationsText', e.target.value)} placeholder="例如：计算机二级" disabled={disabled} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>语言能力（每行一条）</Label>
-            <Textarea value={value.languageSkillsText} onChange={(e) => update('languageSkillsText', e.target.value)} placeholder="例如：CET-6: 601" disabled={disabled} />
-          </div>
-        </TabsContent>
-      </div>
-    </Tabs>
+        </Accordion>
+      )}
     </div>
   )
 }
