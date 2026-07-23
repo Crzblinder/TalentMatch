@@ -12,9 +12,9 @@ import socket
 import subprocess
 import sys
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from collections.abc import Generator
 
 ROOT = Path(__file__).resolve().parent.parent
 BACKEND_DIR = ROOT / "backend"
