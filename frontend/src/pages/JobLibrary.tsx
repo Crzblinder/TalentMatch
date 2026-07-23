@@ -118,7 +118,9 @@ export default function JobLibrary() {
       .then((res) => {
         if (cancelled) return
         if (res.items.length > 0) {
-          setCurrentProfile((prev) => prev || res.items[0])
+          // 优先使用后台标记的活跃画像，其次使用列表第一个
+          const active = res.items.find((p) => p.is_active)
+          setCurrentProfile((prev) => prev || active || res.items[0])
         }
       })
       .catch((e) => {
@@ -152,7 +154,7 @@ export default function JobLibrary() {
 
   useEffect(() => {
     loadFavorites()
-  }, [loadFavorites])
+  }, [loadFavorites, showFavoritesOnly])
 
   // 加载岗位列表数据
   const load = useCallback(async (p: number) => {

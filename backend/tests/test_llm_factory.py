@@ -9,6 +9,7 @@ from app.llm.factory import LLMClientFactory
 def test_create_domestic_dashscope():
     """开启国产模式并配置 DashScope 时，优先返回 DashScope 客户端。"""
     settings = Settings(
+        use_local_llm=False,
         use_domestic_llm=True,
         dashscope_api_key="sk-test",
         dashscope_model="qwen-max",
@@ -23,6 +24,7 @@ def test_create_domestic_dashscope():
 def test_create_domestic_zhipu_when_no_dashscope():
     """仅配置 Zhipu 时返回 Zhipu 客户端。"""
     settings = Settings(
+        use_local_llm=False,
         use_domestic_llm=True,
         zhipu_api_key="sk-zhipu",
         zhipu_model="glm-4",
@@ -37,6 +39,7 @@ def test_create_domestic_zhipu_when_no_dashscope():
 def test_create_fallback_openai_when_domestic_disabled():
     """未开启国产模式时保持原有 OpenAI-compatible 行为。"""
     settings = Settings(
+        use_local_llm=False,
         use_domestic_llm=False,
         openai_api_key="",
         openai_model="gpt-4o-mini",
@@ -51,6 +54,7 @@ def test_create_fallback_openai_when_domestic_disabled():
 def test_create_fallback_openai_when_domestic_enabled_but_no_key():
     """开启国产模式但未配置任何国产 Key 时，降级到 OpenAI-compatible。"""
     settings = Settings(
+        use_local_llm=False,
         use_domestic_llm=True,
         dashscope_api_key="",
         zhipu_api_key="",
@@ -67,6 +71,7 @@ def test_create_fallback_openai_when_domestic_enabled_but_no_key():
 def test_create_multimodal_domestic():
     """开启国产模式时，多模态客户端使用国产多模态模型与 DashScope Key。"""
     settings = Settings(
+        use_local_llm=False,
         use_domestic_llm=True,
         dashscope_api_key="sk-test",
         domestic_multimodal_model="qwen-vl-max",
@@ -81,6 +86,7 @@ def test_create_multimodal_domestic():
 def test_create_multimodal_openai_when_domestic_disabled():
     """未开启国产模式时，多模态客户端保持原有 OpenAI 逻辑。"""
     settings = Settings(
+        use_local_llm=False,
         use_domestic_llm=False,
         multimodal_model="gpt-4o",
         multimodal_api_key="",

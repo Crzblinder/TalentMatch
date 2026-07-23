@@ -188,7 +188,7 @@ export default function ResumeEditor() {
                           <Input
                             value={proj.name}
                             onChange={(e) => updateProject(idx, { name: e.target.value })}
-                            className="mt-1 text-sm"
+                            className="mt-1 min-h-[44px] text-sm focus-visible:ring-2 focus-visible:ring-primary md:min-h-10"
                           />
                         </div>
                         <div>
@@ -196,7 +196,7 @@ export default function ResumeEditor() {
                           <Input
                             value={proj.role}
                             onChange={(e) => updateProject(idx, { role: e.target.value })}
-                            className="mt-1 text-sm"
+                            className="mt-1 min-h-[44px] text-sm focus-visible:ring-2 focus-visible:ring-primary md:min-h-10"
                           />
                         </div>
                         <div className="sm:col-span-3">
@@ -204,7 +204,7 @@ export default function ResumeEditor() {
                           <Textarea
                             value={proj.description}
                             onChange={(e) => updateProject(idx, { description: e.target.value })}
-                            className="mt-1 text-sm"
+                            className="mt-1 min-h-[88px] text-sm focus-visible:ring-2 focus-visible:ring-primary md:min-h-[120px]"
                             rows={4}
                           />
                         </div>
@@ -231,7 +231,7 @@ export default function ResumeEditor() {
                           <Input
                             value={work.company}
                             onChange={(e) => updateWork(idx, { company: e.target.value })}
-                            className="mt-1 text-sm"
+                            className="mt-1 min-h-[44px] text-sm focus-visible:ring-2 focus-visible:ring-primary md:min-h-10"
                           />
                         </div>
                         <div>
@@ -239,7 +239,7 @@ export default function ResumeEditor() {
                           <Input
                             value={work.position}
                             onChange={(e) => updateWork(idx, { position: e.target.value })}
-                            className="mt-1 text-sm"
+                            className="mt-1 min-h-[44px] text-sm focus-visible:ring-2 focus-visible:ring-primary md:min-h-10"
                           />
                         </div>
                         <div className="sm:col-span-3">
@@ -247,7 +247,7 @@ export default function ResumeEditor() {
                           <Textarea
                             value={work.description}
                             onChange={(e) => updateWork(idx, { description: e.target.value })}
-                            className="mt-1 text-sm"
+                            className="mt-1 min-h-[88px] text-sm focus-visible:ring-2 focus-visible:ring-primary md:min-h-[120px]"
                             rows={4}
                           />
                         </div>
@@ -269,7 +269,7 @@ export default function ResumeEditor() {
                 <Textarea
                   value={resume?.self_evaluation || ''}
                   onChange={(e) => updateSelfEvaluation(e.target.value)}
-                  className="mt-1 text-sm"
+                  className="mt-1 min-h-[88px] text-sm focus-visible:ring-2 focus-visible:ring-primary md:min-h-[120px]"
                   rows={6}
                   placeholder="请描述您的核心竞争力和个人优势..."
                 />
@@ -292,7 +292,7 @@ export default function ResumeEditor() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7"
+                className="h-11 w-11 md:h-7 md:w-7"
                 onClick={() => moveField(index, index - 1)}
                 disabled={!canMoveUp}
               >
@@ -301,7 +301,7 @@ export default function ResumeEditor() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7"
+                className="h-11 w-11 md:h-7 md:w-7"
                 onClick={() => moveField(index, index + 1)}
                 disabled={!canMoveDown}
               >
@@ -320,7 +320,7 @@ export default function ResumeEditor() {
 
     return (
       <Tabs defaultValue="project" className="mt-6">
-        <TabsList className="mb-4">
+        <TabsList className="mb-4 flex-wrap">
           <TabsTrigger value="project">项目经历对比</TabsTrigger>
           <TabsTrigger value="work">工作经历对比</TabsTrigger>
           <TabsTrigger value="advantage">个人优势对比</TabsTrigger>
@@ -431,13 +431,13 @@ export default function ResumeEditor() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="flex items-center justify-between mb-6">
-        <Button variant="ghost" onClick={() => navigate(-1)}>
+      <div className="mb-6 flex items-center justify-between gap-2">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="h-11 px-2 md:h-9">
           <ArrowLeft className="mr-2 h-4 w-4" />
           返回
         </Button>
-        <h2 className="text-xl font-bold">简历编辑器</h2>
-        <div className="w-24" />
+        <h2 className="flex-1 truncate text-center text-lg font-bold md:text-xl">简历编辑器</h2>
+        <div className="w-10 md:w-24" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -457,7 +457,7 @@ export default function ResumeEditor() {
                 <Textarea
                   value={jdText}
                   onChange={(e) => setJdText(e.target.value)}
-                  className="mt-1 text-sm"
+                  className="mt-1 min-h-[88px] text-sm focus-visible:ring-2 focus-visible:ring-primary md:min-h-[120px]"
                   rows={6}
                   placeholder="粘贴或上传岗位描述内容..."
                 />
@@ -469,7 +469,7 @@ export default function ResumeEditor() {
                   {fieldOrder.map((field, index) => (
                     <div
                       key={field}
-                      className="flex items-center gap-2 rounded-md border p-2 cursor-move"
+                      className="flex min-h-[44px] items-center gap-2 rounded-md border p-2 cursor-move"
                       draggable
                       onDragStart={(e) => e.dataTransfer.setData('index', String(index))}
                       onDragOver={(e) => e.preventDefault()}
@@ -480,14 +480,14 @@ export default function ResumeEditor() {
                     >
                       <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
                       <Badge variant="secondary">{index + 1}</Badge>
-                      {FIELD_LABELS[field]}
+                      <span className="flex-1 truncate">{FIELD_LABELS[field]}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               <Button
-                className="w-full"
+                className="h-11 w-full md:h-10"
                 onClick={handleOptimize}
                 disabled={optimizing || !resume || !jdText.trim()}
               >
@@ -562,6 +562,7 @@ export default function ResumeEditor() {
                   type="file"
                   accept=".pdf,.docx,.doc,.png,.jpg,.jpeg,.webp,.gif"
                   className="hidden"
+                  data-testid="resume-file-input"
                   onChange={handleResumeFileChange}
                 />
                 <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
@@ -686,17 +687,17 @@ export default function ResumeEditor() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="输入公司/岗位关键词搜索"
-                  className="flex-1"
+                  className="h-11 min-w-0 flex-1"
                 />
                 <select
                   value={searchIntent}
                   onChange={(e) => setSearchIntent(e.target.value)}
-                  className="rounded-md border bg-background px-2 text-sm"
+                  className="h-11 min-w-[6rem] rounded-md border bg-background px-2 text-sm"
                 >
                   {SEARCH_INTENTS.map((item) => (
                     <option key={item.value} value={item.value}>
@@ -707,6 +708,7 @@ export default function ResumeEditor() {
                 <Button
                   onClick={handleSearch}
                   disabled={searchLoading || !searchQuery.trim()}
+                  className="h-11"
                 >
                   {searchLoading ? '搜索中...' : '搜索'}
                 </Button>

@@ -7,6 +7,7 @@ import logging
 import os
 from typing import Any
 
+from app.api.metrics import record_parse_task
 from app.services.jd_service import JDService
 from app.services.resume_service import ResumeService, should_use_fuzzy_parsing
 from app.tasks.celery_app import celery_app
@@ -30,7 +31,9 @@ def parse_resume_text_task(
     """异步解析简历文本。"""
     try:
         service = ResumeService()
-        actual_fuzzy = fuzzy if fuzzy is not None else should_use_fuzzy_parsing(resume_text, "resume")
+        actual_fuzzy = (
+            fuzzy if fuzzy is not None else should_use_fuzzy_parsing(resume_text, "resume")
+        )
         result = service.parse_resume_text(
             resume_text,
             fuzzy=actual_fuzzy,
@@ -42,9 +45,11 @@ def parse_resume_text_task(
 
             detector = ObstacleDetector()
             result["obstacles"] = detector.detect_from_resume(result)
+        record_parse_task("resume_text", success=True)
         return {"status": "success", "data": result}
     except Exception as exc:
         logger.exception("简历文本解析任务失败")
+        record_parse_task("resume_text", success=False)
         if self.request.retries < self.max_retries:
             raise self.retry(exc=exc, countdown=_retry_countdown(self.request.retries))
         return {"status": "failed", "error": str(exc)}
@@ -62,6 +67,7 @@ def parse_resume_file_task(
     file_bytes = base64.b64decode(file_b64)
     ext = os.path.splitext(filename)[1].lower()
     if ext not in (".pdf", ".docx"):
+        record_parse_task("resume_file", success=False)
         return {"status": "failed", "error": f"不支持的文件格式: {ext}"}
 
     try:
@@ -84,9 +90,11 @@ def parse_resume_file_task(
 
             detector = ObstacleDetector()
             result["obstacles"] = detector.detect_from_resume(result)
+        record_parse_task("resume_file", success=True)
         return {"status": "success", "data": result}
     except Exception as exc:
         logger.exception("简历文件解析任务失败")
+        record_parse_task("resume_file", success=False)
         if self.request.retries < self.max_retries:
             raise self.retry(exc=exc, countdown=_retry_countdown(self.request.retries))
         return {"status": "failed", "error": str(exc)}
@@ -109,9 +117,11 @@ def parse_jd_text_task(
             prompt_variant=prompt_variant,
         )
         result["fuzzy"] = actual_fuzzy
+        record_parse_task("jd_text", success=True)
         return {"status": "success", "data": result}
     except Exception as exc:
         logger.exception("JD 文本解析任务失败")
+        record_parse_task("jd_text", success=False)
         if self.request.retries < self.max_retries:
             raise self.retry(exc=exc, countdown=_retry_countdown(self.request.retries))
         return {"status": "failed", "error": str(exc)}
@@ -146,9 +156,11 @@ def parse_jd_file_task(
         result = service.parse_jd_text(raw_text, fuzzy=actual_fuzzy)
         result["fuzzy"] = actual_fuzzy
         result["filename"] = filename
+        record_parse_task("jd_file", success=True)
         return {"status": "success", "data": result}
     except Exception as exc:
         logger.exception("JD 文件解析任务失败")
+        record_parse_task("jd_file", success=False)
         if self.request.retries < self.max_retries:
             raise self.retry(exc=exc, countdown=_retry_countdown(self.request.retries))
         return {"status": "failed", "error": str(exc)}

@@ -6,8 +6,10 @@ import functools
 import hashlib
 import json
 import logging
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
+from app.api.metrics import record_cache_access
 from app.core.cache import get_cache_client
 
 logger = logging.getLogger(__name__)
@@ -51,9 +53,11 @@ def cached(prefix: str, ttl: int = 300) -> Callable[[Callable[..., Any]], Callab
 
             cached_value = cache.get(key)
             if cached_value is not None:
+                record_cache_access(prefix, hit=True)
                 logger.debug("缓存命中: %s", key)
                 return cached_value
 
+            record_cache_access(prefix, hit=False)
             result = func(*args, **kwargs)
             cache.set(key, result, ttl=ttl)
             logger.debug("缓存写入: %s", key)

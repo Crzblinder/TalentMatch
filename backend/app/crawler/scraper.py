@@ -19,6 +19,7 @@ from urllib.parse import urljoin
 import httpx
 from bs4 import BeautifulSoup
 
+from app.api.metrics import record_rss_fetch
 from app.config import get_settings
 from app.crawler.sources import SOURCES
 from app.data.generator import CITIES, get_skill_pool
@@ -392,17 +393,21 @@ class JobScraper:
 
         async with httpx.AsyncClient(timeout=self.timeout, follow_redirects=True) as client:
             for idx, source in enumerate(SOURCES):
+                source_name = source["name"]
                 try:
                     items = await self._fetch_source(client, source)
                     if items is not None:
                         all_items.extend(items)
-                        sources_ok.append(source["name"])
-                        logger.info("源 %s 采集到 %d 条", source["name"], len(items))
+                        sources_ok.append(source_name)
+                        record_rss_fetch(source_name, success=True)
+                        logger.info("源 %s 采集到 %d 条", source_name, len(items))
                     else:
-                        sources_failed.append(source["name"])
+                        sources_failed.append(source_name)
+                        record_rss_fetch(source_name, success=False)
                 except Exception as e:
-                    sources_failed.append(source["name"])
-                    logger.warning("源 %s 采集失败: %s", source["name"], e, exc_info=True)
+                    sources_failed.append(source_name)
+                    record_rss_fetch(source_name, success=False)
+                    logger.warning("源 %s 采集失败: %s", source_name, e, exc_info=True)
                 # 源之间短暂延迟，避免对 RSS 服务器造成压力
                 if idx < len(SOURCES) - 1:
                     await asyncio.sleep(self.delay)

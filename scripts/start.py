@@ -466,7 +466,7 @@ def main() -> None:
         if wait_for_port(args.port_backend):
             print_ok(f"后端已启动: http://127.0.0.1:{args.port_backend}")
             print_ok(f"API 文档: http://127.0.0.1:{args.port_backend}/docs")
-            print_ok(f"Celery Worker 已启动")
+            print_ok("Celery Worker 已启动")
         try:
             backend_proc.wait()
         except KeyboardInterrupt:
@@ -512,11 +512,11 @@ def main() -> None:
 
     url = f"http://127.0.0.1:{args.port_frontend}"
     print_ok("=" * 50)
-    print_ok(f"TalentMatch 已启动")
+    print_ok("TalentMatch 已启动")
     print_ok(f"  前端: {url}")
     print_ok(f"  后端: http://127.0.0.1:{args.port_backend}")
     print_ok(f"  API 文档: http://127.0.0.1:{args.port_backend}/docs")
-    print_ok(f"  Celery Worker 已启动")
+    print_ok("  Celery Worker 已启动")
     print_ok("=" * 50)
 
     if args.open_browser:

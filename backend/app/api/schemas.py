@@ -189,6 +189,15 @@ class UserSkillProfileCreate(BaseModel):
     skills: list[str]
     experience_level: str = "不限"
     target_job_titles: list[str] = []
+    is_active: bool = False
+
+
+class UserSkillProfileUpdate(BaseModel):
+    name: str | None = None
+    skills: list[str] | None = None
+    experience_level: str | None = None
+    target_job_titles: list[str] | None = None
+    is_active: bool | None = None
 
 
 class UserSkillProfileOut(BaseModel):
@@ -197,6 +206,7 @@ class UserSkillProfileOut(BaseModel):
     skills: list[str]
     experience_level: str
     target_job_titles: list[str]
+    is_active: bool
     created_at: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)
@@ -215,6 +225,19 @@ class UserSkillProfileListOut(BaseModel):
 # ---------------------------------------------------------------------------
 # MatchResult
 # ---------------------------------------------------------------------------
+class MatchReportPDFRequest(BaseModel):
+    """匹配报告 PDF 导出请求。
+
+    传入 match_id 时后端自动从数据库拉取完整匹配、岗位与画像信息；
+    也可直接传入 match_data / job_data / profile_data 生成一次性报告。
+    """
+
+    match_id: int | None = None
+    match_data: dict[str, Any] | None = None
+    job_data: dict[str, Any] | None = None
+    profile_data: dict[str, Any] | None = None
+
+
 class MatchResultOut(BaseModel):
     id: int
     user_profile_id: int
@@ -238,7 +261,7 @@ class MatchResultOut(BaseModel):
 
 
 class MatchRequest(BaseModel):
-    profile_id: int
+    profile_id: int | None = None
     job_id: int
     profile: dict[str, Any] | None = None
 
@@ -396,7 +419,7 @@ class LearningPathItem(BaseModel):
 
 
 class LearningPathRequest(BaseModel):
-    profile_id: int
+    profile_id: int | None = None
     job_id: int
 
 
@@ -506,7 +529,13 @@ class SearchOut(BaseModel):
 class TaskCreateRequest(BaseModel):
     """提交异步任务请求。"""
 
-    task_type: str = Field(..., description="任务类型：resume.parse_text | resume.parse_file | jd.parse_text | jd.parse_file | match.profile_job | search.web")
+    task_type: str = Field(
+        ...,
+        description=(
+            "任务类型：resume.parse_text | resume.parse_file | "
+            "jd.parse_text | jd.parse_file | match.profile_job | search.web"
+        ),
+    )
     payload: dict[str, Any] = Field(default_factory=dict, description="任务参数")
 
 

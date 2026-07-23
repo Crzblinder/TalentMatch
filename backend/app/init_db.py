@@ -17,22 +17,32 @@ logger = logging.getLogger(__name__)
 def _ensure_columns(engine) -> None:
     """为已存在的数据表补齐模型新增的可空列，保证旧数据库能直接启动运行。"""
     inspector = inspect(engine)
-    try:
-        existing = {col["name"] for col in inspector.get_columns("match_results")}
-    except Exception:
-        # 表不存在时无需处理，Base.metadata.create_all 会创建完整表结构
-        return
 
-    new_columns = {
-        "skill_score": "FLOAT",
-        "experience_match": "FLOAT",
-        "education_match": "FLOAT",
-    }
-    with engine.connect() as conn:
-        for col_name, col_type in new_columns.items():
-            if col_name not in existing:
-                conn.execute(text(f"ALTER TABLE match_results ADD COLUMN {col_name} {col_type}"))
-        conn.commit()
+    def _ensure_table_columns(table_name: str, columns: dict[str, str]) -> None:
+        try:
+            existing = {col["name"] for col in inspector.get_columns(table_name)}
+        except Exception:
+            return
+        with engine.connect() as conn:
+            for col_name, col_type in columns.items():
+                if col_name not in existing:
+                    conn.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type}"))
+            conn.commit()
+
+    _ensure_table_columns(
+        "match_results",
+        {
+            "skill_score": "FLOAT",
+            "experience_match": "FLOAT",
+            "education_match": "FLOAT",
+        },
+    )
+    _ensure_table_columns(
+        "user_skill_profiles",
+        {
+            "is_active": "BOOLEAN DEFAULT 0",
+        },
+    )
 
 
 def _env_flag(name: str, default: bool = False) -> bool:

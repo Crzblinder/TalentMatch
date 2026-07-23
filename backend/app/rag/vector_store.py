@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from app.config import get_settings
 from app.rag.vector_store_base import VectorStoreBase
@@ -11,7 +10,7 @@ from app.rag.vector_store_base import VectorStoreBase
 logger = logging.getLogger(__name__)
 
 # 保持向后兼容：VectorStore 仍指向 Chroma 实现
-from app.rag.vector_store_chroma import ChromaVectorStore as VectorStore  # noqa: F401
+from app.rag.vector_store_chroma import ChromaVectorStore as VectorStore  # noqa: F401, E402
 
 _vector_store: VectorStoreBase | None = None
 

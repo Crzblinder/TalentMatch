@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from collections import Counter
 from typing import Any
@@ -15,6 +16,41 @@ from app.rag.retriever import HybridJobRetriever
 from app.services.cache_service import CACHE_KEYS, DEFAULT_TTLS, cached
 
 logger = logging.getLogger(__name__)
+
+
+def _load_json_list(value: Any) -> list[Any]:
+    """兼容字符串 JSON 与原生列表。"""
+    if isinstance(value, list):
+        return value
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return []
+    return []
+
+
+def _job_to_dict(job: Job) -> dict[str, Any]:
+    """将 Job ORM 对象序列化为可缓存/可 JSON 化的字典。"""
+    return {
+        "id": job.id,
+        "title": job.title,
+        "company": {
+            "id": job.company.id,
+            "name": job.company.name,
+            "industry": job.company.industry,
+            "size": job.company.size,
+            "city": job.company.city,
+        },
+        "city": job.city,
+        "salary_min": job.salary_min,
+        "salary_max": job.salary_max,
+        "experience_level": job.experience_level,
+        "education_level": job.education_level,
+        "required_skills": _load_json_list(job.required_skills),
+        "description": job.description,
+        "posted_at": job.posted_at,
+    }
 
 
 class JobService:
@@ -59,7 +95,7 @@ class JobService:
             "total": total,
             "page": page,
             "size": size,
-            "items": items,
+            "items": [_job_to_dict(job) for job in items],
         }
 
     def get_job(self, job_id: int) -> Job | None:

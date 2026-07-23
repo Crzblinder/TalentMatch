@@ -144,17 +144,22 @@ def main() -> None:
             )
         db.commit()
 
-        # 示例画像
-        if db.query(UserSkillProfile).count() == 0:
-            db.add(
-                UserSkillProfile(
-                    name="示例候选人",
-                    skills=_json_list(["Python", "FastAPI", "Docker"]),
-                    experience_level="3-5年",
-                    target_job_titles=_json_list(["Python 后端工程师"]),
-                )
+        # 示例画像：始终 upsert 并设为活跃，确保 E2E 测试依赖固定数据
+        demo_profile = db.query(UserSkillProfile).filter_by(name="示例候选人").first()
+        if demo_profile is None:
+            demo_profile = UserSkillProfile(
+                name="示例候选人",
+                skills=_json_list(["Python", "FastAPI", "Docker"]),
+                experience_level="3-5年",
+                target_job_titles=_json_list(["Python 后端工程师"]),
             )
+            db.add(demo_profile)
             db.commit()
+            db.refresh(demo_profile)
+        # 重置所有画像为非活跃，再将示例候选人设为活跃
+        db.query(UserSkillProfile).update({"is_active": False})
+        demo_profile.is_active = True
+        db.commit()
 
         print(
             f"Minimal seed done: "

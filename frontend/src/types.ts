@@ -119,6 +119,7 @@ export interface UserSkillProfile {
   skills: string[]
   experience_level: string
   target_job_titles: string[]
+  is_active: boolean
   created_at: string | null
 }
 
@@ -135,6 +136,16 @@ export interface ProfileCreateRequest {
   skills: string[]
   experience_level: string
   target_job_titles: string[]
+  is_active?: boolean
+}
+
+// 更新画像请求体
+export interface ProfileUpdateRequest {
+  name?: string
+  skills?: string[]
+  experience_level?: string
+  target_job_titles?: string[]
+  is_active?: boolean
 }
 
 // 创建画像后的响应结构
@@ -144,6 +155,7 @@ export interface ProfileResponse {
   skills: string[]
   experience_level: string
   target_job_titles: string[]
+  is_active: boolean
   created_at: string | null
 }
 

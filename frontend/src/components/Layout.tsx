@@ -1,18 +1,31 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   Activity,
   Briefcase,
   Brain,
+  Check,
+  ChevronDown,
   FileText,
   Heart,
   LayoutDashboard,
   Menu,
   Target,
   TrendingUp,
+  User,
 } from 'lucide-react'
 
+import { useProfile } from '@/components/ProfileContext'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Toaster } from '@/components/ui/sonner'
 import {
   Sheet,
@@ -33,11 +46,72 @@ const NAV_ITEMS = [
   { to: '/favorites', icon: Heart, label: '我的收藏' },
   { to: '/skills', icon: Brain, label: '技能图谱' },
   { to: '/trends', icon: TrendingUp, label: '趋势分析' },
+  { to: '/profiles', icon: User, label: '画像管理' },
   { to: '/config-tests', icon: Activity, label: '配置检测' },
 ]
 
 interface LayoutProps {
   children: React.ReactNode
+}
+
+function ProfileSwitcher({ onNavigate }: { onNavigate?: () => void }) {
+  const navigate = useNavigate()
+  const { effectiveProfile, profiles, loading, setActiveProfile } = useProfile()
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="h-auto min-h-[44px] w-full justify-between px-3 py-2"
+          aria-label="切换当前画像"
+        >
+          <span className="flex items-center gap-2 overflow-hidden">
+            <User className="h-4 w-4 shrink-0" />
+            <span className="truncate text-sm">
+              {loading ? (
+                <Skeleton className="h-4 w-20" />
+              ) : effectiveProfile ? (
+                effectiveProfile.name
+              ) : (
+                '未选择画像'
+              )}
+            </span>
+          </span>
+          <ChevronDown className="ml-2 h-4 w-4 shrink-0" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-56">
+        {profiles.length === 0 && !loading && (
+          <DropdownMenuItem disabled>暂无画像</DropdownMenuItem>
+        )}
+        {profiles.map((profile) => (
+          <DropdownMenuItem
+            key={profile.id}
+            className="flex items-center justify-between gap-2"
+            onClick={() => {
+              if (!profile.is_active) {
+                setActiveProfile(profile.id)
+              }
+              onNavigate?.()
+            }}
+          >
+            <span className="truncate">{profile.name}</span>
+            {profile.is_active && (
+              <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+                <Check className="mr-0.5 h-3 w-3" />
+                活跃
+              </Badge>
+            )}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => { navigate('/profiles'); onNavigate?.() }}>
+          管理画像
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 }
 
 export default function Layout({ children }: LayoutProps) {
@@ -67,7 +141,7 @@ export default function Layout({ children }: LayoutProps) {
             to={item.to}
             onClick={() => setMobileOpen(false)}
             className={cn(
-              'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
+              'group relative flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
               isActive
                 ? 'bg-primary text-primary-foreground shadow-sm'
                 : 'text-muted-foreground hover:bg-accent hover:text-foreground'
@@ -93,9 +167,12 @@ export default function Layout({ children }: LayoutProps) {
     <div className="flex h-screen overflow-hidden bg-background">
       {/* 桌面端侧边栏 */}
       <aside className="hidden h-screen w-sidebar flex-col overflow-y-auto border-r bg-card px-4 py-6 md:flex">
-        <h1 className="mb-8 px-3 text-lg font-bold tracking-tight text-foreground">
+        <h1 className="mb-6 px-3 text-lg font-bold tracking-tight text-foreground">
           TalentMatch
         </h1>
+        <div className="mb-4 px-1">
+          <ProfileSwitcher />
+        </div>
         {navContent}
       </aside>
 
@@ -104,19 +181,24 @@ export default function Layout({ children }: LayoutProps) {
         {/* 移动端顶部栏 */}
         <header className="flex items-center justify-between border-b bg-card px-4 py-3 md:hidden">
           <h1 className="text-base font-bold text-foreground">TalentMatch</h1>
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" aria-label="打开菜单">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-sidebar border-r bg-card p-4">
-              <SheetHeader className="mb-6 text-left">
-                <SheetTitle className="text-lg font-bold">TalentMatch</SheetTitle>
-              </SheetHeader>
-              {navContent}
-            </SheetContent>
-          </Sheet>
+          <div className="flex items-center gap-2">
+            <div className="w-32">
+              <ProfileSwitcher onNavigate={() => setMobileOpen(false)} />
+            </div>
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="打开菜单" className="h-11 w-11">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-sidebar border-r bg-card p-4">
+                <SheetHeader className="mb-6 text-left">
+                  <SheetTitle className="text-lg font-bold">TalentMatch</SheetTitle>
+                </SheetHeader>
+                {navContent}
+              </SheetContent>
+            </Sheet>
+          </div>
         </header>
 
         {/* 主内容区 */}

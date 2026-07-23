@@ -84,6 +84,21 @@ class Settings(BaseSettings):
     # 简历数据脱敏
     enable_resume_masking: bool = False
 
+    # 提示词版本：默认使用未版本化的提示词，可指定如 v1、v2 等
+    prompt_version: str = ""
+
+    # 告警通知
+    alert_enabled: bool = False
+    alert_llm_failure_rate_threshold: float = 0.3
+    alert_rss_fetch_failure_rate_threshold: float = 0.5
+    alert_parse_failure_rate_threshold: float = 0.3
+    alert_email_smtp_host: str = ""
+    alert_email_smtp_port: int = 587
+    alert_email_smtp_user: str = ""
+    alert_email_smtp_password: str = ""
+    alert_email_to: str = ""  # 多个收件人用逗号分隔
+    alert_webhook_url: str = ""
+
     @model_validator(mode="after")
     def _validate_security(self) -> "Settings":
         """启动时校验关键安全配置。"""
