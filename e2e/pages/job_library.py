@@ -44,7 +44,9 @@ class JobLibraryPage(BasePage):
                 const rows = Array.from(document.querySelectorAll('table tbody tr'));
                 const row = rows.find(r => r.textContent.includes('""" + job_title + """'));
                 if (!row) return false;
-                const btn = row.querySelector('button[aria-label="收藏"], button[aria-label="取消收藏"]');
+                const btn = row.querySelector(
+                    'button[aria-label="收藏"], button[aria-label="取消收藏"]',
+                );
                 return btn && !btn.disabled;
             }""",
             timeout=10_000,

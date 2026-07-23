@@ -14,7 +14,7 @@ import sys
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Generator
+from collections.abc import Generator
 
 ROOT = Path(__file__).resolve().parent.parent
 BACKEND_DIR = ROOT / "backend"
@@ -77,7 +77,10 @@ def server_context() -> Generator[tuple[subprocess.Popen, subprocess.Popen], Non
 
     # 2. 启动后端
     backend_proc = subprocess.Popen(
-        [PYTHON, "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", str(BACKEND_PORT)],
+        [
+            PYTHON, "-m", "uvicorn", "app.main:app",
+            "--host", "127.0.0.1", "--port", str(BACKEND_PORT),
+        ],
         cwd=BACKEND_DIR,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,

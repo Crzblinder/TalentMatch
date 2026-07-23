@@ -67,7 +67,10 @@ def test_config_tests_page() -> None:
                 passed = summary.get("通过", 0)
                 failed = summary.get("失败", 0)
                 skipped = summary.get("跳过", 0)
-                print(f"Summary: total={total}, passed={passed}, failed={failed}, skipped={skipped}")
+                print(
+                    f"Summary: total={total}, passed={passed}, "
+                    f"failed={failed}, skipped={skipped}"
+                )
 
                 assert total > 0, "Expected total test count > 0"
                 assert total == passed + failed + skipped, (

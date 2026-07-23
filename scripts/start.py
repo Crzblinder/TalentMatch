@@ -149,7 +149,10 @@ def http_ping(url: str, timeout: float = 3.0) -> bool:
         host = parsed.hostname or parsed.path
         if not host:
             return False
-        conn_cls = http.client.HTTPSConnection if (parsed.scheme == "https" or not parsed.scheme) else http.client.HTTPConnection
+        if parsed.scheme == "https" or not parsed.scheme:
+            conn_cls = http.client.HTTPSConnection
+        else:
+            conn_cls = http.client.HTTPConnection
         conn = conn_cls(host, timeout=timeout)
         conn.request("HEAD", "/", headers={"User-Agent": "TalentMatch-Start/1.0"})
         conn.close()
@@ -333,7 +336,10 @@ def start_backend(python: str, env: dict, port: int) -> subprocess.Popen:
     """启动后端服务，输出直接继承当前终端"""
     print_info(f"正在启动后端服务（端口 {port}）...")
     return subprocess.Popen(
-        [python, "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", str(port), "--reload"],
+        [
+            python, "-m", "uvicorn", "app.main:app",
+            "--host", "127.0.0.1", "--port", str(port), "--reload",
+        ],
         cwd=BACKEND_DIR,
         env=env,
     )
@@ -343,7 +349,10 @@ def start_celery_worker(python: str, env: dict) -> subprocess.Popen:
     """启动 Celery Worker，输出直接继承当前终端"""
     print_info("正在启动 Celery Worker...")
     return subprocess.Popen(
-        [python, "-m", "celery", "-A", "app.tasks.celery_app", "worker", "--loglevel=info", "--concurrency=2"],
+        [
+            python, "-m", "celery", "-A", "app.tasks.celery_app",
+            "worker", "--loglevel=info", "--concurrency=2",
+        ],
         cwd=BACKEND_DIR,
         env=env,
     )

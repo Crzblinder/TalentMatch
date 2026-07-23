@@ -12,8 +12,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
 
-from app.models.base import SessionLocal
 from app.models import Company, Job, Skill, SkillRelation, UserSkillProfile
+from app.models.base import SessionLocal
 
 
 def _json_list(value: list[str]) -> str:
