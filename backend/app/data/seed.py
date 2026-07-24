@@ -371,12 +371,13 @@ def seed_database(
     db: Session,
     n_skills: int = 80,
     n_companies: int = 40,
-    n_jobs: int = 250,
+    n_jobs: int = 300,
     fetch_real: bool = True,
 ) -> dict[str, Any]:
     """生成新版结构化数据并持久化到数据库。
 
-    当 fetch_real=True 时，优先加载/采集真实 JD；数量不足时使用生成器补充。
+    当 fetch_real=True 时，优先加载综合采集的真实 JD（300+ 条）；
+    仅当真实数据不足时才使用生成器补充（使用真实公司列表，非 Faker）。
     """
     logger.info("Generating seed data for skill-map and talent-matching engine...")
 
@@ -416,7 +417,7 @@ def seed_database(
     # 4. 规范化真实 JD
     real_jobs = _normalize_real_jobs(real_raw_jobs, skills, real_companies)
 
-    # 5. 若真实 JD 不足，用生成器补充
+    # 5. 若真实 JD 不足，用生成器补充（使用真实公司列表，非 Faker）
     fallback_job_count = max(0, n_jobs - len(real_jobs))
     if fallback_job_count > 0:
         company_map_for_gen = {c["id"]: c for c in real_companies}

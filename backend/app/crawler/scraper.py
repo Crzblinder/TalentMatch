@@ -50,10 +50,12 @@ _last_run_status: dict[str, Any] = {
 DEFAULT_DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")
 DEFAULT_RAW_JOBS_PATH = os.path.join(DEFAULT_DATA_DIR, "raw_jobs.json")
 DEFAULT_SEED_JOBS_PATH = os.path.join(DEFAULT_DATA_DIR, "seed_jobs.json")
+DEFAULT_COLLECTED_JOBS_PATH = os.path.join(DEFAULT_DATA_DIR, "real_jobs_collected.json")
 
 # 公开 RSS 源通常只能提供 10-50 条实时 JD；种子文件提供 80 条行业典型岗位兜底
+# 综合采集文件提供 300+ 条真实岗位数据
 MIN_REAL_JOBS = 30
-TARGET_TOTAL_JOBS = 200
+TARGET_TOTAL_JOBS = 300
 
 # 岗位相关强过滤词（用于从通用 RSS 中筛选出招聘帖）
 _JOB_KEYWORDS: set[str] = {
@@ -873,6 +875,13 @@ def _merge_jobs(*job_lists: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return merged
 
 
+def _load_collected_jobs(path: str | None = None) -> list[dict[str, Any]]:
+    """加载综合采集的真实岗位数据。"""
+    if path is None:
+        path = DEFAULT_COLLECTED_JOBS_PATH
+    return load_jobs(path)
+
+
 def fetch_real_jobs(
     min_count: int = MIN_REAL_JOBS,
     target_total: int = TARGET_TOTAL_JOBS,
@@ -882,25 +891,39 @@ def fetch_real_jobs(
     """获取真实 JD 数据。
 
     数据来源优先级：
-    1. 已保存的 RSS 采集结果（raw_jobs.json）
-    2. 人工整理的行业典型岗位种子（seed_jobs.json）
-    3. 在线 RSS 爬虫实时采集
+    1. 综合采集文件（real_jobs_collected.json，300+ 条）
+    2. 已保存的 RSS 采集结果（raw_jobs.json）
+    3. 人工整理的行业典型岗位种子（seed_jobs.json）
+    4. 在线 RSS 爬虫实时采集
 
     返回合并去重后的真实岗位列表（不补充生成数据）。
     """
     import asyncio
 
-    # 1. 加载种子数据作为稳定基础
+    # 1. 优先加载综合采集文件
+    collected_jobs = _load_collected_jobs()
+    logger.info("加载 %d 条综合采集 JD", len(collected_jobs))
+
+    # 2. 加载种子数据作为稳定基础
     seed_jobs = _load_seed_jobs()
     logger.info("加载 %d 条种子 JD", len(seed_jobs))
 
-    # 2. 加载/采集 RSS 数据
+    # 3. 加载/采集 RSS 数据
     rss_jobs: list[dict[str, Any]] = []
     if not force_fetch:
         rss_jobs = load_jobs(save_path)
         logger.info("加载 %d 条 RSS 缓存 JD", len(rss_jobs))
 
-    if len(seed_jobs) + len(rss_jobs) < min_count or force_fetch:
+    # 如果综合采集 + 种子 + RSS 足够，直接合并返回
+    total = len(collected_jobs) + len(seed_jobs) + len(rss_jobs)
+    if total >= min_count and not force_fetch:
+        jobs = _merge_jobs(collected_jobs, rss_jobs, seed_jobs)
+        logger.info("合并后共 %d 条真实 JD（collected=%d, rss=%d, seed=%d）",
+                     len(jobs), len(collected_jobs), len(rss_jobs), len(seed_jobs))
+        return jobs
+
+    # 在线采集补充
+    if total < min_count or force_fetch:
         try:
             fetched = asyncio.run(_scrape_and_save(save_path))
             rss_jobs = fetched
@@ -909,10 +932,11 @@ def fetch_real_jobs(
             if not rss_jobs:
                 rss_jobs = load_jobs(save_path)
 
-    # 3. 合并去重：RSS 数据优先（更新鲜），种子数据兜底
-    jobs = _merge_jobs(rss_jobs, seed_jobs)
+    # 合并去重：综合采集优先，RSS 次之，种子兜底
+    jobs = _merge_jobs(collected_jobs, rss_jobs, seed_jobs)
     logger.info(
-        "合并后共 %d 条真实 JD（RSS=%d, seed=%d）", len(jobs), len(rss_jobs), len(seed_jobs)
+        "合并后共 %d 条真实 JD（collected=%d, RSS=%d, seed=%d）",
+        len(jobs), len(collected_jobs), len(rss_jobs), len(seed_jobs),
     )
     return jobs
 

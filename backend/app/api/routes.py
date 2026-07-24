@@ -1167,6 +1167,62 @@ def get_dashboard(db: Session = Depends(get_db)) -> ApiResponse:
 
 
 # ---------------------------------------------------------------------------
+# 求职关怀（Care）
+# ---------------------------------------------------------------------------
+@api_router.get("/care/quotes", response_model=ApiResponse)
+def get_care_quotes(
+    count: int = Query(5, ge=1, le=20),
+    scene: str | None = None,
+    category: str | None = None,
+) -> ApiResponse:
+    """获取求职鼓励语录。"""
+    from app.services.care_service import get_encouragement_quotes
+    quotes = get_encouragement_quotes(count=count, scene=scene, category=category)
+    return _success(quotes)
+
+
+@api_router.get("/care/quote", response_model=ApiResponse)
+def get_care_quote(
+    scene: str | None = None,
+    category: str | None = None,
+) -> ApiResponse:
+    """获取一条随机求职鼓励语录。"""
+    from app.services.care_service import get_encouragement_quote
+    quote = get_encouragement_quote(scene=scene, category=category)
+    return _success(quote)
+
+
+@api_router.get("/care/tips", response_model=ApiResponse)
+def get_care_tips(
+    category: str | None = None,
+    difficulty: str | None = None,
+) -> ApiResponse:
+    """获取求职实用建议。"""
+    from app.services.care_service import get_practical_tips
+    tips = get_practical_tips(category=category, difficulty=difficulty)
+    return _success(tips)
+
+
+@api_router.get("/care/stages", response_model=ApiResponse)
+def get_care_stages() -> ApiResponse:
+    """获取求职阶段指南。"""
+    from app.services.care_service import get_job_search_stages
+    stages = get_job_search_stages()
+    return _success(stages)
+
+
+@api_router.get("/care/dashboard", response_model=ApiResponse)
+def get_care_dashboard(
+    profile_id: int | None = None,
+    db: Session = Depends(get_db),
+) -> ApiResponse:
+    """获取求职关怀仪表盘数据。"""
+    from app.services.care_service import get_care_dashboard as _get_care_dashboard
+    result = _get_care_dashboard(db=db, profile_id=profile_id)
+    return _success(result)
+
+
+# ---------------------------------------------------------------------------
 # SSE Stream
 # ---------------------------------------------------------------------------
 async def _match_stream_events(

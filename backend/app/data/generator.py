@@ -1,11 +1,60 @@
 import random
 from typing import Any
 
-from faker import Faker
-
-fake = Faker("zh_CN")
-Faker.seed(42)
 random.seed(42)
+
+# 真实中国科技公司列表（替代 Faker 生成）
+_REAL_COMPANIES: list[dict[str, str]] = [
+    {"name": "字节跳动", "industry": "互联网", "size": "大型", "city": "北京"},
+    {"name": "腾讯科技", "industry": "互联网", "size": "大型", "city": "深圳"},
+    {"name": "阿里巴巴", "industry": "电子商务", "size": "大型", "city": "杭州"},
+    {"name": "华为技术", "industry": "智能制造", "size": "大型", "city": "深圳"},
+    {"name": "美团", "industry": "互联网", "size": "大型", "city": "北京"},
+    {"name": "百度在线", "industry": "互联网", "size": "大型", "city": "北京"},
+    {"name": "京东集团", "industry": "电子商务", "size": "大型", "city": "北京"},
+    {"name": "网易", "industry": "互联网", "size": "大型", "city": "杭州"},
+    {"name": "拼多多", "industry": "电子商务", "size": "大型", "city": "上海"},
+    {"name": "滴滴出行", "industry": "汽车出行", "size": "大型", "city": "北京"},
+    {"name": "小米科技", "industry": "智能制造", "size": "大型", "city": "北京"},
+    {"name": "OPPO", "industry": "智能制造", "size": "大型", "city": "深圳"},
+    {"name": "vivo", "industry": "智能制造", "size": "大型", "city": "深圳"},
+    {"name": "大疆创新", "industry": "智能制造", "size": "中型", "city": "深圳"},
+    {"name": "商汤科技", "industry": "人工智能", "size": "中型", "city": "上海"},
+    {"name": "旷视科技", "industry": "人工智能", "size": "中型", "city": "北京"},
+    {"name": "地平线机器人", "industry": "人工智能", "size": "中型", "city": "北京"},
+    {"name": "思必驰", "industry": "人工智能", "size": "中型", "city": "苏州"},
+    {"name": "蚂蚁集团", "industry": "金融科技", "size": "大型", "city": "杭州"},
+    {"name": "微众银行", "industry": "金融科技", "size": "大型", "city": "深圳"},
+    {"name": "陆金所", "industry": "金融科技", "size": "中型", "city": "上海"},
+    {"name": "蔚来汽车", "industry": "汽车出行", "size": "中型", "city": "上海"},
+    {"name": "理想汽车", "industry": "汽车出行", "size": "中型", "city": "北京"},
+    {"name": "小鹏汽车", "industry": "汽车出行", "size": "中型", "city": "广州"},
+    {"name": "比亚迪", "industry": "汽车出行", "size": "大型", "city": "深圳"},
+    {"name": "B站", "industry": "文化传媒", "size": "中型", "city": "上海"},
+    {"name": "快手", "industry": "互联网", "size": "大型", "city": "北京"},
+    {"name": "小红书", "industry": "互联网", "size": "中型", "city": "上海"},
+    {"name": "知乎", "industry": "互联网", "size": "中型", "city": "北京"},
+    {"name": "携程旅行", "industry": "互联网", "size": "大型", "city": "上海"},
+    {"name": "贝壳控股", "industry": "房地产", "size": "中型", "city": "北京"},
+    {"name": "链家网", "industry": "房地产", "size": "中型", "city": "北京"},
+    {"name": "好未来", "industry": "教育培训", "size": "中型", "city": "北京"},
+    {"name": "猿辅导", "industry": "教育培训", "size": "中型", "city": "北京"},
+    {"name": "作业帮", "industry": "教育培训", "size": "中型", "city": "北京"},
+    {"name": "微医集团", "industry": "医疗健康", "size": "中型", "city": "杭州"},
+    {"name": "平安好医生", "industry": "医疗健康", "size": "中型", "city": "深圳"},
+    {"name": "京东健康", "industry": "医疗健康", "size": "大型", "city": "北京"},
+    {"name": "三只松鼠", "industry": "消费品", "size": "中型", "city": "芜湖"},
+    {"name": "完美日记", "industry": "消费品", "size": "中型", "city": "广州"},
+    {"name": "SHEIN", "industry": "电子商务", "size": "大型", "city": "南京"},
+    {"name": "安克创新", "industry": "消费品", "size": "中型", "city": "深圳"},
+    {"name": "米哈游", "industry": "游戏", "size": "中型", "city": "上海"},
+    {"name": "莉莉丝游戏", "industry": "游戏", "size": "中型", "city": "上海"},
+    {"name": "叠纸游戏", "industry": "游戏", "size": "小型", "city": "上海"},
+    {"name": "完美世界", "industry": "游戏", "size": "大型", "city": "北京"},
+    {"name": "巨人网络", "industry": "游戏", "size": "中型", "city": "上海"},
+    {"name": "猿力科技", "industry": "教育培训", "size": "中型", "city": "北京"},
+    {"name": "声网Agora", "industry": "企业服务", "size": "中型", "city": "上海"},
+]
 
 SKILL_CATEGORIES = [
     "编程语言",
@@ -455,23 +504,18 @@ def generate_skills(n: int = 80) -> list[dict[str, Any]]:
 
 
 def generate_companies(n: int = 40) -> list[dict[str, Any]]:
-    """生成公司实体数据。"""
-    n = max(1, min(n, 50))
-    used_names: set[str] = set()
+    """从真实公司列表中选取公司数据（替代 Faker 生成）。"""
+    n = max(1, min(n, len(_REAL_COMPANIES)))
+    # 随机选取 n 个真实公司
+    selected = random.sample(_REAL_COMPANIES, n)
     companies = []
-    while len(companies) < n:
-        prefix = fake.company_prefix()
-        suffix = random.choice(["科技", "网络", "信息", "智能", "互联", "数字", "云", "创新"])
-        name = f"{prefix}{suffix}"
-        if name in used_names:
-            continue
-        used_names.add(name)
+    for idx, company in enumerate(selected, start=1):
         companies.append({
-            "id": len(companies) + 1,
-            "name": name,
-            "industry": random.choice(INDUSTRIES),
-            "size": random.choice(COMPANY_SIZES),
-            "city": random.choice(CITIES),
+            "id": idx,
+            "name": company["name"],
+            "industry": company["industry"],
+            "size": company["size"],
+            "city": company["city"],
         })
     return companies
 

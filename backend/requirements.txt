@@ -27,7 +27,6 @@ langchain>=0.3.0
 langgraph>=0.2.0
 
 # Data generation / processing
-faker>=25.2.0
 networkx>=3.3
 pandas>=2.2.0
 scikit-learn>=1.5.0

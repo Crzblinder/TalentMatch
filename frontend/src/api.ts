@@ -1,6 +1,10 @@
 import type {
   ApiResponse,
   ConfigTestReport,
+  CareDashboard,
+  EncouragementQuote,
+  PracticalTip,
+  JobSearchStage,
   DashboardData,
   FavoriteJobListResponse,
   FavoriteJobOut,
@@ -297,4 +301,27 @@ export const api = {
 
   /* ---- Dashboard ---- */
   getDashboard: (): Promise<DashboardData> => request('/dashboard'),
+
+  /* ---- Care (求职关怀) ---- */
+  getCareQuote: (scene?: string, category?: string): Promise<EncouragementQuote> => {
+    const qs = buildQuery({ scene, category })
+    return request(`/care/quote${qs ? `?${qs}` : ''}`)
+  },
+
+  getCareQuotes: (count = 5, scene?: string, category?: string): Promise<EncouragementQuote[]> => {
+    const qs = buildQuery({ count, scene, category })
+    return request(`/care/quotes?${qs}`)
+  },
+
+  getCareTips: (category?: string, difficulty?: string): Promise<PracticalTip[]> => {
+    const qs = buildQuery({ category, difficulty })
+    return request(`/care/tips${qs ? `?${qs}` : ''}`)
+  },
+
+  getCareStages: (): Promise<JobSearchStage[]> => request('/care/stages'),
+
+  getCareDashboard: (profileId?: number): Promise<CareDashboard> => {
+    const qs = buildQuery({ profile_id: profileId })
+    return request(`/care/dashboard${qs ? `?${qs}` : ''}`)
+  },
 }

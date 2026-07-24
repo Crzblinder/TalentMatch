@@ -405,3 +405,44 @@ export interface ObstacleAnalysisRequest {
   resume_data?: Record<string, unknown>
   jd_data?: Record<string, unknown>
 }
+
+/* ---- Care (求职关怀) ---- */
+
+export interface EncouragementQuote {
+  text: string
+  category: string
+  scene: string
+}
+
+export interface PracticalTip {
+  title: string
+  category: string
+  content: string
+  difficulty: string
+  estimated_time: string
+}
+
+export interface JobSearchStage {
+  stage: string
+  duration: string
+  tasks: string[]
+  tips: string
+}
+
+export interface CareDashboard {
+  daily_quote: EncouragementQuote
+  tips: PracticalTip[]
+  stages: JobSearchStage[]
+  stats: {
+    total_jobs: number
+    fresh_friendly_jobs: number
+    fresh_friendly_ratio: number
+  }
+  profile: {
+    name: string
+    skills_count: number
+    target_job_titles: string[]
+    experience_level: string
+  } | null
+  generated_at: string
+}
