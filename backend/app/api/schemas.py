@@ -80,6 +80,8 @@ class JobOut(BaseModel):
     education_level: str
     required_skills: list[str]
     description: str
+    source: str = ""
+    source_url: str = ""
     posted_at: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)

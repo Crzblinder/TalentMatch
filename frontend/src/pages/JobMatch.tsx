@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, ArrowUp, ArrowUpDown, ChevronDown, RotateCcw, Scale, Search, Upload, User } from 'lucide-react'
+import { ArrowLeft, ArrowUp, ArrowUpDown, ChevronDown, ExternalLink, RotateCcw, Scale, Search, Upload, User } from 'lucide-react'
 
 import { api } from '../api'
 import { MatchResultCard, SkillRadarChart } from '../components'
@@ -28,7 +28,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { cn } from '@/lib/utils'
+import { cn, getSourceLabel } from '@/lib/utils'
 
 // 页面顶部步骤：填写画像 → 选择岗位 → 查看结果
 const WIZARD_STEPS = [
@@ -583,6 +583,7 @@ export default function JobMatch() {
                       <span className="flex items-center">发布时间 {sortIcon('posted_at')}</span>
                     </TableHead>
                     <TableHead>经验</TableHead>
+                    <TableHead>来源</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -597,6 +598,7 @@ export default function JobMatch() {
                         <TableCell><Skeleton className="h-4 w-28" /></TableCell>
                         <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                         <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                       </TableRow>
                     ))
                   ) : sortedJobs.length ? (
@@ -622,11 +624,34 @@ export default function JobMatch() {
                         <TableCell>{formatSalary(job)}</TableCell>
                         <TableCell>{formatPostedAt(job)}</TableCell>
                         <TableCell>{job.experience_level}</TableCell>
+                        <TableCell>
+                          {job.source ? (
+                            <div className="flex items-center gap-1">
+                              <Badge variant="outline" className="max-w-[100px] truncate text-xs">
+                                {getSourceLabel(job.source)}
+                              </Badge>
+                              {job.source_url && (
+                                <a
+                                  href={job.source_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center text-muted-foreground hover:text-foreground"
+                                  onClick={(e) => e.stopPropagation()}
+                                  title="跳转到原始页面"
+                                >
+                                  <ExternalLink className="h-3 w-3" />
+                                </a>
+                              )}
+                            </div>
+                          ) : (
+                            '-'
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                      <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                         暂无岗位
                       </TableCell>
                     </TableRow>
@@ -788,6 +813,25 @@ const MobileJobCard = memo(function MobileJobCard({
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <span>经验：{job.experience_level}</span>
           <span>发布：{formatPostedAt(job)}</span>
+          {job.source && (
+            <span className="flex items-center gap-1">
+              来源：
+              <Badge variant="outline" className="text-[10px]">
+                {getSourceLabel(job.source)}
+              </Badge>
+              {job.source_url && (
+                <a
+                  href={job.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center hover:text-foreground"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+            </span>
+          )}
         </div>
       </CardContent>
     </Card>

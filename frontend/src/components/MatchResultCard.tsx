@@ -1,6 +1,8 @@
 import ExportPDFButton from './ExportPDFButton'
 import { Badge } from './ui/badge'
+import { ExternalLink } from 'lucide-react'
 import type { Job, MatchResult } from '../types'
+import { getSourceLabel } from '@/lib/utils'
 
 interface MatchResultCardProps {
   matchResult: MatchResult
@@ -23,6 +25,24 @@ export default function MatchResultCard({ matchResult, jobTitle, job }: MatchRes
           <div className="flex items-center gap-3">
             <span className="step-badge">匹配结果</span>
             <span>{jobTitle || '岗位匹配'}</span>
+            {job?.source && (
+              <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                <Badge variant="outline" className="text-xs">
+                  {getSourceLabel(job.source)}
+                </Badge>
+                {job.source_url && (
+                  <a
+                    href={job.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center hover:text-foreground"
+                    title="跳转到原始页面"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </span>
+            )}
           </div>
           {job && <ExportPDFButton job={job} match={matchResult} variant="outline" />}
         </div>

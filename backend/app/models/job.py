@@ -56,6 +56,8 @@ class Job(Base):
     education_level = Column(String(32), nullable=False)
     required_skills = Column(Text, nullable=False, default="[]")
     description = Column(Text, nullable=False)
+    source = Column(String(64), nullable=True, default="", index=True)
+    source_url = Column(String(512), nullable=True, default="")
     posted_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

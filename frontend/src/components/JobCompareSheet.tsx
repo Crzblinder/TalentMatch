@@ -4,6 +4,7 @@ import type { Job } from '../types'
 // shadcn/ui 组件导入
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Badge } from '@/components/ui/badge'
+import { ExternalLink } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -13,7 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { cn } from '@/lib/utils'
+import { cn, getSourceLabel } from '@/lib/utils'
 
 // 高亮背景色池：不同值使用不同背景色
 const HIGHLIGHT_COLORS = [
@@ -96,6 +97,29 @@ export default function JobCompareSheet({ jobs, onClose, open }: JobCompareSheet
       label: '学历要求',
       values: compareJobs.map((j) => j.education_level),
       render: (j) => j.education_level,
+    },
+    {
+      label: '来源信息',
+      values: compareJobs.map((j) => getSourceLabel(j.source || '')),
+      render: (j) =>
+        j.source ? (
+          <div className="flex items-center gap-1">
+            <Badge variant="outline">{getSourceLabel(j.source)}</Badge>
+            {j.source_url && (
+              <a
+                href={j.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-muted-foreground hover:text-foreground"
+                title="跳转到原始页面"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            )}
+          </div>
+        ) : (
+          '-'
+        ),
     },
     {
       label: '技能要求',

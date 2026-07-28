@@ -5,6 +5,7 @@ import html2canvas from 'html2canvas'
 
 import { Button } from '@/components/ui/button'
 import type { Job, MatchResult } from '@/types'
+import { getSourceLabel } from '@/lib/utils'
 
 interface ExportPDFButtonProps {
   /** 目标岗位信息 */
@@ -109,6 +110,7 @@ export default function ExportPDFButton({
         ],
         ['经验要求', job?.experience_level ?? '-'],
         ['学历要求', job?.education_level ?? '-'],
+        ['信息来源', job?.source ? getSourceLabel(job.source) : '-'],
       ]
       jobFields.forEach(([label, value]) => {
         const item = createEl('div', 'flex flex-col', jobGrid)

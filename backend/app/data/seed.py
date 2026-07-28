@@ -134,6 +134,8 @@ def _persist_jobs(db: Session, jobs: list[dict[str, Any]]) -> list[Job]:
             education_level=item["education_level"],
             required_skills=_json_list(item.get("required_skills", [])),
             description=item["description"],
+            source=item.get("source", ""),
+            source_url=item.get("source_url", ""),
         )
         db.add(job)
         persisted.append(job)

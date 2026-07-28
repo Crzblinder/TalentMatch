@@ -69,6 +69,8 @@ export interface Job {
   education_level: string
   required_skills: string[]
   description: string
+  source: string
+  source_url: string
   posted_at: string | null
 }
 

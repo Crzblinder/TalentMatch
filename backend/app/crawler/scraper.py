@@ -672,6 +672,7 @@ def _parse_zhilian_job(element: Any) -> dict[str, Any]:
     title = _first_text(
         element,
         ".jobinfo__name",
+        "a.jobinfo__name",
         "[class*='jobName']",
         "[class*='job-name']",
         "h3",
@@ -679,6 +680,8 @@ def _parse_zhilian_job(element: Any) -> dict[str, Any]:
     )
     company = _first_text(
         element,
+        ".companyinfo__name",
+        "a.companyinfo__name",
         ".company__name",
         "[class*='company_name']",
         "[class*='company-name']",
@@ -688,11 +691,12 @@ def _parse_zhilian_job(element: Any) -> dict[str, Any]:
     )
     location = _first_text(
         element,
+        ".jobinfo__other-info-item",
         ".jobinfo__area",
         "[class*='address']",
         "[class*='area']",
     )
-    link_el = element.select_one("a[href]")
+    link_el = element.select_one("a[href*='jobdetail']") or element.select_one("a[href]")
     url = ""
     if link_el is not None:
         href = link_el.get("href", "")

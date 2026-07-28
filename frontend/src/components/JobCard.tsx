@@ -1,4 +1,6 @@
 import type { Job } from '../types'
+import { ExternalLink } from 'lucide-react'
+import { getSourceLabel } from '@/lib/utils'
 
 interface JobCardProps {
   job: Job
@@ -33,6 +35,27 @@ export default function JobCard({ job, onClick, onMatchClick }: JobCardProps) {
             <span className="tag-chip">+{job.required_skills.length - 3}</span>
           )}
         </div>
+      </td>
+      <td>
+        {job.source ? (
+          <span className="inline-flex items-center gap-1">
+            {getSourceLabel(job.source)}
+            {job.source_url && (
+              <a
+                href={job.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center"
+                onClick={(e) => e.stopPropagation()}
+                title="跳转到原始页面"
+              >
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            )}
+          </span>
+        ) : (
+          '-'
+        )}
       </td>
       {onMatchClick && (
         <td>

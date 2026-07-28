@@ -32,7 +32,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/lib/utils'
+import { cn, getSourceLabel } from '@/lib/utils'
 import { toast } from 'sonner'
 import JobCompareSheet from '@/components/JobCompareSheet'
 
@@ -41,6 +41,7 @@ import {
   ArrowUpDown,
   ChevronDown,
   ChevronUp,
+  ExternalLink,
   Heart,
   Scale,
   Search,
@@ -323,8 +324,9 @@ export default function JobLibrary() {
           <TableCell><Skeleton className="h-4 w-16" /></TableCell>
           <TableCell><Skeleton className="h-4 w-32" /></TableCell>
           <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-20" /></TableCell>
           <TableCell><Skeleton className="h-4 w-12" /></TableCell>
-          <TableCell><Skeleton className="h-4 w-8" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-12" /></TableCell>
           <TableCell><Skeleton className="h-8 w-20" /></TableCell>
         </TableRow>
       )),
@@ -496,6 +498,7 @@ export default function JobLibrary() {
                     <SortIcon columnKey="posted_at" sortConfig={sortConfig} />
                   </div>
                 </TableHead>
+                <TableHead>来源</TableHead>
                 <TableHead
                   className="cursor-pointer select-none"
                   onClick={() => requestSort('match_score')}
@@ -548,6 +551,28 @@ export default function JobLibrary() {
                         ? new Date(job.posted_at).toLocaleDateString('zh-CN')
                         : '-'}
                     </TableCell>
+                    <TableCell>
+                      {job.source ? (
+                        <div className="flex items-center gap-1">
+                          <Badge variant="outline" className="max-w-[120px] truncate">
+                            {getSourceLabel(job.source)}
+                          </Badge>
+                          {job.source_url && (
+                            <a
+                              href={job.source_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center text-muted-foreground hover:text-foreground"
+                              title="跳转到原始页面"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                        </div>
+                      ) : (
+                        '-'
+                      )}
+                    </TableCell>
                     <TableCell>-</TableCell>
                     <TableCell>
                       <Button
@@ -583,7 +608,7 @@ export default function JobLibrary() {
               )}
               {!loading && displayJobs.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={12} className="py-8 text-center text-muted-foreground">
+                  <TableCell colSpan={13} className="py-8 text-center text-muted-foreground">
                     暂无岗位
                   </TableCell>
                 </TableRow>
@@ -670,6 +695,27 @@ export default function JobLibrary() {
                   </div>
                 </div>
               </section>
+
+              {/* 来源信息 */}
+              {selectedJob.source && (
+                <section>
+                  <h4 className="mb-3 font-semibold">来源信息</h4>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Badge variant="secondary">{getSourceLabel(selectedJob.source)}</Badge>
+                    {selectedJob.source_url && (
+                      <a
+                        href={selectedJob.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-primary hover:underline"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        查看原始页面
+                      </a>
+                    )}
+                  </div>
+                </section>
+              )}
 
               {/* 技能要求 */}
               <section>
