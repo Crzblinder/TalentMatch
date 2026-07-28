@@ -26,6 +26,7 @@ def main():
             n_companies=40,
             n_jobs=250,
             fetch_real=fetch_real,
+            allow_fallback=False,
         )
         print(f"Seeded: {result}")
     finally:

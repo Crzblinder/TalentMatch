@@ -13,7 +13,7 @@ class UserSkillProfile(Base):
     skills = Column(Text, nullable=False, default="[]")
     experience_level = Column(String(64), nullable=False)
     target_job_titles = Column(Text, nullable=False, default="[]")
-    is_active = Column(Boolean, default=False, nullable=False)
+    is_active = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # 一个画像可以收藏多个岗位

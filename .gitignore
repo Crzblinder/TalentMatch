@@ -97,6 +97,10 @@ e2e/failure.png
 # Tool-generated documentation
 .qoder/
 
+# Agent skills (installed via npx skills, re-installable)
+.agents/
+skills-lock.json
+
 # Temporary test files
 tmp_*.docx
 tmp_*.json

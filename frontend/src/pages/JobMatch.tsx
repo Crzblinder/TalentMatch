@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, ArrowUp, ArrowUpDown, ChevronDown, RotateCcw, Scale, Search, Upload, User } from 'lucide-react'
 
 import { api } from '../api'
@@ -76,9 +76,8 @@ type SortDirection = 'asc' | 'desc'
 
 function arraysEqual(a: string[], b: string[]): boolean {
   if (a.length !== b.length) return false
-  const sortedA = [...a].sort()
-  const sortedB = [...b].sort()
-  return sortedA.every((v, i) => v === sortedB[i])
+  const setB = new Set(b)
+  return a.every((v) => setB.has(v))
 }
 
 function formMatchesProfile(form: ProfileFormData, profile: UserSkillProfile): boolean {
@@ -94,6 +93,14 @@ function formMatchesProfile(form: ProfileFormData, profile: UserSkillProfile): b
       profile.target_job_titles,
     )
   )
+}
+
+function formatSalary(job: Job): string {
+  return `¥${job.salary_min.toLocaleString()}-${job.salary_max.toLocaleString()}`
+}
+
+function formatPostedAt(job: Job): string {
+  return job.posted_at ? new Date(job.posted_at).toLocaleDateString('zh-CN') : '-'
 }
 
 export default function JobMatch() {
@@ -365,64 +372,10 @@ export default function JobMatch() {
     return streamCompletedSteps.length
   }, [streamActiveStep, streamCompletedSteps])
 
-  // 格式化薪资显示
-  const formatSalary = (job: Job) =>
-    `¥${job.salary_min.toLocaleString()}-${job.salary_max.toLocaleString()}`
-
-  // 格式化发布时间
-  const formatPostedAt = (job: Job) =>
-    job.posted_at ? new Date(job.posted_at).toLocaleDateString('zh-CN') : '-'
-
-  // 移动端岗位卡片
-  const renderMobileJobCard = (job: Job) => {
-    const selected = selectedJobId === job.id
-    return (
-      <Card
-        key={job.id}
-        className={cn(
-          'cursor-pointer transition-colors',
-          selected ? 'border-primary bg-primary/5' : 'hover:bg-accent'
-        )}
-        onClick={() => setSelectedJobId(job.id)}
-      >
-        <CardContent className="space-y-3 p-4">
-          <div className="flex items-start gap-3">
-            <input
-              type="radio"
-              name="selected-job"
-              checked={selected}
-              onChange={() => setSelectedJobId(job.id)}
-              className="mt-1 h-5 w-5 cursor-pointer accent-primary"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <div className="min-w-0 flex-1 space-y-1">
-              <div className="truncate font-medium">{job.title}</div>
-              <div className="text-sm text-muted-foreground">
-                {job.company.name} · {job.city}
-              </div>
-              <div className="text-sm">{formatSalary(job)}</div>
-              <div className="flex flex-wrap gap-1">
-                {job.required_skills.slice(0, 4).map((skill, idx) => (
-                  <Badge key={idx} variant="secondary" className="text-xs">
-                    {skill}
-                  </Badge>
-                ))}
-                {job.required_skills.length > 4 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{job.required_skills.length - 4}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            <span>经验：{job.experience_level}</span>
-            <span>发布：{formatPostedAt(job)}</span>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
+  // 移动端岗位卡片渲染辅助
+  const handleSelectJob = useCallback((jobId: number) => {
+    setSelectedJobId(jobId)
+  }, [])
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -689,7 +642,14 @@ export default function JobMatch() {
                   <Skeleton key={i} className="h-36 w-full rounded-lg" />
                 ))
               ) : sortedJobs.length ? (
-                sortedJobs.map((job) => renderMobileJobCard(job))
+                sortedJobs.map((job) => (
+                  <MobileJobCard
+                    key={job.id}
+                    job={job}
+                    selected={selectedJobId === job.id}
+                    onSelect={handleSelectJob}
+                  />
+                ))
               ) : (
                 <div className="py-12 text-center text-muted-foreground">暂无岗位</div>
               )}
@@ -774,3 +734,62 @@ export default function JobMatch() {
     </div>
   )
 }
+
+// 提取为独立组件，避免在父组件内部定义导致每次渲染都重新创建
+interface MobileJobCardProps {
+  job: Job
+  selected: boolean
+  onSelect: (jobId: number) => void
+}
+
+const MobileJobCard = memo(function MobileJobCard({
+  job,
+  selected,
+  onSelect,
+}: MobileJobCardProps) {
+  return (
+    <Card
+      className={cn(
+        'cursor-pointer transition-colors',
+        selected ? 'border-primary bg-primary/5' : 'hover:bg-accent'
+      )}
+      onClick={() => onSelect(job.id)}
+    >
+      <CardContent className="space-y-3 p-4">
+        <div className="flex items-start gap-3">
+          <input
+            type="radio"
+            name="selected-job"
+            checked={selected}
+            onChange={() => onSelect(job.id)}
+            className="mt-1 h-5 w-5 cursor-pointer accent-primary"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="min-w-0 flex-1 space-y-1">
+            <div className="truncate font-medium">{job.title}</div>
+            <div className="text-sm text-muted-foreground">
+              {job.company.name} · {job.city}
+            </div>
+            <div className="text-sm">{formatSalary(job)}</div>
+            <div className="flex flex-wrap gap-1">
+              {job.required_skills.slice(0, 4).map((skill, idx) => (
+                <Badge key={idx} variant="secondary" className="text-xs">
+                  {skill}
+                </Badge>
+              ))}
+              {job.required_skills.length > 4 && (
+                <Badge variant="outline" className="text-xs">
+                  +{job.required_skills.length - 4}
+                </Badge>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <span>经验：{job.experience_level}</span>
+          <span>发布：{formatPostedAt(job)}</span>
+        </div>
+      </CardContent>
+    </Card>
+  )
+})

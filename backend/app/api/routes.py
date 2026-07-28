@@ -11,7 +11,8 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import Response, StreamingResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
+from starlette.concurrency import run_in_threadpool
 
 from app.agents.graph_state import JobMatchState
 from app.agents.trend_predictor import TrendPredictor
@@ -144,7 +145,9 @@ def _get_trend_summary(db: Session) -> dict[str, Any]:
         return cached_value
 
     job_data = []
-    for job in db.query(Job).all():
+    for job in db.query(Job).options(
+        load_only(Job.title, Job.city, Job.salary_min, Job.salary_max, Job.required_skills)
+    ).all():
         job_data.append(
             {
                 "title": job.title,
@@ -1225,10 +1228,11 @@ def get_care_dashboard(
 # ---------------------------------------------------------------------------
 # SSE Stream
 # ---------------------------------------------------------------------------
-async def _match_stream_events(
+def _prepare_match_stream_data(
     db: Session,
     payload: MatchStreamRequest,
-) -> Any:
+) -> tuple[str, Any, dict[str, Any], list[dict[str, Any]]]:
+    """预取流式匹配所需的同步数据（避免在 async generator 中阻塞事件循环）。"""
     input_text = payload.jd_text or ""
     target_job = None
     profile = payload.profile or {}
@@ -1250,7 +1254,9 @@ async def _match_stream_events(
 
     job_data = payload.job_data or []
     if not job_data:
-        for job in db.query(Job).all():
+        for job in db.query(Job).options(
+            load_only(Job.title, Job.city, Job.salary_min, Job.salary_max, Job.required_skills)
+        ).all():
             job_data.append(
                 {
                     "title": job.title,
@@ -1260,6 +1266,18 @@ async def _match_stream_events(
                     "required_skills": _load_json_list(job.required_skills),
                 }
             )
+
+    return input_text, target_job, profile, job_data
+
+
+async def _match_stream_events(
+    db: Session,
+    payload: MatchStreamRequest,
+) -> Any:
+    # 在线程池中执行所有同步数据库查询，避免阻塞事件循环
+    input_text, target_job, profile, job_data = await run_in_threadpool(
+        _prepare_match_stream_data, db, payload
+    )
 
     state: JobMatchState = {
         "input_text": input_text,

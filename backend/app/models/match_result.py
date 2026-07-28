@@ -20,4 +20,4 @@ class MatchResult(Base):
     missing_skills = Column(Text, nullable=False, default="[]")
     transferable_skills = Column(Text, nullable=False, default="[]")
     analysis_summary = Column(Text, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)

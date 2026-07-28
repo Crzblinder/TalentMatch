@@ -17,6 +17,7 @@ from app.data.generator import (
 )
 from app.models import (
     Company,
+    FavoriteJob,
     Job,
     MatchResult,
     Skill,
@@ -373,13 +374,22 @@ def seed_database(
     n_companies: int = 40,
     n_jobs: int = 300,
     fetch_real: bool = True,
+    allow_fallback: bool = False,
 ) -> dict[str, Any]:
     """生成新版结构化数据并持久化到数据库。
 
-    当 fetch_real=True 时，优先加载综合采集的真实 JD（300+ 条）；
-    仅当真实数据不足时才使用生成器补充（使用真实公司列表，非 Faker）。
+    当 fetch_real=True 时，优先加载综合采集的真实 JD；
+    仅当 allow_fallback=True 且真实数据不足时，才使用生成器补充。
     """
     logger.info("Generating seed data for skill-map and talent-matching engine...")
+
+    # 清理旧数据：只保留技能、画像等基础数据，清除岗位及相关派生数据
+    db.query(MatchResult).delete(synchronize_session=False)
+    db.query(FavoriteJob).delete(synchronize_session=False)
+    db.query(Job).delete(synchronize_session=False)
+    db.query(Company).delete(synchronize_session=False)
+    db.commit()
+    logger.info("Cleared existing jobs, companies, matches and favorites.")
 
     # 1. 技能词表仍然使用人工整理版本
     data = generate_all_data(n_skills=n_skills, n_companies=0, n_jobs=0)
@@ -396,19 +406,19 @@ def seed_database(
             )
             logger.info("获取到 %d 条真实 JD", len(real_raw_jobs))
         except Exception as exc:
-            logger.warning("获取真实 JD 失败，将使用生成数据: %s", exc)
+            logger.warning("获取真实 JD 失败: %s", exc)
 
-    # 3. 提取真实公司并补充到目标数量
+    # 3. 提取真实公司
     real_companies = _extract_companies_from_jobs(real_raw_jobs)
-    fallback_company_count = max(0, n_companies - len(real_companies))
-    if fallback_company_count > 0:
-        fallback_companies = generate_companies(fallback_company_count)
-        # 避免名称冲突
-        existing_names = {c["name"] for c in real_companies}
-        for c in fallback_companies:
-            if c["name"] not in existing_names:
-                real_companies.append(c)
-                existing_names.add(c["name"])
+    if allow_fallback:
+        fallback_company_count = max(0, n_companies - len(real_companies))
+        if fallback_company_count > 0:
+            fallback_companies = generate_companies(fallback_company_count)
+            existing_names = {c["name"] for c in real_companies}
+            for c in fallback_companies:
+                if c["name"] not in existing_names:
+                    real_companies.append(c)
+                    existing_names.add(c["name"])
 
     # 分配公司 ID
     for idx, company in enumerate(real_companies, start=1):
@@ -417,17 +427,17 @@ def seed_database(
     # 4. 规范化真实 JD
     real_jobs = _normalize_real_jobs(real_raw_jobs, skills, real_companies)
 
-    # 5. 若真实 JD 不足，用生成器补充（使用真实公司列表，非 Faker）
-    fallback_job_count = max(0, n_jobs - len(real_jobs))
-    if fallback_job_count > 0:
-        company_map_for_gen = {c["id"]: c for c in real_companies}
-        fallback_jobs = generate_jobs(
-            companies=list(company_map_for_gen.values()),
-            skills=skills,
-            n=fallback_job_count,
-        )
-        # generate_jobs 自带 id，需要重新编号以接在真实 JD 之后
-        real_jobs.extend(fallback_jobs)
+    # 5. 若允许 fallback 且真实 JD 不足，用生成器补充
+    if allow_fallback:
+        fallback_job_count = max(0, n_jobs - len(real_jobs))
+        if fallback_job_count > 0:
+            company_map_for_gen = {c["id"]: c for c in real_companies}
+            fallback_jobs = generate_jobs(
+                companies=list(company_map_for_gen.values()),
+                skills=skills,
+                n=fallback_job_count,
+            )
+            real_jobs.extend(fallback_jobs)
 
     # 统一分配 job ID（从 1 开始）
     for idx, job in enumerate(real_jobs, start=1):
@@ -440,6 +450,7 @@ def seed_database(
     profiles = _seed_demo_profiles(db, skill_map)
     match_count = _seed_demo_matches(db, profiles, jobs, skill_map)
 
+    fallback_count = len(real_jobs) - len(real_raw_jobs)
     logger.info(
         "Seeded %s skills, %s companies, %s jobs (real=%s, fallback=%s), "
         "%s relations, %s profiles, %s matches",
@@ -447,7 +458,7 @@ def seed_database(
         len(real_companies),
         len(jobs),
         len(real_raw_jobs),
-        len(real_jobs) - len(real_raw_jobs),
+        fallback_count,
         relation_count,
         len(profiles),
         match_count,
@@ -457,7 +468,7 @@ def seed_database(
         "companies": len(real_companies),
         "jobs": len(jobs),
         "real_jobs": len(real_raw_jobs),
-        "fallback_jobs": len(real_jobs) - len(real_raw_jobs),
+        "fallback_jobs": fallback_count,
         "relations": relation_count,
         "profiles": len(profiles),
         "matches": match_count,

@@ -72,6 +72,7 @@ def init_db(
                 n_companies=40,
                 n_jobs=250,
                 fetch_real=fetch_real_jobs,
+                allow_fallback=False,
             )
             logger.info("Seed result: %s", result)
         finally:

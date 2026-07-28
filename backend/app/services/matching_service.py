@@ -47,7 +47,12 @@ class MatchingService:
         if profile is None:
             raise ValueError(f"用户画像不存在: profile_id={profile_id}")
 
-        job = self.db.query(Job).filter(Job.id == job_id).first()
+        job = (
+            self.db.query(Job)
+            .options(joinedload(Job.company))
+            .filter(Job.id == job_id)
+            .first()
+        )
         if job is None:
             raise ValueError(f"岗位不存在: job_id={job_id}")
 
@@ -172,7 +177,12 @@ class MatchingService:
         if profile is None:
             raise ValueError(f"用户画像不存在: profile_id={profile_id}")
 
-        job = self.db.query(Job).filter(Job.id == job_id).first()
+        job = (
+            self.db.query(Job)
+            .options(joinedload(Job.company))
+            .filter(Job.id == job_id)
+            .first()
+        )
         if job is None:
             raise ValueError(f"岗位不存在: job_id={job_id}")
 

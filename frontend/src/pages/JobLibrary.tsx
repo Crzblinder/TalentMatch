@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import type { Job, UserSkillProfile } from '../types'
@@ -309,35 +309,27 @@ export default function JobLibrary() {
   // 当前已选中的对比岗位列表
   const compareList = useMemo(() => Object.values(compareMap), [compareMap])
 
-  // 排序表头图标
-  const SortIcon = ({ columnKey }: { columnKey: SortKey }) => {
-    if (sortConfig?.key !== columnKey) {
-      return <ArrowUpDown className="ml-1 h-3 w-3 opacity-50" />
-    }
-    return sortConfig.direction === 'asc' ? (
-      <ChevronUp className="ml-1 h-3 w-3" />
-    ) : (
-      <ChevronDown className="ml-1 h-3 w-3" />
-    )
-  }
-
-  // 骨架屏行
-  const skeletonRows = Array.from({ length: 5 }).map((_, i) => (
-    <TableRow key={`sk-${i}`}>
-      <TableCell><Skeleton className="h-4 w-4" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-12" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-8" /></TableCell>
-      <TableCell><Skeleton className="h-8 w-20" /></TableCell>
-    </TableRow>
-  ))
+  // 骨架屏行：useMemo 避免每次渲染重新创建
+  const skeletonRows = useMemo(
+    () =>
+      Array.from({ length: 5 }).map((_, i) => (
+        <TableRow key={`sk-${i}`}>
+          <TableCell><Skeleton className="h-4 w-4" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-8" /></TableCell>
+          <TableCell><Skeleton className="h-8 w-20" /></TableCell>
+        </TableRow>
+      )),
+    []
+  )
 
   return (
     <div>
@@ -489,7 +481,7 @@ export default function JobLibrary() {
                 >
                   <div className="flex items-center">
                     薪资
-                    <SortIcon columnKey="salary_min" />
+                    <SortIcon columnKey="salary_min" sortConfig={sortConfig} />
                   </div>
                 </TableHead>
                 <TableHead>经验</TableHead>
@@ -501,7 +493,7 @@ export default function JobLibrary() {
                 >
                   <div className="flex items-center">
                     发布时间
-                    <SortIcon columnKey="posted_at" />
+                    <SortIcon columnKey="posted_at" sortConfig={sortConfig} />
                   </div>
                 </TableHead>
                 <TableHead
@@ -510,7 +502,7 @@ export default function JobLibrary() {
                 >
                   <div className="flex items-center">
                     匹配分数
-                    <SortIcon columnKey="match_score" />
+                    <SortIcon columnKey="match_score" sortConfig={sortConfig} />
                   </div>
                 </TableHead>
                 <TableHead>收藏</TableHead>
@@ -719,3 +711,20 @@ export default function JobLibrary() {
     </div>
   )
 }
+
+// 提取为独立组件，避免在父组件内部定义导致每次渲染都重新创建
+interface SortIconProps {
+  columnKey: SortKey
+  sortConfig: { key: SortKey; direction: 'asc' | 'desc' } | null
+}
+
+const SortIcon = memo(function SortIcon({ columnKey, sortConfig }: SortIconProps) {
+  if (sortConfig?.key !== columnKey) {
+    return <ArrowUpDown className="ml-1 h-3 w-3 opacity-50" />
+  }
+  return sortConfig.direction === 'asc' ? (
+    <ChevronUp className="ml-1 h-3 w-3" />
+  ) : (
+    <ChevronDown className="ml-1 h-3 w-3" />
+  )
+})
