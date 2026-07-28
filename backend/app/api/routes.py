@@ -110,6 +110,8 @@ def _job_to_dict(job: Job) -> dict[str, Any]:
         "education_level": job.education_level,
         "required_skills": _load_json_list(job.required_skills),
         "description": job.description,
+        "source": job.source or "",
+        "source_url": job.source_url or "",
         "posted_at": job.posted_at,
     }
 
