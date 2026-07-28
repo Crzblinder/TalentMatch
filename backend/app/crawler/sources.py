@@ -54,6 +54,46 @@ SOURCES: list[dict[str, Any]] = [
         "description": "LearnKu Go 社区 RSS，含 Go 岗位帖",
         "requires_filter": True,
     },
+    {
+        "name": "cnodejs",
+        "type": "rss",
+        "url": "https://cnodejs.org/rss",
+        "parser": "rss_atom",
+        "description": "CNode 社区 RSS，Node.js 技术社区偶含招聘帖",
+        "requires_filter": True,
+    },
+    {
+        "name": "oschina_news",
+        "type": "rss",
+        "url": "https://www.oschina.net/news/rss",
+        "parser": "rss_atom",
+        "description": "开源中国资讯 RSS，技术行业动态含招聘信号",
+        "requires_filter": True,
+    },
+    {
+        "name": "segmentfault",
+        "type": "rss",
+        "url": "https://segmentfault.com/feeds",
+        "parser": "rss_atom",
+        "description": "思否社区 RSS，开发者社区含招聘/求职内容",
+        "requires_filter": True,
+    },
+    {
+        "name": "infoq_cn",
+        "type": "rss",
+        "url": "https://www.infoq.cn/feed",
+        "parser": "rss_atom",
+        "description": "InfoQ 中文站 RSS，技术行业动态含招聘信号",
+        "requires_filter": True,
+    },
+    {
+        "name": "cnblogs",
+        "type": "rss",
+        "url": "https://www.cnblogs.com/rss",
+        "parser": "rss_atom",
+        "description": "博客园 RSS，开发者社区含招聘/求职内容",
+        "requires_filter": True,
+    },
     # -----------------------------------------------------------------------
     # 国内招聘平台公开列表页（默认关闭，需同时开启配置 DOMESTIC_CRAWLER_ENABLED）
     # -----------------------------------------------------------------------
