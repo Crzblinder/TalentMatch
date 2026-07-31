@@ -125,3 +125,16 @@ browser_verify_*.png
 # IDE backups
 .idea.backup/
 
+# Root-level generated test artifacts (resume / JD verification outputs)
+resume_detail.json
+resume_parse_result.json
+resumes_list.json
+test_jd_result*.json
+test_resume_result*.json
+upload_logs.json
+verify_jd_upload.json
+verify_resume_upload.json
+字段.md
+简历*.pdf
+岗位*.png
+
