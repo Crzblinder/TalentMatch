@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TalentMatch 选项</title>
+    <style>
+      body {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 0 16px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      label { display: block; margin-bottom: 6px; font-weight: 600; }
+      input {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        box-sizing: border-box;
+      }
+      button {
+        margin-top: 12px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        background: #2563eb;
+        color: white;
+        cursor: pointer;
+      }
+      button:hover { background: #1d4ed8; }
+      .hint { color: #6b7280; font-size: 13px; margin-top: 4px; }
+      #status { margin-top: 12px; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <h1>TalentMatch 选项</h1>
+    <div>
+      <label for="backend-url">后端服务地址</label>
+      <input id="backend-url" type="url" value="http://127.0.0.1:8000" />
+      <p class="hint">本地启动后端后默认地址为 http://127.0.0.1:8000</p>
+    </div>
+    <button id="save">保存</button>
+    <div id="status"></div>
+    <script src="options.js"></script>
+  </body>
+</html>

@@ -48,8 +48,16 @@ import {
   X,
 } from 'lucide-react'
 
-// 经验级别选项
-const EXPERIENCE_LEVELS = ['不限', '应届生', '1-3年', '3-5年', '5-10年', '10年以上']
+// 经验级别选项：value 为后端数据库存储的实际值，label 为前端展示文案
+// 注意：后端存储应届岗为「应届/在校生」，前端展示为「应届生」，两者必须区分
+const EXPERIENCE_LEVELS: { value: string; label: string }[] = [
+  { value: '不限', label: '不限' },
+  { value: '应届/在校生', label: '应届生' },
+  { value: '1-3年', label: '1-3年' },
+  { value: '3-5年', label: '3-5年' },
+  { value: '5-10年', label: '5-10年' },
+  { value: '10年以上', label: '10年以上' },
+]
 
 // 筛选条件类型
 interface Filters {
@@ -79,12 +87,12 @@ export default function JobLibrary() {
   const [page, setPage] = useState(1)
   const pageSize = 15
 
-  // 筛选条件状态
+  // 筛选条件状态（支持从 URL ?experience=xxx 预选经验筛选，用于关怀页跳转）
   const [filters, setFilters] = useState<Filters>({
     search: '',
     city: '',
     industry: '',
-    experienceLevel: '',
+    experienceLevel: searchParams.get('experience') || '',
   })
 
   // 是否只展示我的收藏（通过 URL ?favorites=1 进入）
@@ -386,8 +394,8 @@ export default function JobLibrary() {
                   </SelectTrigger>
                   <SelectContent>
                     {EXPERIENCE_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {level}
+                      <SelectItem key={level.value} value={level.value}>
+                        {level.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TalentMatch</title>
+    <style>
+      body {
+        width: 280px;
+        margin: 0;
+        padding: 16px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      h1 { font-size: 16px; margin: 0 0 12px; }
+      p { font-size: 13px; color: #4b5563; margin: 0 0 12px; }
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 8px;
+        border: none;
+        border-radius: 6px;
+        background: #2563eb;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      button:hover { background: #1d4ed8; }
+      button.secondary { background: #e5e7eb; color: #1f2937; }
+      button.secondary:hover { background: #d1d5db; }
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        margin-top: 12px;
+      }
+      .dot { width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; }
+      .dot.ok { background: #22c55e; }
+      .dot.err { background: #ef4444; }
+    </style>
+  </head>
+  <body>
+    <h1>TalentMatch</h1>
+    <p>岗位技能图谱与人才匹配引擎</p>
+    <p style="font-size:12px;color:#6b7280">在招聘官网页面会自动显示网申助手，支持表单识别、智能填充、JD 简历优化。</p>
+    <button id="open-sidepanel">在侧边栏打开</button>
+    <button id="open-options" class="secondary">选项设置</button>
+    <div class="status">
+      <span id="status-dot" class="dot"></span>
+      <span id="status-text">检测中…</span>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

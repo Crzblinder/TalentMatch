@@ -25,8 +25,16 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 
-// 经验级别选项，与后端默认值保持一致
-const EXPERIENCE_LEVELS = ['不限', '应届生', '1-3年', '3-5年', '5-10年', '10年以上']
+// 经验级别选项：value 为后端存储的实际值，label 为前端展示文案
+// 与岗位库/匹配页保持一致，应届岗在后端统一存储为「应届/在校生」
+const EXPERIENCE_LEVELS: { value: string; label: string }[] = [
+  { value: '不限', label: '不限' },
+  { value: '应届/在校生', label: '应届生' },
+  { value: '1-3年', label: '1-3年' },
+  { value: '3-5年', label: '3-5年' },
+  { value: '5-10年', label: '5-10年' },
+  { value: '10年以上', label: '10年以上' },
+]
 
 // localStorage 键名
 const STORAGE_KEY_COMPLETED = 'onboarding_completed'
@@ -140,7 +148,7 @@ export default function OnboardingDialog({ onComplete }: OnboardingDialogProps) 
         return merged.join(', ')
       })
       // 仅当解析出的经验级别在可选范围内时才覆盖
-      if (resume.experience_level && EXPERIENCE_LEVELS.includes(resume.experience_level)) {
+      if (resume.experience_level && EXPERIENCE_LEVELS.some((l) => l.value === resume.experience_level)) {
         setExperienceLevel(resume.experience_level)
       }
     } catch (e: any) {
@@ -230,10 +238,10 @@ export default function OnboardingDialog({ onComplete }: OnboardingDialogProps) 
               <SelectValue placeholder="选择经验" />
             </SelectTrigger>
             <SelectContent>
-              {EXPERIENCE_LEVELS.map((level) => (
-                <SelectItem key={level} value={level}>
-                  {level}
-                </SelectItem>
+                {EXPERIENCE_LEVELS.map((level) => (
+                  <SelectItem key={level.value} value={level.value}>
+                    {level.label}
+                  </SelectItem>
               ))}
             </SelectContent>
           </Select>

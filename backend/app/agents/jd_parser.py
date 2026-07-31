@@ -94,8 +94,16 @@ class JDParser(BaseAgent):
 
         if not normalized["title"]:
             normalized["title"] = self._extract_title(jd_text)
+
+        extracted_company = self._extract_company(jd_text)
         if not normalized["company"]:
-            normalized["company"] = self._extract_company(jd_text)
+            normalized["company"] = extracted_company
+        elif len(normalized["company"]) < 15 and not self._looks_like_company(
+            normalized["company"]
+        ):
+            # LLM 返回的公司名疑似错误（无公司标识），用规则提取结果覆盖
+            normalized["company"] = extracted_company
+
         if normalized["experience_level"] == "不限":
             normalized["experience_level"] = self._extract_experience(jd_text)
         if normalized["education_level"] == "不限":
@@ -130,11 +138,29 @@ class JDParser(BaseAgent):
             return m.group(1).strip()
         return lines[0][:30]
 
+    _COMPANY_MARKERS: frozenset[str] = frozenset(
+        {"公司", "集团", "科技", "网络", "信息", "智能", "电子", "银行", "研究院", "大疆", "dji"}
+    )
+
+    def _looks_like_company(self, name: str) -> bool:
+        """判断字符串是否包含公司名常见标识。"""
+        lower = name.lower()
+        return any(marker in lower for marker in self._COMPANY_MARKERS)
+
     def _extract_company(self, jd_text: str) -> str:
+        # 优先匹配显式 "公司/企业：xxx"
         m = re.search(r"(?:公司|企业)[:：]\s*([^\n]{2,50})", jd_text)
         if m:
             return m.group(1).strip()
-        m = re.search(r"([\u4e00-\u9fa5]{2,20}(?:科技|网络|信息|智能|互联|数字|云|创新))", jd_text)
+        # 知名公司硬编码识别
+        known = re.search(r"(大疆|DJI|深圳市大疆创新科技有限公司)", jd_text, re.I)
+        if known:
+            return known.group(1) if known.group(1) != "深圳市大疆创新科技有限公司" else "大疆"
+        # 通用公司名模式：中文名 + 行业/组织后缀
+        m = re.search(
+            r"([\u4e00-\u9fa5]{2,20}(?:科技|网络|信息|智能|互联|数字|云|创新|电子|股份|集团|有限公司|银行|研究院))",
+            jd_text,
+        )
         if m:
             return m.group(1)
         return ""

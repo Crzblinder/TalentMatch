@@ -14,6 +14,12 @@ basic_info（基本信息对象）：
 - id_card_no: 证件号码
 - hukou: 户籍
 - jiguan: 籍贯
+- highest_education: 最高学历（大专/本科/硕士/博士/其他）
+- recruitment_source: 招聘信息来源（如校园宣讲会、招聘网站、内推等）
+- other_intended_position: 其他意向职位
+- accept_city_adjustment: 是否接受意向城市调剂（是/否）
+- current_country: 当前所在国家
+- current_location: 当前所在地（城市）
 
 education（教育经历数组），每项包含：
 - school: 学校名称
@@ -22,8 +28,11 @@ education（教育经历数组），每项包含：
 - start_date: 开始时间，格式 YYYY-MM
 - end_date: 结束时间，格式 YYYY-MM 或"至今"
 - description: 在校经历描述（荣誉、主修课程等）
+- department: 院系
+- ranking: 成绩排名（如前 10%、前 20% 等）
+- has_lab_experience: 是否有实验室经历（是/否）
 
-work_experience（工作经历数组），每项包含：
+work_experience（工作经历/实习经历数组），每项包含：
 - company: 公司名称
 - position: 职位
 - start_date: 开始时间，格式 YYYY-MM
@@ -36,6 +45,20 @@ project_experience（项目经历数组），每项包含：
 - start_date: 开始时间，格式 YYYY-MM
 - end_date: 结束时间，格式 YYYY-MM 或"至今"
 - description: 项目描述
+
+competition_experience（赛事/竞赛经历数组），每项包含：
+- start_date: 开始时间，格式 YYYY-MM
+- end_date: 结束时间，格式 YYYY-MM 或"至今"
+- competition_name: 赛事名称
+- other_competition_name: 其他赛事名称（当赛事名称选“其他”时填写）
+- description: 赛事描述
+
+publications（论文/期刊数组），每项包含：
+- title: 论文/期刊名称
+
+portfolio（作品附件数组），每项包含：
+- file_url: 附件文件地址（如简历中未提供则留空）
+- link_url: 附件链接（如 GitHub、作品集链接等）
 
 skills: 技能列表（字符串数组），尽量从简历的技能、项目、工作描述中提取，去重
 

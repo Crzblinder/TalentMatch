@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TalentMatch</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      iframe {
+        border: none;
+        width: 100%;
+        height: 100%;
+      }
+      #error {
+        display: none;
+        padding: 16px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      #error h2 { margin-top: 0; }
+      #error code {
+        background: #f3f4f6;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="error">
+      <h2>无法连接到 TalentMatch 后端</h2>
+      <p>请确认本地后端服务已启动：</p>
+      <p><code>python scripts/start.py --backend-only</code></p>
+      <p>后端地址可在扩展的“选项”中修改。</p>
+      <button id="retry">重试</button>
+      <button id="open-options">打开选项</button>
+    </div>
+    <iframe id="app" title="TalentMatch"></iframe>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

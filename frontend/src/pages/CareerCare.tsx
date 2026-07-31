@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { RefreshCw, Lightbulb, Heart, TrendingUp, Target, Clock } from 'lucide-react'
 
 import { api } from '@/api'
@@ -10,6 +11,7 @@ import type { CareDashboard } from '@/types'
 
 export default function CareerCare() {
   const { effectiveProfile } = useProfile()
+  const navigate = useNavigate()
   const [data, setData] = useState<CareDashboard | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -90,6 +92,25 @@ export default function CareerCare() {
           </Card>
         </div>
       )}
+
+      {/* 行动号召：一键查看应届友好岗位 */}
+      <Card className="border-primary/20 bg-gradient-to-br from-primary/10 to-secondary/10">
+        <CardContent className="flex flex-col items-start justify-between gap-3 p-4 sm:flex-row sm:items-center">
+          <div>
+            <h3 className="font-semibold text-foreground">准备好开始投递了吗？</h3>
+            <p className="text-sm text-muted-foreground">
+              一键查看为你筛选的 {data?.stats?.fresh_friendly_jobs ?? 0} 个应届友好岗位，告别「经验不符」的挫败感
+            </p>
+          </div>
+          <Button
+            className="shrink-0"
+            onClick={() => navigate(`/jobs?experience=${encodeURIComponent('应届/在校生')}`)}
+          >
+            <Target className="mr-2 h-4 w-4" />
+            查看应届友好岗位
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* 实用建议 */}
       {data?.tips && data.tips.length > 0 && (

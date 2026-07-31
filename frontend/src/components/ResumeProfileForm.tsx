@@ -31,14 +31,24 @@ import {
 } from '@/components/ui/accordion'
 import type {
   ResumeBasicInfo,
+  ResumeCompetitionExperience,
   ResumeEducation,
+  ResumePortfolio,
   ResumeProjectExperience,
-  ResumeWorkExperience,
   ResumeUploadOut,
+  ResumeWorkExperience,
 } from '@/types'
 
-// 经验级别选项（与岗位库/匹配页保持一致）
-const EXPERIENCE_LEVELS = ['不限', '应届生', '1-3年', '3-5年', '5-10年', '10年以上']
+// 经验级别选项：value 为后端存储的实际值，label 为前端展示文案
+// 与岗位库/匹配页保持一致，应届岗在后端统一存储为「应届/在校生」
+const EXPERIENCE_LEVELS: { value: string; label: string }[] = [
+  { value: '不限', label: '不限' },
+  { value: '应届/在校生', label: '应届生' },
+  { value: '1-3年', label: '1-3年' },
+  { value: '3-5年', label: '3-5年' },
+  { value: '5-10年', label: '5-10年' },
+  { value: '10年以上', label: '10年以上' },
+]
 
 const GENDER_OPTIONS = ['男', '女', '保密']
 
@@ -98,6 +108,24 @@ const PROVINCE_OPTIONS = [
   '澳门',
 ]
 
+const EDUCATION_LEVEL_OPTIONS = ['大专', '本科', '硕士', '博士', '其他']
+
+const RECRUITMENT_SOURCE_OPTIONS = [
+  '校园宣讲会',
+  '招聘网站',
+  '社交媒体',
+  '内推',
+  '猎头',
+  '学校就业中心',
+  '其他',
+]
+
+const YES_NO_OPTIONS = ['是', '否']
+
+const COUNTRY_OPTIONS = ['中国', '美国', '英国', '日本', '德国', '法国', '其他']
+
+const LAB_EXPERIENCE_OPTIONS = ['是', '否', '未知']
+
 // 左侧导航分组配置
 const SECTIONS = [
   { id: 'basic', label: '基本信息', icon: User },
@@ -105,6 +133,7 @@ const SECTIONS = [
   { id: 'education', label: '教育经历', icon: GraduationCap },
   { id: 'work', label: '工作经历', icon: Briefcase },
   { id: 'project', label: '项目经历', icon: Lightbulb },
+  { id: 'competition', label: '赛事经历', icon: Trophy },
   { id: 'skills', label: '技能优势', icon: Trophy },
   { id: 'other', label: '其他信息', icon: Mail },
 ] as const
@@ -120,6 +149,13 @@ export interface ProfileFormData {
   idCardType: string
   hukou: string
   jiguan: string
+  // 大疆网申字段扩展
+  highestEducation: string
+  recruitmentSource: string
+  otherIntendedPosition: string
+  acceptCityAdjustment: string
+  currentCountry: string
+  currentLocation: string
   expectedPosition: string
   expectedCity: string
   expectedSalary: string
@@ -131,9 +167,12 @@ export interface ProfileFormData {
   education: ResumeEducation[]
   workExperience: ResumeWorkExperience[]
   projectExperience: ResumeProjectExperience[]
+  competitionExperience: ResumeCompetitionExperience[]
   awardsText: string
   certificationsText: string
   languageSkillsText: string
+  publicationsText: string
+  portfolio: ResumePortfolio[]
 }
 
 interface ResumeProfileFormProps {
@@ -156,6 +195,13 @@ const EMPTY_BASIC: ResumeBasicInfo = {
   id_card_no: '',
   hukou: '',
   jiguan: '',
+  // 大疆网申字段扩展
+  highest_education: '',
+  recruitment_source: '',
+  other_intended_position: '',
+  accept_city_adjustment: '',
+  current_country: '',
+  current_location: '',
 }
 
 const EMPTY_EDUCATION: ResumeEducation = {
@@ -165,6 +211,10 @@ const EMPTY_EDUCATION: ResumeEducation = {
   start_date: '',
   end_date: '',
   description: '',
+  // 大疆网申字段扩展
+  department: '',
+  ranking: '',
+  has_lab_experience: '',
 }
 
 const EMPTY_WORK: ResumeWorkExperience = {
@@ -181,6 +231,19 @@ const EMPTY_PROJECT: ResumeProjectExperience = {
   start_date: '',
   end_date: '',
   description: '',
+}
+
+const EMPTY_COMPETITION: ResumeCompetitionExperience = {
+  start_date: '',
+  end_date: '',
+  competition_name: '',
+  other_competition_name: '',
+  description: '',
+}
+
+const EMPTY_PORTFOLIO: ResumePortfolio = {
+  file_url: '',
+  link_url: '',
 }
 
 export function resumeToFormData(resume: ResumeUploadOut): ProfileFormData {
@@ -203,6 +266,13 @@ export function resumeToFormData(resume: ResumeUploadOut): ProfileFormData {
     idCardType: basic.id_card_type || '',
     hukou: basic.hukou || '',
     jiguan: basic.jiguan || '',
+    // 大疆网申字段扩展
+    highestEducation: basic.highest_education || '',
+    recruitmentSource: basic.recruitment_source || '',
+    otherIntendedPosition: basic.other_intended_position || '',
+    acceptCityAdjustment: basic.accept_city_adjustment || '',
+    currentCountry: basic.current_country || '',
+    currentLocation: basic.current_location || '',
     expectedPosition: intention.expected_position || '',
     expectedCity: intention.expected_city || '',
     expectedSalary: intention.expected_salary || '',
@@ -215,9 +285,15 @@ export function resumeToFormData(resume: ResumeUploadOut): ProfileFormData {
     workExperience: (resume.work_experience || []).length > 0 ? resume.work_experience : [EMPTY_WORK],
     projectExperience:
       (resume.project_experience || []).length > 0 ? resume.project_experience : [EMPTY_PROJECT],
+    competitionExperience:
+      (resume.competition_experience || []).length > 0
+        ? resume.competition_experience
+        : [EMPTY_COMPETITION],
     awardsText: (resume.awards || []).join('\n'),
     certificationsText: (resume.certifications || []).join('\n'),
     languageSkillsText: (resume.language_skills || []).join('\n'),
+    publicationsText: (resume.publications || []).map((p) => p.title).join('\n'),
+    portfolio: (resume.portfolio || []).length > 0 ? resume.portfolio : [EMPTY_PORTFOLIO],
   }
 }
 
@@ -233,6 +309,13 @@ export function emptyProfileFormData(): ProfileFormData {
     idCardType: '',
     hukou: '',
     jiguan: '',
+    // 大疆网申字段扩展
+    highestEducation: '',
+    recruitmentSource: '',
+    otherIntendedPosition: '',
+    acceptCityAdjustment: '',
+    currentCountry: '',
+    currentLocation: '',
     expectedPosition: '',
     expectedCity: '',
     expectedSalary: '',
@@ -244,9 +327,12 @@ export function emptyProfileFormData(): ProfileFormData {
     education: [EMPTY_EDUCATION],
     workExperience: [EMPTY_WORK],
     projectExperience: [EMPTY_PROJECT],
+    competitionExperience: [EMPTY_COMPETITION],
     awardsText: '',
     certificationsText: '',
     languageSkillsText: '',
+    publicationsText: '',
+    portfolio: [EMPTY_PORTFOLIO],
   }
 }
 
@@ -324,6 +410,35 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
     onChange({ ...value, projectExperience: next.length ? next : [EMPTY_PROJECT] })
   }
 
+  const updateCompetition = (
+    index: number,
+    field: keyof ResumeCompetitionExperience,
+    val: string,
+  ) => {
+    const next = [...value.competitionExperience]
+    next[index] = { ...next[index], [field]: val }
+    onChange({ ...value, competitionExperience: next })
+  }
+
+  const addCompetition = () => {
+    onChange({ ...value, competitionExperience: [...value.competitionExperience, EMPTY_COMPETITION] })
+  }
+
+  const removeCompetition = (index: number) => {
+    const next = value.competitionExperience.filter((_, i) => i !== index)
+    onChange({ ...value, competitionExperience: next.length ? next : [EMPTY_COMPETITION] })
+  }
+
+  const updatePortfolio = (index: number, field: keyof ResumePortfolio, val: string) => {
+    const next = [...value.portfolio]
+    next[index] = { ...next[index], [field]: val }
+    onChange({ ...value, portfolio: next })
+  }
+
+  const addPortfolio = () => {
+    onChange({ ...value, portfolio: [...value.portfolio, EMPTY_PORTFOLIO] })
+  }
+
   // 各分组完成度
   const progress = useMemo(() => {
     return {
@@ -339,8 +454,13 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
           value.idCardType,
           value.hukou,
           value.jiguan,
+          value.highestEducation,
+          value.recruitmentSource,
+          value.currentCountry,
+          value.currentLocation,
+          value.acceptCityAdjustment,
         ]),
-        total: 10,
+        total: 15,
       },
       intention: {
         filled: countFilled([
@@ -364,13 +484,23 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
         filled: value.projectExperience.filter((p) => p.name || p.role).length,
         total: value.projectExperience.length || 1,
       },
+      competition: {
+        filled: value.competitionExperience.filter((c) => c.competition_name || c.description)
+          .length,
+        total: value.competitionExperience.length || 1,
+      },
       skills: {
         filled: countFilled([value.skillsText, value.selfEvaluation]),
         total: 2,
       },
       other: {
-        filled: countFilled([value.awardsText, value.certificationsText, value.languageSkillsText]),
-        total: 3,
+        filled: countFilled([
+          value.awardsText,
+          value.certificationsText,
+          value.languageSkillsText,
+          value.publicationsText,
+        ]),
+        total: 4,
       },
     }
   }, [value])
@@ -526,6 +656,111 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-1.5">
+                <Label>最高学历</Label>
+                <Select
+                  value={value.highestEducation}
+                  onValueChange={(v) => update('highestEducation', v)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择最高学历" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EDUCATION_LEVEL_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>招聘信息来源</Label>
+                <Select
+                  value={value.recruitmentSource}
+                  onValueChange={(v) => update('recruitmentSource', v)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择来源" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RECRUITMENT_SOURCE_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>其他意向职位</Label>
+                <Input
+                  value={value.otherIntendedPosition}
+                  onChange={(e) => update('otherIntendedPosition', e.target.value)}
+                  placeholder="请输入其他意向职位"
+                  disabled={disabled}
+                  className={inputClass}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>是否接受意向城市调剂</Label>
+                <Select
+                  value={value.acceptCityAdjustment}
+                  onValueChange={(v) => update('acceptCityAdjustment', v)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择是否接受" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {YES_NO_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>当前所在国家</Label>
+                <Select
+                  value={value.currentCountry}
+                  onValueChange={(v) => update('currentCountry', v)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择国家" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COUNTRY_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>当前所在地</Label>
+                <Select
+                  value={value.currentLocation}
+                  onValueChange={(v) => update('currentLocation', v)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue placeholder="选择当前所在地" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROVINCE_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         )
@@ -558,10 +793,10 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
                     <SelectValue placeholder="选择经验" />
                   </SelectTrigger>
                   <SelectContent>
-                    {EXPERIENCE_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {level}
-                      </SelectItem>
+                      {EXPERIENCE_LEVELS.map((level) => (
+                        <SelectItem key={level.value} value={level.value}>
+                          {level.label}
+                        </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -618,8 +853,27 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
                     <Input value={edu.major} onChange={(e) => updateEducation(idx, 'major', e.target.value)} placeholder="专业" disabled={disabled} className={inputClass} />
                   </div>
                   <div className="space-y-1.5">
+                    <Label>院系</Label>
+                    <Input value={edu.department} onChange={(e) => updateEducation(idx, 'department', e.target.value)} placeholder="例如：计算机学院" disabled={disabled} className={inputClass} />
+                  </div>
+                  <div className="space-y-1.5">
                     <Label>学历</Label>
-                    <Input value={edu.degree} onChange={(e) => updateEducation(idx, 'degree', e.target.value)} placeholder="本科 / 硕士" disabled={disabled} className={inputClass} />
+                    <Select
+                      value={edu.degree}
+                      onValueChange={(v) => updateEducation(idx, 'degree', v)}
+                      disabled={disabled}
+                    >
+                      <SelectTrigger className={selectTriggerClass}>
+                        <SelectValue placeholder="选择学历" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {EDUCATION_LEVEL_OPTIONS.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1.5">
                     <Label>起止时间</Label>
@@ -628,6 +882,29 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
                       <span className="text-muted-foreground">~</span>
                       <Input value={edu.end_date} onChange={(e) => updateEducation(idx, 'end_date', e.target.value)} placeholder="2024-06" disabled={disabled} className={inputClass} />
                     </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>成绩排名</Label>
+                    <Input value={edu.ranking} onChange={(e) => updateEducation(idx, 'ranking', e.target.value)} placeholder="例如：前 10%" disabled={disabled} className={inputClass} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>是否有实验室经历</Label>
+                    <Select
+                      value={edu.has_lab_experience}
+                      onValueChange={(v) => updateEducation(idx, 'has_lab_experience', v)}
+                      disabled={disabled}
+                    >
+                      <SelectTrigger className={selectTriggerClass}>
+                        <SelectValue placeholder="选择是否有实验室经历" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LAB_EXPERIENCE_OPTIONS.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
@@ -741,6 +1018,88 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
           </div>
         )
 
+      case 'competition':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold">
+                赛事经历
+                <FieldTip empty={progress.competition.filled < progress.competition.total} tip="竞赛经历能体现综合能力" />
+              </h3>
+              <Button type="button" variant="outline" size="sm" onClick={addCompetition} disabled={disabled} className={addBtnClass}>
+                + 添加
+              </Button>
+            </div>
+            {value.competitionExperience.map((comp, idx) => (
+              <div key={idx} className="relative rounded-lg border p-3">
+                {value.competitionExperience.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-2 h-8 text-destructive md:h-7"
+                    onClick={() => removeCompetition(idx)}
+                    disabled={disabled}
+                  >
+                    删除
+                  </Button>
+                )}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label>赛事名称</Label>
+                    <Input
+                      value={comp.competition_name}
+                      onChange={(e) => updateCompetition(idx, 'competition_name', e.target.value)}
+                      placeholder="例如：挑战杯"
+                      disabled={disabled}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>其他赛事名称</Label>
+                    <Input
+                      value={comp.other_competition_name}
+                      onChange={(e) => updateCompetition(idx, 'other_competition_name', e.target.value)}
+                      placeholder="选择其他时填写"
+                      disabled={disabled}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>起止时间</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={comp.start_date}
+                        onChange={(e) => updateCompetition(idx, 'start_date', e.target.value)}
+                        placeholder="2023-03"
+                        disabled={disabled}
+                        className={inputClass}
+                      />
+                      <span className="text-muted-foreground">~</span>
+                      <Input
+                        value={comp.end_date}
+                        onChange={(e) => updateCompetition(idx, 'end_date', e.target.value)}
+                        placeholder="至今"
+                        disabled={disabled}
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label>赛事描述</Label>
+                    <Textarea
+                      value={comp.description}
+                      onChange={(e) => updateCompetition(idx, 'description', e.target.value)}
+                      placeholder="简述参赛内容和成果"
+                      disabled={disabled}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+
       case 'skills':
         return (
           <div className="space-y-4">
@@ -791,6 +1150,52 @@ export default function ResumeProfileForm({ value, onChange, disabled }: ResumeP
             <div className="space-y-1.5">
               <Label>语言能力（每行一条）</Label>
               <Textarea value={value.languageSkillsText} onChange={(e) => update('languageSkillsText', e.target.value)} placeholder="例如：CET-6: 601" disabled={disabled} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>论文/期刊（每行一条）</Label>
+              <Textarea
+                value={value.publicationsText}
+                onChange={(e) => update('publicationsText', e.target.value)}
+                placeholder="例如：基于深度学习的图像分类方法研究"
+                disabled={disabled}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label>作品附件/链接</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addPortfolio}
+                  disabled={disabled}
+                  className={addBtnClass}
+                >
+                  + 添加
+                </Button>
+              </div>
+              {value.portfolio.map((item, idx) => (
+                <div key={idx} className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Input
+                      value={item.file_url}
+                      onChange={(e) => updatePortfolio(idx, 'file_url', e.target.value)}
+                      placeholder="附件文件地址"
+                      disabled={disabled}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Input
+                      value={item.link_url}
+                      onChange={(e) => updatePortfolio(idx, 'link_url', e.target.value)}
+                      placeholder="作品链接（如 GitHub）"
+                      disabled={disabled}
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )

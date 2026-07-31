@@ -321,6 +321,13 @@ class ResumeBasicInfo(BaseModel):
     id_card_no: str = ""
     hukou: str = ""
     jiguan: str = ""
+    # 大疆网申字段扩展
+    highest_education: str = ""
+    recruitment_source: str = ""
+    other_intended_position: str = ""
+    accept_city_adjustment: str = ""
+    current_country: str = ""
+    current_location: str = ""
 
 
 class ResumeEducation(BaseModel):
@@ -332,6 +339,10 @@ class ResumeEducation(BaseModel):
     start_date: str = ""
     end_date: str = ""
     description: str = ""
+    # 大疆网申字段扩展
+    department: str = ""
+    ranking: str = ""
+    has_lab_experience: str = ""
 
 
 class ResumeWorkExperience(BaseModel):
@@ -363,9 +374,33 @@ class ResumeJobIntention(BaseModel):
     expected_industry: str = ""
 
 
+class ResumeCompetitionExperience(BaseModel):
+    """赛事/竞赛经历条目（大疆网申字段）。"""
+
+    start_date: str = ""
+    end_date: str = ""
+    competition_name: str = ""
+    other_competition_name: str = ""
+    description: str = ""
+
+
+class ResumePublication(BaseModel):
+    """论文/期刊条目（大疆网申字段）。"""
+
+    title: str = ""
+
+
+class ResumePortfolio(BaseModel):
+    """作品附件条目（大疆网申字段）。"""
+
+    file_url: str = ""
+    link_url: str = ""
+
+
 class ResumeUploadOut(BaseModel):
     """简历上传解析输出。"""
 
+    id: int | None = None
     name: str
     skills: list[str]
     experience_level: str
@@ -375,13 +410,204 @@ class ResumeUploadOut(BaseModel):
     education: list[ResumeEducation]
     work_experience: list[ResumeWorkExperience]
     project_experience: list[ResumeProjectExperience]
+    competition_experience: list[ResumeCompetitionExperience] = []
     awards: list[str]
     certifications: list[str]
     language_skills: list[str]
     self_evaluation: str
     job_intention: ResumeJobIntention
+    publications: list[ResumePublication] = []
+    portfolio: list[ResumePortfolio] = []
     fuzzy: bool = False
     obstacles: dict[str, Any] | None = None
+
+
+class ResumeCreate(BaseModel):
+    """创建简历记录请求。"""
+
+    name: str
+    phone: str = ""
+    email: str = ""
+    file_name: str = ""
+    file_size: int = 0
+    basic_info: ResumeBasicInfo = Field(default_factory=ResumeBasicInfo)
+    education: list[ResumeEducation] = Field(default_factory=list)
+    work_experience: list[ResumeWorkExperience] = Field(default_factory=list)
+    project_experience: list[ResumeProjectExperience] = Field(default_factory=list)
+    competition_experience: list[ResumeCompetitionExperience] = Field(default_factory=list)
+    awards: list[str] = Field(default_factory=list)
+    certifications: list[str] = Field(default_factory=list)
+    language_skills: list[str] = Field(default_factory=list)
+    self_evaluation: str = ""
+    job_intention: ResumeJobIntention = Field(default_factory=ResumeJobIntention)
+    publications: list[ResumePublication] = Field(default_factory=list)
+    portfolio: list[ResumePortfolio] = Field(default_factory=list)
+    skills: list[str] = Field(default_factory=list)
+    raw_text: str = ""
+    experience_level: str = ""
+    education_level: str = ""
+    fuzzy: bool = False
+    obstacles: dict[str, Any] | None = None
+
+
+class ResumeUpdate(BaseModel):
+    """更新简历记录请求。"""
+
+    name: str | None = None
+    phone: str | None = None
+    email: str | None = None
+    file_name: str | None = None
+    file_size: int | None = None
+    basic_info: ResumeBasicInfo | None = None
+    education: list[ResumeEducation] | None = None
+    work_experience: list[ResumeWorkExperience] | None = None
+    project_experience: list[ResumeProjectExperience] | None = None
+    competition_experience: list[ResumeCompetitionExperience] | None = None
+    awards: list[str] | None = None
+    certifications: list[str] | None = None
+    language_skills: list[str] | None = None
+    self_evaluation: str | None = None
+    job_intention: ResumeJobIntention | None = None
+    publications: list[ResumePublication] | None = None
+    portfolio: list[ResumePortfolio] | None = None
+    skills: list[str] | None = None
+    raw_text: str | None = None
+    experience_level: str | None = None
+    education_level: str | None = None
+    fuzzy: bool | None = None
+    obstacles: dict[str, Any] | None = None
+    is_active: bool | None = None
+
+
+class ResumeOut(BaseModel):
+    """简历记录输出。"""
+
+    id: int
+    name: str
+    phone: str
+    email: str
+    file_name: str
+    file_size: int
+    basic_info: ResumeBasicInfo
+    education: list[ResumeEducation]
+    work_experience: list[ResumeWorkExperience]
+    project_experience: list[ResumeProjectExperience]
+    competition_experience: list[ResumeCompetitionExperience] = []
+    awards: list[str]
+    certifications: list[str]
+    language_skills: list[str]
+    self_evaluation: str
+    job_intention: ResumeJobIntention
+    publications: list[ResumePublication] = []
+    portfolio: list[ResumePortfolio] = []
+    skills: list[str]
+    raw_text: str
+    experience_level: str
+    education_level: str
+    fuzzy: bool = False
+    obstacles: dict[str, Any] | None = None
+    is_active: bool
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+    @field_validator(
+        "basic_info",
+        "education",
+        "work_experience",
+        "project_experience",
+        "competition_experience",
+        "awards",
+        "certifications",
+        "language_skills",
+        "job_intention",
+        "publications",
+        "portfolio",
+        "skills",
+        mode="before",
+    )
+    @classmethod
+    def _parse_json_fields(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return {} if v.strip().startswith("{") else []
+        return v
+
+    @field_validator("obstacles", mode="before")
+    @classmethod
+    def _parse_obstacles(cls, v: Any) -> dict[str, Any] | None:
+        if not v:
+            return None
+        if isinstance(v, str):
+            try:
+                parsed = json.loads(v)
+            except json.JSONDecodeError:
+                return None
+            return parsed if isinstance(parsed, dict) else None
+        return v if isinstance(v, dict) else None
+
+
+class ResumeListParams(BaseModel):
+    """简历列表查询参数。"""
+
+    page: int = Field(1, ge=1)
+    size: int = Field(20, ge=1, le=100)
+    q: str | None = Field(None, description="按姓名/邮箱/手机号/技能搜索")
+    education_level: str | None = None
+    experience_level: str | None = None
+    fuzzy: bool | None = None
+    is_active: bool | None = None
+
+
+class ResumeListOut(BaseModel):
+    """简历列表输出。"""
+
+    total: int
+    page: int
+    size: int
+    items: list[ResumeOut]
+
+
+class UploadLogOut(BaseModel):
+    """上传/操作日志输出。"""
+
+    id: int
+    action: str
+    entity_type: str
+    entity_id: int | None = None
+    file_name: str
+    file_size: int
+    file_type: str
+    status: str
+    message: str
+    created_at: datetime | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UploadLogListParams(BaseModel):
+    """上传日志列表查询参数。"""
+
+    page: int = Field(1, ge=1)
+    size: int = Field(20, ge=1, le=100)
+    action: str | None = None
+    entity_type: str | None = None
+    status: str | None = None
+    file_name: str | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+
+
+class UploadLogListOut(BaseModel):
+    """上传日志列表输出。"""
+
+    total: int
+    page: int
+    size: int
+    items: list[UploadLogOut]
 
 
 class ResumeOptimizeRequest(BaseModel):
@@ -582,3 +808,49 @@ class ObstacleAnalysisRequest(BaseModel):
 
     resume_data: dict[str, Any] | None = None
     jd_data: dict[str, Any] | None = None
+
+
+# ---------------------------------------------------------------------------
+# Application Form Autofill
+# ---------------------------------------------------------------------------
+class FormFieldMatchRequest(BaseModel):
+    """网申表单字段匹配请求。"""
+
+    fields: list[dict[str, Any]] = Field(..., description="页面提取的表单字段列表")
+    profile: dict[str, Any] = Field(..., description="用户简历/画像数据")
+    jd_text: str | None = Field(None, description="可选的岗位描述文本")
+
+
+class FormFieldMatchOut(BaseModel):
+    """单个表单字段匹配结果。"""
+
+    field_id: str
+    value: str
+    confidence: str = "medium"
+    reason: str = ""
+
+
+class FormFieldMatchResponse(BaseModel):
+    """表单字段匹配响应。"""
+
+    matches: list[FormFieldMatchOut]
+    unmatched: list[dict[str, Any]]
+
+
+class JDOptimizeForApplicationRequest(BaseModel):
+    """根据 JD 优化简历请求（网申场景）。"""
+
+    resume_data: dict[str, Any] = Field(..., description="简历结构化数据")
+    jd_text: str = Field(..., description="岗位描述文本")
+    field_order: list[str] = Field(
+        ["project", "internship", "advantage"],
+        description="字段排放顺序",
+    )
+
+
+class ApplicationAdviceRequest(BaseModel):
+    """网申经验建议搜索请求。"""
+
+    company: str | None = Field(None, description="目标公司")
+    position: str | None = Field(None, description="目标岗位")
+    scene: str = Field("网申", description="场景，如网申、笔试、面试")

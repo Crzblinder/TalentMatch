@@ -42,13 +42,37 @@ class JDService:
         return parser.parse_jd(text)
 
     def extract_text_from_image(self, file_bytes: bytes, ext: str, settings: Settings) -> str:
-        """使用多模态模型识别图片中的 JD 文本。
+        """识别图片中的文本。
 
-        开启国产模式时优先调用国产多模态模型；识别失败时自动回退到
-        OpenAI 多模态模型，确保可用性。
+        优先级：
+        1. 本地 OCR（rapidocr-onnxruntime），无需 API Key，开箱即用；
+        2. 配置多模态 LLM 时，使用多模态模型进行二次识别；
+        3. 均未配置时抛出清晰错误。
         """
         if ext not in ("png", "jpg", "jpeg", "webp", "gif"):
             raise ValueError(f"不支持的图片格式: {ext}")
+
+        # 第一层：本地 OCR，零成本、无需网络
+        try:
+            from app.utils.ocr import extract_text_from_image as local_ocr_extract
+
+            logger.info("图片识别：优先使用本地 OCR")
+            raw_text = local_ocr_extract(file_bytes, ext)
+            if raw_text.strip():
+                return raw_text
+            logger.warning("本地 OCR 未识别到文本，尝试多模态 LLM")
+        except Exception as exc:
+            logger.warning("本地 OCR 不可用: %s", exc)
+
+        # 第二层：多模态 LLM（需配置 API Key）
+        if (
+            not settings.effective_multimodal_api_key
+            or settings.effective_multimodal_api_key == "dummy"
+        ):
+            raise RuntimeError(
+                "图片识别失败：本地 OCR 未返回文本，且未配置多模态 LLM API Key。"
+                "请安装 rapidocr-onnxruntime 或配置 MULTIMODAL_API_KEY / OPENAI_API_KEY。"
+            )
 
         logger.info("识别图片文件，使用多模态模型进行 OCR")
         base64_image = base64.b64encode(file_bytes).decode("utf-8")
@@ -71,22 +95,8 @@ class JDService:
             response = llm.invoke(messages)
             raw_text = response.content if hasattr(response, "content") else str(response)
         except Exception as exc:
-            if settings.use_domestic_llm:
-                logger.warning("国产多模态 OCR 失败，回退到 OpenAI 多模态: %s", exc)
-                from langchain_openai import ChatOpenAI
-
-                fallback_llm = ChatOpenAI(
-                    model=settings.multimodal_model,
-                    api_key=settings.effective_multimodal_api_key or "dummy",
-                    base_url=settings.effective_multimodal_base_url,
-                    temperature=0.2,
-                    timeout=120.0,
-                )
-                response = fallback_llm.invoke(messages)
-                raw_text = response.content if hasattr(response, "content") else str(response)
-            else:
-                logger.error("图片 OCR 识别失败: %s", exc)
-                raise
+            logger.error("图片 OCR 识别失败: %s", exc)
+            raise
 
         logger.info("图片 OCR 识别成功")
         return raw_text

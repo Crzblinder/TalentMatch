@@ -4,8 +4,10 @@ from app.models.evaluation import EvaluationRun, PromptVariant
 from app.models.favorite import FavoriteJob
 from app.models.job import Job
 from app.models.match_result import MatchResult
+from app.models.resume import Resume
 from app.models.skill import Skill
 from app.models.skill_relation import SkillRelation
+from app.models.upload_log import UploadLog
 from app.models.user_skill_profile import UserSkillProfile
 
 __all__ = [
@@ -19,7 +21,9 @@ __all__ = [
     "Job",
     "MatchResult",
     "PromptVariant",
+    "Resume",
     "Skill",
     "SkillRelation",
+    "UploadLog",
     "UserSkillProfile",
 ]

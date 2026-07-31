@@ -34,7 +34,18 @@ import type {
   UserSkillProfileListResponse,
 } from './types'
 
-const API_BASE = '/api/v1'
+// 扩展环境下通过全局变量或 URL 查询参数指定后端地址，Web 开发环境继续走 Vite 代理
+function resolveApiBase(): string {
+  if (typeof window === 'undefined') return '/api/v1'
+  const globalBase = (window as unknown as { TALENTMATCH_API_BASE?: string }).TALENTMATCH_API_BASE
+  if (globalBase) return globalBase
+  const params = new URLSearchParams(window.location.search)
+  const queryBase = params.get('apiBase')
+  if (queryBase) return queryBase
+  return '/api/v1'
+}
+
+const API_BASE = resolveApiBase()
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {

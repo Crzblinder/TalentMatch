@@ -66,16 +66,13 @@ def parse_resume_file_task(
     """异步解析简历文件（PDF/DOCX）。"""
     file_bytes = base64.b64decode(file_b64)
     ext = os.path.splitext(filename)[1].lower()
-    if ext not in (".pdf", ".docx"):
+    if ext not in (".pdf", ".docx", ".png", ".jpg", ".jpeg", ".webp", ".gif"):
         record_parse_task("resume_file", success=False)
         return {"status": "failed", "error": f"不支持的文件格式: {ext}"}
 
     try:
         service = ResumeService()
-        if ext == ".pdf":
-            raw_text = service.extract_text_from_pdf(file_bytes)
-        else:
-            raw_text = service.extract_text_from_docx(file_bytes)
+        raw_text = service._extract_text(file_bytes, filename)
 
         actual_fuzzy = fuzzy if fuzzy is not None else should_use_fuzzy_parsing(raw_text, "resume")
         result = service.parse_resume_text(

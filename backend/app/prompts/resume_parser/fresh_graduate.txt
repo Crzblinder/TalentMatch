@@ -17,9 +17,9 @@
    - 若发现频繁短期实习（每段少于 3 个月），可标记为 "经历较零散"
    - 若学校非 985/211 且投递大厂岗位，请保持客观并完整提取信息
 
-5. **基本信息字段**：与 zero_shot 一致
+5. **基本信息字段**：与 zero_shot 一致，包含大疆网申扩展字段（highest_education、recruitment_source、other_intended_position、accept_city_adjustment、current_country、current_location）
 
-6. **输出字段**：与 zero_shot 一致，额外允许包含 `notes` 字段说明识别过程中的不确定项或建议补充项。
+6. **输出字段**：与 zero_shot 一致，包含 competition_experience、publications、portfolio，额外允许包含 `notes` 字段说明识别过程中的不确定项或建议补充项。
 
 7. **毕业生求职场景优化**：
    - 主动识别「期望城市」「期望薪资」「期望行业」等意图

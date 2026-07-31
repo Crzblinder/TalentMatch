@@ -1,6 +1,6 @@
 """TalentMatch MCP Server。
 
-基于官方 mcp Python SDK 的 stdio 服务，暴露 4 个核心工具：
+基于官方 mcp Python SDK 1.x 的 stdio 服务，暴露 4 个核心工具：
 - search_jobs
 - fuzzy_parse_resume
 - fuzzy_parse_jd
@@ -34,15 +34,6 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 SERVER_NAME = "talentmatch-job-search-assistant"
 SERVER_VERSION = "1.0.0"
-
-mcp = Server(
-    name=SERVER_NAME,
-    version=SERVER_VERSION,
-    instructions=(
-        "TalentMatch 应届毕业生求职助手 MCP Server，"
-        "提供联网搜索、简历/岗位模糊解析、求职障碍识别等能力。"
-    ),
-)
 
 # 工具 schema 必须与 backend/app/skills/mcp_config.json 完全一致
 TOOLS: list[types.Tool] = [
@@ -142,6 +133,27 @@ async def _call_sync_tool(tool_func: Any, arguments: dict[str, Any]) -> dict[str
     return await anyio.to_thread.run_sync(lambda: tool_func(**arguments))
 
 
+def _error_response(message: str) -> list[types.TextContent]:
+    """构造统一的错误响应。"""
+    return [
+        types.TextContent(
+            type="text",
+            text=json.dumps({"error": message}, ensure_ascii=False, indent=2),
+        )
+    ]
+
+
+# Server 实例：必须在注册 handler 之前创建
+mcp = Server(
+    name=SERVER_NAME,
+    version=SERVER_VERSION,
+    instructions=(
+        "TalentMatch 应届毕业生求职助手 MCP Server，"
+        "提供联网搜索、简历/岗位模糊解析、求职障碍识别等能力。"
+    ),
+)
+
+
 @mcp.list_tools()
 async def list_tools() -> list[types.Tool]:
     """返回 TalentMatch 暴露的 MCP 工具列表。"""
@@ -167,14 +179,6 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[types.TextCont
     return [types.TextContent(type="text", text=json.dumps(result, ensure_ascii=False, indent=2))]
 
 
-def _error_response(message: str) -> list[types.TextContent]:
-    """构造统一的错误响应。"""
-    return [
-        types.TextContent(
-            type="text",
-            text=json.dumps({"error": message}, ensure_ascii=False, indent=2),
-        )
-    ]
 
 
 # ---------------------------------------------------------------------------

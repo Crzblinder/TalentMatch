@@ -101,7 +101,7 @@ def test_jd_parser():
     assert result["title"]
     assert "Python" in result["required_skills"]
     assert result["experience_level"] in ("3-5年", "不限")
-    assert result["education_level"] in ("本科", "不限")
+    assert result["education_level"] in ("本科", "本科及以上", "不限")
 
 
 def test_talent_matcher(db_session):

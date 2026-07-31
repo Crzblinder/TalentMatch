@@ -1,7 +1,11 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import ConfigDict, model_validator
 from pydantic_settings import BaseSettings
+
+# 项目根目录（backend 的父目录）
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
@@ -146,7 +150,7 @@ class Settings(BaseSettings):
         return self
 
     model_config = ConfigDict(
-        env_file=".env",
+        env_file=str(ROOT_DIR / ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )

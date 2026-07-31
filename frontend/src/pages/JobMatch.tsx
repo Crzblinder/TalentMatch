@@ -445,7 +445,7 @@ export default function JobMatch() {
               <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <div className="text-sm font-medium">上传简历</div>
-                  <div className="text-xs text-muted-foreground">支持 PDF、DOCX，上传后自动解析并填充下方画像</div>
+                  <div className="text-xs text-muted-foreground">支持 PDF、DOCX、图片（PNG/JPG/WEBP/GIF），上传后自动解析并填充下方画像</div>
                 </div>
                 <Button
                   variant="outline"
@@ -461,7 +461,7 @@ export default function JobMatch() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                accept=".pdf,.docx,.png,.jpg,.jpeg,.webp,.gif,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/png,image/jpeg,image/webp,image/gif"
                 className="hidden"
                 onChange={handleFileChange}
               />

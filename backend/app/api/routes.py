@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import Response, StreamingResponse
 from sqlalchemy.orm import Session, load_only
 from starlette.concurrency import run_in_threadpool
@@ -19,10 +19,14 @@ from app.agents.trend_predictor import TrendPredictor
 from app.agents.workflow import run_job_match_stream
 from app.api.schemas import (
     ApiResponse,
+    ApplicationAdviceRequest,
     FavoriteJobListOut,
     FavoriteJobOut,
     FavoriteRequest,
+    FormFieldMatchRequest,
+    FormFieldMatchResponse,
     JDFuzzyParseRequest,
+    JDOptimizeForApplicationRequest,
     JDParseOut,
     JDParseRequest,
     JDUploadOut,
@@ -40,10 +44,15 @@ from app.api.schemas import (
     MatchStreamRequest,
     ObstacleAnalysisOut,
     ObstacleAnalysisRequest,
+    ResumeCreate,
     ResumeFuzzyParseRequest,
+    ResumeListOut,
+    ResumeListParams,
     ResumeOptimizeOut,
     ResumeOptimizeRequest,
+    ResumeOut,
     ResumeParseRequest,
+    ResumeUpdate,
     ResumeUploadOut,
     SearchOut,
     SearchRequest,
@@ -52,6 +61,9 @@ from app.api.schemas import (
     TaskCreateRequest,
     TaskOut,
     TaskStatusOut,
+    UploadLogListOut,
+    UploadLogListParams,
+    UploadLogOut,
     UserSkillProfileCreate,
     UserSkillProfileListOut,
     UserSkillProfileOut,
@@ -62,12 +74,22 @@ from app.models import Job, MatchResult, UserSkillProfile
 from app.models.base import get_db
 from app.scheduler import trigger_fetch_jobs
 from app.services.alert_service import run_alert_evaluation
+from app.services.application_service import ApplicationService, profile_to_resume_format
 from app.services.cache_service import CACHE_KEYS, DEFAULT_TTLS, get_cache_client
 from app.services.favorite_service import FavoriteService
 from app.services.jd_service import JDService
 from app.services.job_service import JobService
 from app.services.matching_service import MatchingService
 from app.services.report_service import generate_match_report_pdf
+from app.services.resume_crud_service import (
+    create_resume,
+    create_upload_log,
+    delete_resume,
+    get_resume,
+    list_resumes,
+    list_upload_logs,
+    update_resume,
+)
 from app.services.resume_service import ResumeService, should_use_fuzzy_parsing
 from app.services.skill_service import SkillService
 from app.tasks import (
@@ -307,8 +329,11 @@ async def upload_resume_async(
 
     filename = file.filename or ""
     ext = os.path.splitext(filename)[1].lower()
-    if ext not in (".pdf", ".docx"):
-        raise HTTPException(status_code=400, detail="仅支持 PDF 和 DOCX 格式")
+    if ext not in (".pdf", ".docx", ".png", ".jpg", ".jpeg", ".webp", ".gif"):
+        raise HTTPException(
+            status_code=400,
+            detail="仅支持 PDF、DOCX 和图片格式（PNG/JPG/WEBP/GIF）",
+        )
 
     file_b64 = base64.b64encode(file_bytes).decode("utf-8")
     task = parse_resume_file_task.delay(
@@ -571,16 +596,19 @@ async def upload_resume(
     fuzzy: bool | None = Query(
         None, description="是否启用模糊识别（应届生友好模式）；不传则自动判定"
     ),
+    db: Session = Depends(get_db),
 ) -> ApiResponse:
-    """上传简历并解析为结构化信息。"""
+    """上传简历并解析为结构化信息，同时保存到数据库。"""
     file_bytes = await file.read()
+    filename = file.filename or ""
+    file_size = len(file_bytes)
+    file_type = os.path.splitext(filename)[1].lower().lstrip(".")
 
     # 限制上传文件大小不超过 10MB
-    if len(file_bytes) > MAX_UPLOAD_SIZE:
+    if file_size > MAX_UPLOAD_SIZE:
         raise HTTPException(status_code=413, detail="文件大小超过 10MB 限制")
 
     service = ResumeService()
-    filename = file.filename or ""
     ext = os.path.splitext(filename)[1].lower()
 
     try:
@@ -588,8 +616,10 @@ async def upload_resume(
             raw_text = service.extract_text_from_pdf(file_bytes)
         elif ext == ".docx":
             raw_text = service.extract_text_from_docx(file_bytes)
+        elif ext in (".png", ".jpg", ".jpeg", ".webp", ".gif"):
+            raw_text = service.extract_text_from_image(file_bytes, filename)
         else:
-            raise ValueError("仅支持 PDF 和 DOCX 格式")
+            raise ValueError("仅支持 PDF、DOCX 和图片格式（PNG/JPG/WEBP/GIF）")
 
         actual_fuzzy = fuzzy if fuzzy is not None else should_use_fuzzy_parsing(raw_text, "resume")
         result = service.parse_resume_text(
@@ -602,13 +632,166 @@ async def upload_resume(
 
             detector = ObstacleDetector()
             result["obstacles"] = detector.detect_from_resume(result)
+
+        # 持久化简历记录
+        resume_create = ResumeCreate(
+            name=result.get("name", ""),
+            phone=result.get("basic_info", {}).get("phone", ""),
+            email=result.get("basic_info", {}).get("email", ""),
+            file_name=filename,
+            file_size=file_size,
+            basic_info=result.get("basic_info", {}),
+            education=result.get("education", []),
+            work_experience=result.get("work_experience", []),
+            project_experience=result.get("project_experience", []),
+            competition_experience=result.get("competition_experience", []),
+            awards=result.get("awards", []),
+            certifications=result.get("certifications", []),
+            language_skills=result.get("language_skills", []),
+            self_evaluation=result.get("self_evaluation", ""),
+            job_intention=result.get("job_intention", {}),
+            publications=result.get("publications", []),
+            portfolio=result.get("portfolio", []),
+            skills=result.get("skills", []),
+            raw_text=raw_text,
+            experience_level=result.get("experience_level", ""),
+            education_level=result.get("education_level", ""),
+            fuzzy=actual_fuzzy,
+            obstacles=result.get("obstacles"),
+        )
+        db_resume = create_resume(db, resume_create)
+        result["id"] = db_resume.id
+
+        # 记录上传日志
+        create_upload_log(
+            db,
+            action="upload",
+            entity_type="resume",
+            entity_id=db_resume.id,
+            file_name=filename,
+            file_size=file_size,
+            file_type=file_type,
+            status="success",
+            message="简历上传并解析成功",
+        )
+        logger.info(
+            "简历上传并保存: id=%s, file=%s, size=%s", db_resume.id, filename, file_size
+        )
     except ValueError as exc:
+        create_upload_log(
+            db,
+            action="upload",
+            entity_type="resume",
+            file_name=filename,
+            file_size=file_size,
+            file_type=file_type,
+            status="failed",
+            message=str(exc),
+        )
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         logger.exception("简历解析失败")
+        create_upload_log(
+            db,
+            action="upload",
+            entity_type="resume",
+            file_name=filename,
+            file_size=file_size,
+            file_type=file_type,
+            status="failed",
+            message=f"简历解析失败: {exc}",
+        )
         raise HTTPException(status_code=500, detail=f"简历解析失败: {exc}") from exc
 
     return _success(ResumeUploadOut.model_validate(result).model_dump())
+
+
+@api_router.get("/resumes", response_model=ApiResponse)
+def get_resumes(
+    params: ResumeListParams = Depends(),
+    db: Session = Depends(get_db),
+) -> ApiResponse:
+    """分页查询简历记录，支持关键词、学历、经验级别、模糊解析等筛选。"""
+    items, total = list_resumes(db, params)
+    return _success(
+        ResumeListOut(
+            total=total,
+            page=params.page,
+            size=params.size,
+            items=[ResumeOut.model_validate(item) for item in items],
+        ).model_dump()
+    )
+
+
+@api_router.get("/resumes/{resume_id}", response_model=ApiResponse)
+def get_resume_by_id(
+    resume_id: int,
+    db: Session = Depends(get_db),
+) -> ApiResponse:
+    """获取单条简历记录详情。"""
+    db_resume = get_resume(db, resume_id)
+    if not db_resume:
+        raise HTTPException(status_code=404, detail="简历记录不存在")
+    return _success(ResumeOut.model_validate(db_resume).model_dump())
+
+
+@api_router.put("/resumes/{resume_id}", response_model=ApiResponse)
+def update_resume_by_id(
+    resume_id: int,
+    payload: ResumeUpdate,
+    db: Session = Depends(get_db),
+) -> ApiResponse:
+    """更新简历记录。"""
+    db_resume = update_resume(db, resume_id, payload)
+    if not db_resume:
+        raise HTTPException(status_code=404, detail="简历记录不存在")
+
+    create_upload_log(
+        db,
+        action="update",
+        entity_type="resume",
+        entity_id=resume_id,
+        status="success",
+        message="简历记录更新成功",
+    )
+    return _success(ResumeOut.model_validate(db_resume).model_dump())
+
+
+@api_router.delete("/resumes/{resume_id}", response_model=ApiResponse)
+def delete_resume_by_id(
+    resume_id: int,
+    db: Session = Depends(get_db),
+) -> ApiResponse:
+    """删除（软删除）简历记录。"""
+    if not delete_resume(db, resume_id):
+        raise HTTPException(status_code=404, detail="简历记录不存在")
+
+    create_upload_log(
+        db,
+        action="delete",
+        entity_type="resume",
+        entity_id=resume_id,
+        status="success",
+        message="简历记录删除成功",
+    )
+    return _success({"id": resume_id})
+
+
+@api_router.get("/upload-logs", response_model=ApiResponse)
+def get_upload_logs(
+    params: UploadLogListParams = Depends(),
+    db: Session = Depends(get_db),
+) -> ApiResponse:
+    """查询上传/操作日志，支持动作、实体类型、状态、文件名、时间范围筛选。"""
+    items, total = list_upload_logs(db, params)
+    return _success(
+        UploadLogListOut(
+            total=total,
+            page=params.page,
+            size=params.size,
+            items=[UploadLogOut.model_validate(item) for item in items],
+        ).model_dump()
+    )
 
 
 @api_router.post("/resumes/fuzzy-parse", response_model=ApiResponse)
@@ -1225,6 +1408,102 @@ def get_care_dashboard(
     from app.services.care_service import get_care_dashboard as _get_care_dashboard
     result = _get_care_dashboard(db=db, profile_id=profile_id)
     return _success(result)
+
+
+# ---------------------------------------------------------------------------
+# Application Form Autofill
+# ---------------------------------------------------------------------------
+@api_router.post("/applications/form-match", response_model=ApiResponse)
+def match_application_form_fields(payload: FormFieldMatchRequest) -> ApiResponse:
+    """智能匹配网申表单字段与简历数据。"""
+    service = ApplicationService()
+    try:
+        result = service.match_form_fields(
+            fields=payload.fields,
+            profile=payload.profile,
+            jd_text=payload.jd_text,
+        )
+    except Exception as exc:
+        logger.exception("表单字段匹配失败")
+        raise HTTPException(status_code=500, detail=f"表单字段匹配失败: {exc}") from exc
+    return _success(FormFieldMatchResponse.model_validate(result).model_dump())
+
+
+@api_router.post("/applications/optimize-for-jd", response_model=ApiResponse)
+def optimize_resume_for_application_jd(
+    payload: JDOptimizeForApplicationRequest,
+) -> ApiResponse:
+    """根据岗位 JD 优化简历内容，用于网申场景。"""
+    service = ApplicationService()
+    try:
+        result = service.optimize_resume_for_jd(
+            resume_data=payload.resume_data,
+            jd_text=payload.jd_text,
+            field_order=payload.field_order,
+        )
+    except Exception as exc:
+        logger.exception("JD 简历优化失败")
+        raise HTTPException(status_code=500, detail=f"JD 简历优化失败: {exc}") from exc
+    return _success(ResumeOptimizeOut.model_validate(result).model_dump())
+
+
+@api_router.post("/applications/parse-jd", response_model=ApiResponse)
+async def parse_jd_for_application(
+    file: UploadFile | None = File(None),
+    jd_text: str | None = Form(None),
+) -> ApiResponse:
+    """上传 JD 图片/文件或文本，解析用于网申场景。"""
+    service = ApplicationService()
+    file_bytes = None
+    filename = ""
+    if file is not None:
+        file_bytes = await file.read()
+        filename = file.filename or ""
+        if len(file_bytes) > MAX_UPLOAD_SIZE:
+            raise HTTPException(status_code=413, detail="文件大小超过 10MB 限制")
+
+    try:
+        result = service.parse_jd_for_application(file_bytes, filename, jd_text)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("JD 解析失败")
+        raise HTTPException(status_code=500, detail=f"JD 解析失败: {exc}") from exc
+
+    return _success(JDParseOut.model_validate(result).model_dump())
+
+
+@api_router.post("/applications/advice", response_model=ApiResponse)
+def get_application_advice(payload: ApplicationAdviceRequest) -> ApiResponse:
+    """联网搜索网申经验、面试流程与投递建议。"""
+    service = ApplicationService()
+    try:
+        result = service.get_application_advice(
+            company=payload.company,
+            position=payload.position,
+            scene=payload.scene,
+        )
+    except Exception as exc:
+        logger.exception("求职建议搜索失败")
+        raise HTTPException(status_code=500, detail=f"求职建议搜索失败: {exc}") from exc
+    return _success(result)
+
+
+@api_router.get("/profiles/active/resume", response_model=ApiResponse)
+def get_active_profile_resume(db: Session = Depends(get_db)) -> ApiResponse:
+    """获取当前活跃画像的完整简历格式数据（供扩展网申使用）。"""
+    profile = (
+        db.query(UserSkillProfile)
+        .filter(UserSkillProfile.is_active.is_(True))
+        .first()
+    )
+    if profile is None:
+        raise HTTPException(status_code=404, detail="当前未设置活跃画像")
+
+    resume_format = profile_to_resume_format(
+        UserSkillProfileOut.model_validate(profile).model_dump()
+    )
+    return _success(resume_format)
 
 
 # ---------------------------------------------------------------------------

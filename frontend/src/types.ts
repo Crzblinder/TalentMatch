@@ -255,6 +255,13 @@ export interface ResumeBasicInfo {
   id_card_no: string
   hukou: string
   jiguan: string
+  // 大疆网申字段扩展
+  highest_education: string
+  recruitment_source: string
+  other_intended_position: string
+  accept_city_adjustment: string
+  current_country: string
+  current_location: string
 }
 
 export interface ResumeEducation {
@@ -264,6 +271,10 @@ export interface ResumeEducation {
   start_date: string
   end_date: string
   description: string
+  // 大疆网申字段扩展
+  department: string
+  ranking: string
+  has_lab_experience: string
 }
 
 export interface ResumeWorkExperience {
@@ -289,6 +300,23 @@ export interface ResumeJobIntention {
   expected_industry: string
 }
 
+export interface ResumeCompetitionExperience {
+  start_date: string
+  end_date: string
+  competition_name: string
+  other_competition_name: string
+  description: string
+}
+
+export interface ResumePublication {
+  title: string
+}
+
+export interface ResumePortfolio {
+  file_url: string
+  link_url: string
+}
+
 export interface ResumeUploadOut {
   name: string
   skills: string[]
@@ -299,11 +327,15 @@ export interface ResumeUploadOut {
   education: ResumeEducation[]
   work_experience: ResumeWorkExperience[]
   project_experience: ResumeProjectExperience[]
+  competition_experience: ResumeCompetitionExperience[]
   awards: string[]
   certifications: string[]
   language_skills: string[]
   self_evaluation: string
   job_intention: ResumeJobIntention
+  publications: ResumePublication[]
+  portfolio: ResumePortfolio[]
+  fuzzy?: boolean
   obstacles?: ObstacleAnalysis
 }
 

@@ -284,13 +284,26 @@ class ResumeService:
         paragraphs = [p.text for p in document.paragraphs if p.text]
         return "\n".join(paragraphs).strip()
 
+    def extract_text_from_image(self, file_bytes: bytes, filename: str) -> str:
+        """从图片中提取文本（简历照片/截图）。
+
+        优先使用本地 OCR，未配置 LLM 时也能工作。
+        """
+        from app.utils.ocr import extract_text_from_image as local_ocr_extract
+
+        ext = os.path.splitext(filename)[1].lower().lstrip(".")
+        logger.info("简历图片使用本地 OCR 解析: %s", filename)
+        return local_ocr_extract(file_bytes, ext)
+
     def _extract_text(self, file_bytes: bytes, filename: str) -> str:
-        """根据文件名扩展名选择 PDF 或 DOCX 文本提取。"""
+        """根据文件名扩展名选择 PDF、DOCX 或图片文本提取。"""
         ext = os.path.splitext(filename)[1].lower()
         if ext == ".pdf":
             return self.extract_text_from_pdf(file_bytes)
         if ext == ".docx":
             return self.extract_text_from_docx(file_bytes)
+        if ext in (".png", ".jpg", ".jpeg", ".webp", ".gif"):
+            return self.extract_text_from_image(file_bytes, filename)
         raise ValueError(f"不支持的文件格式: {ext}")
 
     def parse_resume(
@@ -312,12 +325,10 @@ class ResumeService:
         # 获取文件扩展名并统一小写
         ext = os.path.splitext(filename)[1].lower()
 
-        if ext == ".pdf":
-            raw_text = self.extract_text_from_pdf(file_bytes)
-        elif ext == ".docx":
-            raw_text = self.extract_text_from_docx(file_bytes)
+        if ext in (".pdf", ".docx", ".png", ".jpg", ".jpeg", ".webp", ".gif"):
+            raw_text = self._extract_text(file_bytes, filename)
         else:
-            raise ValueError("仅支持 PDF 和 DOCX 格式")
+            raise ValueError("仅支持 PDF、DOCX 和图片格式（PNG/JPG/WEBP/GIF）")
 
         return self.parse_resume_text(
             raw_text,
@@ -363,11 +374,14 @@ class ResumeService:
             "education": parsed.get("education") or [],
             "work_experience": parsed.get("work_experience") or [],
             "project_experience": parsed.get("project_experience") or [],
+            "competition_experience": parsed.get("competition_experience") or [],
             "awards": parsed.get("awards") or [],
             "certifications": parsed.get("certifications") or [],
             "language_skills": parsed.get("language_skills") or [],
             "self_evaluation": parsed.get("self_evaluation", ""),
             "job_intention": job_intention,
+            "publications": parsed.get("publications") or [],
+            "portfolio": parsed.get("portfolio") or [],
         }
 
         if settings.enable_resume_masking:
