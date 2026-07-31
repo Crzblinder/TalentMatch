@@ -1,84 +1,88 @@
+# Pinned dependency set — captured from the validated backend/.venv (Python 3.14).
+# Exact pins prevent `>=` drift on fresh CI installs (Python 3.11), which previously
+# broke the backend `Test` step. These versions are mutually consistent and all publish
+# cp311 wheels, so installs on CI remain reproducible.
+
 # Web framework
-fastapi>=0.111.0
-uvicorn[standard]>=0.30.0
-python-multipart>=0.0.9
+fastapi==0.139.2
+uvicorn[standard]==0.51.0
+python-multipart==0.0.32
 
 # Database
-sqlalchemy>=2.0.30
-pymysql>=1.1.1
-cryptography>=42.0.7
-alembic>=1.13.1
+sqlalchemy==2.0.51
+pymysql==1.2.0
+cryptography==49.0.0
+alembic==1.18.5
 
 # Vector / RAG
-chromadb>=0.5.0
-qdrant-client>=1.10.0
-sentence-transformers>=3.0.0
-transformers>=4.41.0
-torch>=2.3.0
-numpy>=1.26.0
+chromadb==1.5.9
+qdrant-client==1.18.0
+sentence-transformers==5.6.0
+transformers==5.14.1
+torch==2.13.0
+numpy==2.5.1
 
 # LLM
-openai>=1.30.0
-httpx>=0.27.0
-langchain-core>=0.3.0
-langchain-openai>=0.3.0
-langchain-ollama>=0.3.0
-langchain>=0.3.0
-langgraph>=0.2.0
+openai==2.46.0
+httpx==0.28.1
+langchain-core==1.4.9
+langchain-openai==1.3.5
+langchain-ollama==1.1.0
+langchain==1.3.14
+langgraph==1.2.9
 
 # Data generation / processing
-networkx>=3.3
-pandas>=2.2.0
-scikit-learn>=1.5.0
-beautifulsoup4>=4.12.0
-feedparser>=6.0.0
+networkx==3.6.1
+pandas==3.0.3
+scikit-learn==1.9.0
+beautifulsoup4==4.15.0
+feedparser==6.0.12
 
 # Testing
-pytest>=8.2.0
-pytest-asyncio>=0.23.7
-pytest-mock>=3.14.0
-playwright>=1.44.0
+pytest==9.1.1
+pytest-asyncio==1.4.0
+pytest-mock==3.15.1
+playwright==1.61.0
 
 # Lint / format
-ruff>=0.4.5
-mypy>=1.10.0
+ruff==0.15.22
+mypy==2.3.0
 
 # Document parsing
-python-docx>=1.1.0
-PyPDF2>=3.0.0
+python-docx==1.2.0
+PyPDF2==3.0.1
 
 # Local OCR (Chinese/English, no external binary dependencies)
-rapidocr-onnxruntime>=1.2.0
+rapidocr-onnxruntime==1.2.3
 
 # PDF generation
-reportlab>=4.2.0
+reportlab==5.0.0
 
 # Scheduler
-apscheduler>=3.10.0
+apscheduler==3.11.3
 
 # Async task queue & cache
-celery[redis]>=5.4.0
-redis>=5.0.0
+celery[redis]==5.6.3
+redis==6.4.0
 
 # Observability
-prometheus-client>=0.20.0
-structlog>=24.1.0
+prometheus-client==0.25.0
+structlog==26.1.0
 
 # Web search
 # DuckDuckGo 免费搜索（无需 API Key）
-duckduckgo-search>=6.0.0
+duckduckgo-search==8.1.1
 # Tavily 提供更稳定的结构化搜索（可选，需配置 TAVILY_API_KEY）
 # tavily-python>=0.5.0
 
 # HTTP client used by alert service, load test and several utilities
-requests>=2.31.0
+requests==2.34.2
 
 # MCP Server
-mcp>=1.0.0
+mcp==1.28.1
 
 # Utilities
-pydantic>=2.7.1
-pydantic-settings>=2.2.1
-python-dotenv>=1.0.1
-tenacity>=8.3.0
-structlog>=24.1.0
+pydantic==2.13.4
+pydantic-settings==2.14.2
+python-dotenv==1.0.1
+tenacity==9.1.4
